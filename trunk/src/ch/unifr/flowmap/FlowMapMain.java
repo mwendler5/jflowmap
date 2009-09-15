@@ -12,7 +12,6 @@ import prefuse.data.io.DataIOException;
 import prefuse.data.io.GraphMLReader;
 import ch.unifr.flowmap.ui.FlowMapCanvas;
 import java.awt.BorderLayout;
-import javax.swing.BoxLayout;
 
 /**
  * @author Ilya Boyandin
