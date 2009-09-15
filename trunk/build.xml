@@ -1,0 +1,63 @@
+<project name="JFlowMap" basedir="." default="build">
+
+	<property name="path.src" value="src"/>
+	<property name="path.classes" value="bin"/>
+	<property name="path.lib" value="lib"/>
+	<property name="path.build" value="build"/>
+
+	<target name="build" depends="mkdirs, compile, one-big-jar" />
+
+	<path id="master-classpath">
+		<fileset dir="${path.lib}">
+			<include name="*.jar"/>
+		</fileset>
+		<pathelement path="${path.classes}"/>
+	</path>
+
+	<target name="mkdirs">
+		<mkdir dir="${path.classes}"/>
+		<mkdir dir="${path.build}"/>
+	</target>
+
+	<target name="compile">
+		<javac destdir="${path.classes}" failonerror="true" debug="true">
+			<src path="${path.src}"/>
+			<classpath refid="master-classpath"/>
+		</javac>
+	</target>
+
+	<target name="clean">
+		<delete includeEmptyDirs="true">
+			<fileset dir="${path.classes}">
+				<include name="**/*.class"/>
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="one-big-jar">
+		<copy file="log4j-prod.properties" tofile="${path.build}/log4j.properties" overwrite="true"/>
+		<jar basedir="." jarfile="${path.build}/JFlowMap.jar">
+			<manifest>
+				<attribute name="Main-Class" value="ch.unifr.flowmap.FlowMapMain" />
+			</manifest>
+			<exclude name="**/*" />
+			<fileset dir="${path.classes}">
+				<include name="**/*.class"/>
+				<include name="**/res/*.*"/>
+			</fileset>
+			<fileset dir="${path.build}">
+				<include name="log4j.properties"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="license.txt"/>
+				<include name="data/*.*"/>
+			</fileset>
+			<zipgroupfileset dir="${path.lib}">
+				<include name="**/*.jar"/>
+			</zipgroupfileset>
+		</jar>
+		<delete file="${path.build}/log4j.properties" quiet="true"/>
+	</target>
+
+</project>
+
