@@ -30,14 +30,14 @@ public class VisualNode extends PPath {
     private final List<VisualEdge> outgoingEdges = new ArrayList<VisualEdge>();
     private final List<VisualEdge> incomingEdges = new ArrayList<VisualEdge>();
 
-    private final VisualGraph visualGraph;
+    private final FlowMapCanvas visualGraph;
 
 	private Node node;
 
 	private double valueX;
 	private double valueY;
     
-    public VisualNode(VisualGraph visualGraph, Node node, double x, double y, double size) {
+    public VisualNode(FlowMapCanvas visualGraph, Node node, double x, double y, double size) {
         super(new Ellipse2D.Double(x - size/2, y - size/2, size, size));
         this.valueX = x;
         this.valueY = y;
@@ -83,7 +83,7 @@ public class VisualNode extends PPath {
 		return node;
 	}
    
-    public VisualGraph getVisualGraph() {
+    public FlowMapCanvas getVisualGraph() {
 		return visualGraph;
 	}
 

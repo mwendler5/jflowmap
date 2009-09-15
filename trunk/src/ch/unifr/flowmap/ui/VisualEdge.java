@@ -34,7 +34,7 @@ public class VisualEdge extends PNode {
 
 	private final PPath startMarker;
 	private final PPath endMarker;
-	private final VisualGraph visualGraph;
+	private final FlowMapCanvas visualGraph;
 
 	private final double value;
 	private double normalizedValue;
@@ -44,7 +44,7 @@ public class VisualEdge extends PNode {
 
 	private Edge edge;
 
-    public VisualEdge(VisualGraph visualGraph, Edge edge, VisualNode sourceNode, VisualNode targetNode) {
+    public VisualEdge(FlowMapCanvas visualGraph, Edge edge, VisualNode sourceNode, VisualNode targetNode) {
     	this.edge = edge;
         this.sourceNode = sourceNode;
         this.targetNode = targetNode;
@@ -200,7 +200,7 @@ public class VisualEdge extends PNode {
     	return (VisualEdge)parent;
     }
     
-    public VisualGraph getVisualGraph() {
+    public FlowMapCanvas getVisualGraph() {
         return visualGraph;
     }
 

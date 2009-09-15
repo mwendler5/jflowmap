@@ -1,5 +1,6 @@
 package ch.unifr.flowmap;
 
+import ch.unifr.flowmap.ui.ControlPanel;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
@@ -9,7 +10,9 @@ import javax.swing.SwingUtilities;
 import prefuse.data.Graph;
 import prefuse.data.io.DataIOException;
 import prefuse.data.io.GraphMLReader;
-import ch.unifr.flowmap.ui.VisualGraph;
+import ch.unifr.flowmap.ui.FlowMapCanvas;
+import java.awt.BorderLayout;
+import javax.swing.BoxLayout;
 
 /**
  * @author Ilya Boyandin
@@ -17,9 +20,7 @@ import ch.unifr.flowmap.ui.VisualGraph;
 public class FlowMapMain extends JFrame {
 
     private static final long serialVersionUID = 1L;
-
     public static final String OS_NAME = System.getProperty("os.name");
-
     public static boolean IS_OS_MAC = getOSMatches("Mac");
 
     private static boolean getOSMatches(String osNamePrefix) {
@@ -31,8 +32,9 @@ public class FlowMapMain extends JFrame {
 
     public FlowMapMain(Graph graph, String valueAttrName, String labelAttrName) {
         setTitle("FlowMap");
-//        add(new JFlowMap());
-		add(new VisualGraph(graph, valueAttrName, labelAttrName));
+        setLayout(new BorderLayout());
+        add(new ControlPanel(), BorderLayout.NORTH);
+        add(new FlowMapCanvas(graph, valueAttrName, labelAttrName));
 //		add(new JPanel());
         setPreferredSize(new Dimension(800, 600));
         pack();
@@ -47,20 +49,20 @@ public class FlowMapMain extends JFrame {
     }
 
     public static void main(String[] args) throws DataIOException {
-    	final GraphMLReader reader = new GraphMLReader();
-        
+        final GraphMLReader reader = new GraphMLReader();
+
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 try {
 //            		new FlowMapMain(reader.readGraph("data/migrations.xml"), "value", "tooltip").setVisible(true);
-					new FlowMapMain(reader.readGraph("data/refugee-flows-2008.xml"), "refugees", "name").setVisible(true);
-				} catch (DataIOException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-            } 
+                    new FlowMapMain(reader.readGraph("data/refugee-flows-2008.xml"), "refugees", "name").setVisible(true);
+                } catch (DataIOException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+            }
         });
 
     }
-
 }

@@ -25,7 +25,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 /**
  * @author Ilya Boyandin
  */
-public class VisualGraph extends PCanvas {
+public class FlowMapCanvas extends PCanvas {
 
     private static final int DEFAULT_NODE_SIZE = 6;
 	private static final int SHORT_ANIMATION_DURATION = 500;
@@ -38,7 +38,7 @@ public class VisualGraph extends PCanvas {
 	private String labelAttr = "tooltip";
 	private PBounds nodeBounds;
 
-    public VisualGraph(Graph graph, String edgeValueAttrName, String labelAttrName) {
+    public FlowMapCanvas(Graph graph, String edgeValueAttrName, String labelAttrName) {
     	this.graph = graph;
     	this.edgeValueAttr = edgeValueAttrName;
     	this.labelAttr = labelAttrName;
@@ -205,12 +205,10 @@ public class VisualGraph extends PCanvas {
         while (it.hasNext()) {
         	Tuple tuple = (Tuple)it.next();
 			final double v = tuple.getDouble(attrName);
-			if (v >= 0) {
-	            if (v > max)
-	                max = v;
-	            if (v < min)
-	                min = v;
-			}
+            if (v > max)
+                max = v;
+            if (v < min)
+                min = v;
         }
         return new MinMax(min, max);
     }
