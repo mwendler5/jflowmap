@@ -12,6 +12,8 @@ import prefuse.data.io.DataIOException;
 import prefuse.data.io.GraphMLReader;
 import ch.unifr.flowmap.ui.FlowMapCanvas;
 import java.awt.BorderLayout;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 /**
  * @author Ilya Boyandin
@@ -32,7 +34,7 @@ public class FlowMapMain extends JFrame {
     public FlowMapMain(Graph graph, String valueAttrName, String labelAttrName) {
         setTitle("FlowMap");
         setLayout(new BorderLayout());
-        add(new ControlPanel(), BorderLayout.NORTH);
+        add(new ControlPanel(), BorderLayout.SOUTH);
         add(new FlowMapCanvas(graph, valueAttrName, labelAttrName));
 //		add(new JPanel());
         setPreferredSize(new Dimension(800, 600));
@@ -48,14 +50,13 @@ public class FlowMapMain extends JFrame {
     }
 
     public static void main(String[] args) throws DataIOException {
+        initLookAndFeel();
         final GraphMLReader reader = new GraphMLReader();
-
         SwingUtilities.invokeLater(new Runnable() {
-
             public void run() {
                 try {
-//            		new FlowMapMain(reader.readGraph("data/migrations.xml"), "value", "tooltip").setVisible(true);
-                    new FlowMapMain(reader.readGraph("data/refugee-flows-2008.xml"), "refugees", "name").setVisible(true);
+                    new FlowMapMain(reader.readGraph("data/migrations.xml"), "value", "tooltip").setVisible(true);
+//                  new FlowMapMain(reader.readGraph("data/refugee-flows-2008.xml"), "refugees", "name").setVisible(true);
                 } catch (DataIOException e) {
                     e.printStackTrace();
                     System.exit(1);
@@ -63,5 +64,25 @@ public class FlowMapMain extends JFrame {
             }
         });
 
+    }
+
+    static class DatasetSpec {
+        private String filename;
+        private String valueAttrName;
+        private String labelAttrName;
+    }
+
+    private static void initLookAndFeel() {
+        try {
+//            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

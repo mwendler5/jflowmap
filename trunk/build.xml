@@ -1,7 +1,7 @@
 <project name="JFlowMap" basedir="." default="build">
 
 	<property name="path.src" value="src"/>
-	<property name="path.classes" value="bin"/>
+	<property name="path.classes" value="build/classes"/>
 	<property name="path.lib" value="lib"/>
 	<property name="path.build" value="build"/>
 
@@ -54,6 +54,9 @@
 			</fileset>
 			<zipgroupfileset dir="${path.lib}">
 				<include name="**/*.jar"/>
+				<exclude name="CopyLibs/*.jar"/>
+				<exclude name="junit/*.jar"/>
+				<exclude name="junit_4/*.jar"/>
 			</zipgroupfileset>
 		</jar>
 		<delete file="${path.build}/log4j.properties" quiet="true"/>
