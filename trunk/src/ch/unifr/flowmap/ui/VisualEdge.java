@@ -166,10 +166,14 @@ public class VisualEdge extends PNode {
         int g = (int) Math.round(normalizedValue * baseColor.getGreen());
         int b = (int) Math.round(normalizedValue * baseColor.getBlue());
         int alpha;
-        if (forMarker) {
-            alpha = canvas.getEdgeMarkerAlpha();
+        if (baseColor.getAlpha() == 255) {
+            if (forMarker) {
+                alpha = canvas.getEdgeMarkerAlpha();
+            } else {
+                alpha = canvas.getEdgeAlpha();
+            }
         } else {
-            alpha = canvas.getEdgeAlpha();
+            alpha = baseColor.getAlpha();
         }
         return new Color(r, g, b,alpha);
     }
