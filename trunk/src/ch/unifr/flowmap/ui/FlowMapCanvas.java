@@ -1,10 +1,8 @@
 package ch.unifr.flowmap.ui;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Insets;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,8 +17,8 @@ import ch.unifr.flowmap.util.PiccoloUtils;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
+import java.util.List;
 
 /**
  * @author Ilya Boyandin
@@ -28,15 +26,16 @@ import edu.umd.cs.piccolo.util.PBounds;
 public class FlowMapCanvas extends PCanvas {
 
     private static final int DEFAULT_NODE_SIZE = 6;
-	private static final int SHORT_ANIMATION_DURATION = 500;
-	private static final long serialVersionUID = 1L;
-	private final PValueTooltip tooltipBox;
-	private final Graph graph;
-	private final String edgeValueAttr;
-	private String xCoordAttr = "x";
-	private String yCoordAttr = "y";
-	private String labelAttr = "tooltip";
-	private PBounds nodeBounds;
+    private static final int SHORT_ANIMATION_DURATION = 500;
+    private static final long serialVersionUID = 1L;
+    private final PValueTooltip tooltipBox;
+    private final Graph graph;
+    private final String edgeValueAttr;
+    private String xCoordAttr = "x";
+    private String yCoordAttr = "y";
+    private String labelAttr = "tooltip";
+    private PBounds nodeBounds;
+    private PNode edgeLayer;
 
     public FlowMapCanvas(Graph graph, String edgeValueAttrName, String labelAttrName) {
     	this.graph = graph;
@@ -63,37 +62,50 @@ public class FlowMapCanvas extends PCanvas {
         System.out.println("xStats: " + xStats);
         System.out.println("yStats: " + yStats);
 
-		Map<Node, VisualNode> nodesToVisuals = new HashMap<Node, VisualNode>();
+	Map<Node, VisualNode> nodesToVisuals = new HashMap<Node, VisualNode>();
         for (int i = 0; i < numNodes; i++) {
             Node node = graph.getNode(i);
-            
-			VisualNode vnode = new VisualNode(this, node,
-					node.getDouble(xCoordAttr) - xStats.min,
-					node.getDouble(yCoordAttr) - yStats.min,
-					DEFAULT_NODE_SIZE
-			);
+
+            VisualNode vnode = new VisualNode(this, node,
+                    node.getDouble(xCoordAttr) - xStats.min,
+                    node.getDouble(yCoordAttr) - yStats.min,
+                    DEFAULT_NODE_SIZE);
             nodeLayer.addChild(vnode);
             nodesToVisuals.put(node, vnode);
         }
         
         
-        PNode flowLayer = new PNode();
-        
+        edgeLayer = new PNode();
+
+        for (int i = 0; i < graph.getEdgeTable().getColumnCount(); i++) {
+            System.out.println("Field: " + graph.getEdgeTable().getColumnName(i));
+        }
+
+        Iterator<Integer> it = graph.getEdgeTable().rows();  //.rowsSortedBy(edgeValueAttrName, false);
+        while (it.hasNext()) {
+            Edge edge = graph.getEdge(it.next());
+
+            VisualNode fromNode = nodesToVisuals.get(edge.getSourceNode());
+            VisualNode toNode = nodesToVisuals.get(edge.getTargetNode());
+
+            VisualEdge ve = new VisualEdge(this, edge, fromNode, toNode);
+            edgeLayer.addChild(ve);
+        }
+
+        /*
         final int numEdges = graph.getEdgeCount();
         for (int i = 0; i < numEdges; i++) {
-        	Edge edge = graph.getEdge(i);
+            Edge edge = graph.getEdge(i);
         	
-//            double value = edge.getDouble(valueAttrName);
-//            if (value < 100) continue;
-            
             VisualNode fromNode = nodesToVisuals.get(edge.getSourceNode());
             VisualNode toNode = nodesToVisuals.get(edge.getTargetNode());
             
-			VisualEdge ve = new VisualEdge(this, edge, fromNode, toNode);
-            flowLayer.addChild(ve);
+            VisualEdge ve = new VisualEdge(this, edge, fromNode, toNode);
+            edgeLayer.addChild(ve);
         }
+         */
 
-        getLayer().addChild(flowLayer);
+        getLayer().addChild(edgeLayer);
         getLayer().addChild(nodeLayer);
         
         
@@ -143,6 +155,35 @@ public class FlowMapCanvas extends PCanvas {
 //		}
 		
 	}
+
+    private int edgeAlpha = 5;
+    private int edgeMarkerAlpha = 50;
+
+    public int getEdgeAlpha() {
+        return edgeAlpha;
+    }
+
+    public void setEdgeAlpha(int edgeAlpha) {
+        this.edgeAlpha = edgeAlpha;
+        for (PNode node : (List<PNode>)edgeLayer.getChildrenReference()) {
+            if (node instanceof VisualEdge) {
+                ((VisualEdge)node).updateEdgeColors();
+            }
+        }
+    }
+
+    public int getEdgeMarkerAlpha() {
+        return edgeMarkerAlpha;
+    }
+
+    public void setEdgeMarkerAlpha(int edgeMarkerAlpha) {
+        this.edgeMarkerAlpha = edgeMarkerAlpha;
+        for (PNode node : (List<PNode>)edgeLayer.getChildrenReference()) {
+            if (node instanceof VisualEdge) {
+                ((VisualEdge)node).updateEdgeMarkerColors();
+            }
+        }
+    }
     
     private static final Insets contentInsets = new Insets(10, 10, 10, 10);
     
@@ -168,12 +209,12 @@ public class FlowMapCanvas extends PCanvas {
     private final Map<String, MinMax> tupleStats = new HashMap<String, MinMax>();
     
     public String getEdgeValueAttr() {
-		return edgeValueAttr;
-	}
-    
+        return edgeValueAttr;
+    }
+
     public String getLabelAttr() {
-		return labelAttr;
-	}
+        return labelAttr;
+    }
     
     public MinMax getEdgeValueAttrStats(String attrName) {
     	String key = "edge-" + attrName;
@@ -217,8 +258,8 @@ public class FlowMapCanvas extends PCanvas {
     	if (component instanceof VisualNode) {
     	    VisualNode vnode = (VisualNode)component;
 //    		tooltipBox.setText(fnode.getId(), nodeData.nodeLabel(nodeIdx), "");
-			tooltipBox.setText(
-					vnode.getLabel(),
+		tooltipBox.setText(
+			vnode.getLabel(),
 			        ""
 //			        "Outgoing " + selectedFlowAttrName + ": " + graph.getOutgoingTotal(fnode.getId(), selectedFlowAttrName) + "\n" +
 //			        "Incoming " + selectedFlowAttrName + ": " + graph.getIncomingTotal(fnode.getId(), selectedFlowAttrName)

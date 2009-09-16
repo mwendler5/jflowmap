@@ -12,8 +12,8 @@ import prefuse.data.io.DataIOException;
 import prefuse.data.io.GraphMLReader;
 import ch.unifr.flowmap.ui.FlowMapCanvas;
 import java.awt.BorderLayout;
+import javax.swing.JSplitPane;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 /**
  * @author Ilya Boyandin
@@ -34,9 +34,9 @@ public class FlowMapMain extends JFrame {
     public FlowMapMain(Graph graph, String valueAttrName, String labelAttrName) {
         setTitle("FlowMap");
         setLayout(new BorderLayout());
-        add(new ControlPanel(), BorderLayout.SOUTH);
-        add(new FlowMapCanvas(graph, valueAttrName, labelAttrName));
-//		add(new JPanel());
+        FlowMapCanvas canvas = new FlowMapCanvas(graph, valueAttrName, labelAttrName);
+        add(canvas);
+        add(new ControlPanel(canvas), BorderLayout.SOUTH);
         setPreferredSize(new Dimension(800, 600));
         pack();
 
@@ -55,8 +55,8 @@ public class FlowMapMain extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new FlowMapMain(reader.readGraph("data/migrations.xml"), "value", "tooltip").setVisible(true);
-//                  new FlowMapMain(reader.readGraph("data/refugee-flows-2008.xml"), "refugees", "name").setVisible(true);
+//                    new FlowMapMain(reader.readGraph("data/migrations.xml"), "value", "tooltip").setVisible(true);
+                  new FlowMapMain(reader.readGraph("data/refugee-flows-2008.xml"), "refugees", "name").setVisible(true);
                 } catch (DataIOException e) {
                     e.printStackTrace();
                     System.exit(1);
