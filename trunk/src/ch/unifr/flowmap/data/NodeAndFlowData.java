@@ -64,7 +64,7 @@ public class NodeAndFlowData implements INodeAndFlowData {
 		return nodeData;
 	}
 
-    public static MinMax getFlowStats(INodeAndFlowData data, String attrName) {
+    public static Stats getFlowStats(INodeAndFlowData data, String attrName) {
     	IFlowData flowData = data.getFlowData();
         final int size = flowData.numFlows();
 
@@ -78,7 +78,7 @@ public class NodeAndFlowData implements INodeAndFlowData {
             if (v < min)
                 min = v;
         }
-        return new MinMax(min, max);
+        return new Stats(min, max);
     }
 
 	@Override

@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.awt.geom.Line2D;
 
 import prefuse.data.Edge;
-import ch.unifr.flowmap.data.MinMax;
+import ch.unifr.flowmap.data.Stats;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -23,7 +23,6 @@ public class VisualEdge extends PNode {
     private static final Color START_MARKER_STROKE_PAINT = new Color(255, 0, 0);
     private static final Color END_MARKER_STROKE_PAINT = new Color(0, 255, 0);
 
-//    private static final Color START_HIGHLIGHTED_MARKER_STROKE_PAINT = new Color(138, 238, 0, 110);
     private static final Color STROKE_HIGHLIGHTED_PAINT = new Color(255, 0, 0, 200);
     private static final Color STROKE_INVERSE_HIGHLIGHTED_PAINT = new Color(0, 255, 0, 200); // new Color(255, 0, 0, 250);
     private static final double START_MARKER_MAX_SIZE = 6;
@@ -35,16 +34,15 @@ public class VisualEdge extends PNode {
     private final FlowMapCanvas canvas;
     private final double value;
 
-    private double normalizedValue;
     private VisualNode sourceNode;
     private VisualNode targetNode;
     private Edge edge;
 
-    public VisualEdge(FlowMapCanvas visualGraph, Edge edge, VisualNode sourceNode, VisualNode targetNode) {
+    public VisualEdge(FlowMapCanvas canvas, Edge edge, VisualNode sourceNode, VisualNode targetNode) {
         this.edge = edge;
         this.sourceNode = sourceNode;
         this.targetNode = targetNode;
-        this.canvas = visualGraph;
+        this.canvas = canvas;
 
         targetNode.addIncomingEdge(this);
         sourceNode.addOutgoingEdge(this);
@@ -54,23 +52,7 @@ public class VisualEdge extends PNode {
         final double x2 = targetNode.getValueX();
         final double y2 = targetNode.getValueY();
 
-        MinMax minMax = visualGraph.getEdgeValueAttrStats(visualGraph.getEdgeValueAttr());
-
-        value = edge.getDouble(visualGraph.getEdgeValueAttr());
-//    	normalizedValue = (Math.log(value) - Math.log(minMax.min)) / (Math.log(minMax.max) - Math.log(minMax.min)); 
-//    	normalizedValue = (value - minMax.min) / (minMax.max - minMax.min);
-//    	normalizedValue = Math.sqrt((value - minMax.min) / (minMax.max - minMax.min)); 
-//    	normalizedValue = Math.log( 1 + (value - minMax.min) / (minMax.max - minMax.min)); 
-
-//    	normalizedValue = 4 * (Math.log(value) - minMax.minLog) / (minMax.maxLog - minMax.minLog);
-        normalizedValue = 2 * (Math.log(value) - minMax.minLog) / (minMax.maxLog - minMax.minLog);
-
-        if (normalizedValue < 0) {
-            normalizedValue = 0.0;
-        }
-        if (normalizedValue > 1.0) {
-            normalizedValue = 1.0;
-        }
+        value = edge.getDouble(canvas.getEdgeValueAttr());
 
 
 //    	BasicStroke stroke = new BasicStroke((int)Math.round(value));
@@ -125,6 +107,39 @@ public class VisualEdge extends PNode {
         addInputEventListener(flowListener);
     }
 
+    public double getNormalizedValue() {
+        double nv;
+        final double minLog;
+        final double maxLog;
+        if (canvas.getAutoAdjustEdgeColorScale()) {
+            maxLog = Math.log(canvas.getValueFilterMax());
+            minLog = Math.log(canvas.getValueFilterMin());
+        } else {
+            Stats stats = canvas.getEdgeValueAttrStats();
+            minLog = stats.minLog;
+            maxLog = stats.maxLog;
+        }
+//    	normalizedValue = (Math.log(value) - Math.log(minMax.min)) / (Math.log(minMax.max) - Math.log(minMax.min));
+//    	normalizedValue = (value - minMax.min) / (minMax.max - minMax.min);
+//    	normalizedValue = Math.sqrt((value - minMax.min) / (minMax.max - minMax.min));
+//    	normalizedValue = Math.log( 1 + (value - minMax.min) / (minMax.max - minMax.min));
+
+//    	normalizedValue = 4 * (Math.log(value) - minMax.minLog) / (minMax.maxLog - minMax.minLog);
+
+//        nv = 2 * (Math.log(value) - minMax.minLog) / (minMax.maxLog - minMax.minLog);
+        nv = 2 * (Math.log(value) - minLog) / (maxLog - minLog);
+
+        if (nv < 0) {
+            nv = 0.0;
+        }
+        if (nv > 1.0) {
+            nv = 1.0;
+        }
+
+        return nv;
+    }
+
+
     public void updateEdgeColors() {
         line.setStrokePaint(getValueColor(STROKE_PAINT, false));
     }
@@ -162,6 +177,7 @@ public class VisualEdge extends PNode {
     }
 
     private Color getValueColor(Color baseColor, boolean forMarker) {
+        final double normalizedValue = getNormalizedValue();
         int r = (int) Math.round(normalizedValue * baseColor.getRed());
         int g = (int) Math.round(normalizedValue * baseColor.getGreen());
         int b = (int) Math.round(normalizedValue * baseColor.getBlue());
@@ -187,21 +203,24 @@ public class VisualEdge extends PNode {
 
         @Override
         public void mouseEntered(PInputEvent event) {
-            VisualEdge node = getParentEdge(event.getPickedNode());
-            if (node != null) {
-                node.setHighlighted(true);
+            VisualEdge edge = getParentEdge(event.getPickedNode());
+            if (edge != null) {
+                edge.setHighlighted(true, false);
             }
-            node.getVisualGraph().showTooltip(node, event.getPosition());
+            edge.getVisualGraph().showTooltip(edge, event.getPosition());
 //            node.moveToFront();
         }
 
         @Override
         public void mouseExited(PInputEvent event) {
-            VisualEdge node = getParentEdge(event.getPickedNode());
-            if (node != null) {
-                node.setHighlighted(false);
+            VisualEdge edge = getParentEdge(event.getPickedNode());
+            if (!edge.getVisible()) {
+                return;
             }
-            node.getVisualGraph().hideTooltip();
+            if (edge != null) {
+                edge.setHighlighted(false, false);
+            }
+            edge.getVisualGraph().hideTooltip();
         }
     };
 
@@ -217,9 +236,10 @@ public class VisualEdge extends PNode {
         return canvas;
     }
 
-    public void setHighlighted(boolean value) {
+    public void setHighlighted(boolean value, boolean inverse) {
         if (value) {
-            line.setStrokePaint(getValueColor(STROKE_HIGHLIGHTED_PAINT, false));
+            line.setStrokePaint(getValueColor(
+                    inverse ? STROKE_INVERSE_HIGHLIGHTED_PAINT : STROKE_HIGHLIGHTED_PAINT, false));
 //        	startMarker.setStrokePaint(START_HIGHLIGHTED_MARKER_STROKE_PAINT);
 //        	moveToFront();
         } else {
@@ -230,26 +250,4 @@ public class VisualEdge extends PNode {
         getTargetNode().setVisible(value);
     }
 
-    public void setInverseHighlighted(boolean value) {
-        if (value) {
-            line.setStrokePaint(getValueColor(STROKE_INVERSE_HIGHLIGHTED_PAINT, false));
-//        	startMarker.setStrokePaint(START_HIGHLIGHTED_MARKER_STROKE_PAINT);
-//        	moveToFront();
-        } else {
-            line.setStrokePaint(getValueColor(STROKE_PAINT, false));
-//        	startMarker.setStrokePaint(START_MARKER_STROKE_PAINT);
-        }
-        getSourceNode().setVisible(value);
-        getTargetNode().setVisible(value);
-    }
-//    @Override
-//    protected void STROKE_PAINT(PPaintContext paintContext) {
-//        Graphics2D g2 = paintContext.getGraphics();
-//        
-//        if (stroke != null && strokePaint != null) {
-//            g2.setPaint(strokePaint);
-//            g2.setStroke(stroke);
-//            g2.draw(shape);
-//        }       
-//    }
 }

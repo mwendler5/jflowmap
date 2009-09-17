@@ -57,6 +57,7 @@
 				<exclude name="CopyLibs/*.jar"/>
 				<exclude name="junit/*.jar"/>
 				<exclude name="junit_4/*.jar"/>
+				<exclude name="beans-binding/*.jar"/>
 			</zipgroupfileset>
 		</jar>
 		<delete file="${path.build}/log4j.properties" quiet="true"/>

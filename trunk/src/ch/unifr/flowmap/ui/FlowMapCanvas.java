@@ -12,12 +12,13 @@ import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Tuple;
 import prefuse.data.tuple.TupleSet;
-import ch.unifr.flowmap.data.MinMax;
+import ch.unifr.flowmap.data.Stats;
 import ch.unifr.flowmap.util.PiccoloUtils;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -35,13 +36,30 @@ public class FlowMapCanvas extends PCanvas {
     private String yCoordAttr = "y";
     private String labelAttr = "tooltip";
     private PBounds nodeBounds;
-    private PNode edgeLayer;
+    
+    private final PNode edgeLayer;
+    private final PNode nodeLayer;
+
+    private int edgeAlpha = 5;
+    private int edgeMarkerAlpha = 50;
+    private double valueFilterMin = Double.MIN_VALUE;
+    private double valueFilterMax = Double.MAX_VALUE;
+
+    private Map<Node, VisualNode> nodesToVisuals;
+    private Map<Edge, VisualEdge> edgesToVisuals;
+    private boolean autoAdjustEdgeColorScale;
 
     public FlowMapCanvas(Graph graph, String edgeValueAttrName, String labelAttrName) {
     	this.graph = graph;
     	this.edgeValueAttr = edgeValueAttrName;
     	this.labelAttr = labelAttrName;
-    	
+
+        Stats minMax = getEdgeValueAttrStats();
+
+        valueFilterMin = minMax.min;
+        valueFilterMax = minMax.max;
+
+
 //        setBackground(new Color(47, 89, 134));
         setBackground(Color.BLACK);
         
@@ -52,17 +70,18 @@ public class FlowMapCanvas extends PCanvas {
 //        Color STROKE_PAINT = new Color(238, 238, 0, 100);
 //        Color STROKE_PAINT = new Color(255, 255, 255, 13);
 
-        PNode nodeLayer = new PNode();
+        nodeLayer = new PNode();
         
         final int numNodes = graph.getNodeCount();
 
-        MinMax xStats = getNodeAttrStats(xCoordAttr);
-        MinMax yStats = getNodeAttrStats(yCoordAttr);
-        
+        Stats xStats = getNodeAttrStats(xCoordAttr);
+        Stats yStats = getNodeAttrStats(yCoordAttr);
+
         System.out.println("xStats: " + xStats);
         System.out.println("yStats: " + yStats);
 
-	Map<Node, VisualNode> nodesToVisuals = new HashMap<Node, VisualNode>();
+	nodesToVisuals = new LinkedHashMap<Node, VisualNode>();
+
         for (int i = 0; i < numNodes; i++) {
             Node node = graph.getNode(i);
 
@@ -81,7 +100,9 @@ public class FlowMapCanvas extends PCanvas {
             System.out.println("Field: " + graph.getEdgeTable().getColumnName(i));
         }
 
-        Iterator<Integer> it = graph.getEdgeTable().rows();  //.rowsSortedBy(edgeValueAttrName, false);
+	edgesToVisuals = new LinkedHashMap<Edge, VisualEdge>();
+//        Iterator<Integer> it = graph.getEdgeTable().rows();  //.rowsSortedBy(edgeValueAttrName, false);
+        Iterator<Integer> it = graph.getEdgeTable().rowsSortedBy(edgeValueAttrName, true);
         while (it.hasNext()) {
             Edge edge = graph.getEdge(it.next());
 
@@ -90,74 +111,82 @@ public class FlowMapCanvas extends PCanvas {
 
             VisualEdge ve = new VisualEdge(this, edge, fromNode, toNode);
             edgeLayer.addChild(ve);
-        }
 
-        /*
-        final int numEdges = graph.getEdgeCount();
-        for (int i = 0; i < numEdges; i++) {
-            Edge edge = graph.getEdge(i);
-        	
-            VisualNode fromNode = nodesToVisuals.get(edge.getSourceNode());
-            VisualNode toNode = nodesToVisuals.get(edge.getTargetNode());
-            
-            VisualEdge ve = new VisualEdge(this, edge, fromNode, toNode);
-            edgeLayer.addChild(ve);
+            edgesToVisuals.put(edge, ve);
         }
-         */
 
         getLayer().addChild(edgeLayer);
         getLayer().addChild(nodeLayer);
         
-        
-//        for (PFlowNode node : nodes) {
-//            node.moveToFront();
-//            node.setVisible(false);
-//        }
-
         tooltipBox = new PValueTooltip();
         tooltipBox.setVisible(false);
         tooltipBox.setPickable(false);
         PCamera camera = getCamera();
-		camera.addChild(tooltipBox);
-        
+	camera.addChild(tooltipBox);
         
         nodeBounds = new PBounds(
-//        		-500, -250, 500, 250 
-        		0, 0, (xStats.max - xStats.min)/2, (yStats.max - yStats.min)/2
+        	0, 0, (xStats.max - xStats.min)/2, (yStats.max - yStats.min)/2
         );
-//        nodeLayer.localToGlobal(nodeBounds);
-        
-        
-//        PPath pp = new PPath(nodeBounds, new BasicStroke(2));
-//        pp.setStrokePaint(Color.red);
-//		nodeLayer.addChild(pp);
-       
-//		camera.globalToLocal(nodeBounds);
-//		camera.localToView(nodeBounds);
-//		camera.viewToLocal(nodeBounds);
-		
-//		getCamera().setViewBounds(
-//				new Rectangle2D.Double(-500, -250, 500, 250));
-		
-//		camera.setViewBounds(nodeBounds);
-//		camera.setOffset(xStats.min, yStats.min);
-//		camera.setOffset(0, 0);
-		
-//        fitInCameraView(false);
-//        camera.viewToLocal(rect);
-//        camera.globalToLocal(rect);
-//        getCamera().setViewBounds(new Rectangle2D.Double(
-//        		-2800, -2400, 2600, 2800));
-        
-		
-//		for (VisualNode vnode : nodesToVisuals.values()) {
-//			vnode.createNodeShape();
-//		}
-		
-	}
+    }
 
-    private int edgeAlpha = 5;
-    private int edgeMarkerAlpha = 50;
+    public boolean getAutoAdjustEdgeColorScale() {
+        return autoAdjustEdgeColorScale;
+    }
+
+    public void setAutoAdjustEdgeColorScale(boolean autoAdjustEdgeColorScale) {
+        this.autoAdjustEdgeColorScale = autoAdjustEdgeColorScale;
+        updateEdgeColors();
+        updateEdgeMarkerColors();
+    }
+
+    public double getValueFilterMax() {
+        return valueFilterMax;
+    }
+
+    public void setValueFilterMax(double valueFilterMax) {
+        this.valueFilterMax = valueFilterMax;
+        updateEdgeVisibility();
+        updateEdgeColors();
+        updateEdgeMarkerColors();
+    }
+
+    public double getValueFilterMin() {
+        return valueFilterMin;
+    }
+
+    public void setValueFilterMin(double valueFilterMin) {
+        this.valueFilterMin = valueFilterMin;
+        updateEdgeVisibility();
+        updateEdgeColors();
+        updateEdgeMarkerColors();
+    }
+
+    private void updateEdgeColors() {
+        for (PNode node : (List<PNode>) edgeLayer.getChildrenReference()) {
+            if (node instanceof VisualEdge) {
+                ((VisualEdge) node).updateEdgeColors();
+            }
+        }
+    }
+
+    private void updateEdgeMarkerColors() {
+        for (PNode node : (List<PNode>) edgeLayer.getChildrenReference()) {
+            if (node instanceof VisualEdge) {
+                ((VisualEdge) node).updateEdgeMarkerColors();
+            }
+        }
+    }
+
+    private void updateEdgeVisibility() {
+        for (VisualEdge ve : edgesToVisuals.values()) {
+            final double value = ve.getValue();
+            final boolean visible = valueFilterMin <= value && value <= valueFilterMax;
+            ve.setVisible(visible);
+            ve.setPickable(visible);
+            ve.setChildrenPickable(visible);
+        }
+    }
+
 
     public int getEdgeAlpha() {
         return edgeAlpha;
@@ -165,11 +194,7 @@ public class FlowMapCanvas extends PCanvas {
 
     public void setEdgeAlpha(int edgeAlpha) {
         this.edgeAlpha = edgeAlpha;
-        for (PNode node : (List<PNode>)edgeLayer.getChildrenReference()) {
-            if (node instanceof VisualEdge) {
-                ((VisualEdge)node).updateEdgeColors();
-            }
-        }
+        updateEdgeColors();
     }
 
     public int getEdgeMarkerAlpha() {
@@ -178,11 +203,7 @@ public class FlowMapCanvas extends PCanvas {
 
     public void setEdgeMarkerAlpha(int edgeMarkerAlpha) {
         this.edgeMarkerAlpha = edgeMarkerAlpha;
-        for (PNode node : (List<PNode>)edgeLayer.getChildrenReference()) {
-            if (node instanceof VisualEdge) {
-                ((VisualEdge)node).updateEdgeMarkerColors();
-            }
-        }
+        updateEdgeMarkerColors();
     }
     
     private static final Insets contentInsets = new Insets(10, 10, 10, 10);
@@ -206,7 +227,7 @@ public class FlowMapCanvas extends PCanvas {
         }
     }
 
-    private final Map<String, MinMax> tupleStats = new HashMap<String, MinMax>();
+    private final Map<String, Stats> statsCache = new HashMap<String, Stats>();
     
     public String getEdgeValueAttr() {
         return edgeValueAttr;
@@ -215,43 +236,29 @@ public class FlowMapCanvas extends PCanvas {
     public String getLabelAttr() {
         return labelAttr;
     }
-    
-    public MinMax getEdgeValueAttrStats(String attrName) {
-    	String key = "edge-" + attrName;
-		MinMax stats = tupleStats.get(key);
-    	if (stats == null) {
-    		stats = getTupleStats(graph.getEdges(), attrName);
-        	System.out.println("Attr stats for '" + attrName + "': " + stats);
-    		tupleStats.put(key, stats);
-    	}
-    	return stats;
-    }
-    
-    public MinMax getNodeAttrStats(String attrName) {
-    	String key = "node-" + attrName;
-    	MinMax stats = tupleStats.get(key);
-    	if (stats == null) {
-    		stats = getTupleStats(graph.getNodes(), attrName);
-    		tupleStats.put(key, stats);
-    	}
-		return stats;
+
+    public Stats getEdgeValueAttrStats() {
+        return getEdgeValueAttrStats(edgeValueAttr);
     }
 
-    public static MinMax getTupleStats(TupleSet tupleSet, String attrName) {
-        Iterator<?> it = tupleSet.tuples();
-
-        double max = Double.MIN_VALUE;
-        double min = Double.MAX_VALUE;
-
-        while (it.hasNext()) {
-        	Tuple tuple = (Tuple)it.next();
-			final double v = tuple.getDouble(attrName);
-            if (v > max)
-                max = v;
-            if (v < min)
-                min = v;
+    public Stats getEdgeValueAttrStats(String attrName) {
+        String key = "edge-" + attrName;
+        Stats stats = statsCache.get(key);
+        if (stats == null) {
+            stats = Stats.getTupleStats(graph.getEdges(), attrName);
+            statsCache.put(key, stats);
         }
-        return new MinMax(min, max);
+        return stats;
+    }
+
+    public Stats getNodeAttrStats(String attrName) {
+    	String key = "node-" + attrName;
+    	Stats stats = statsCache.get(key);
+    	if (stats == null) {
+            stats = Stats.getTupleStats(graph.getNodes(), attrName);
+            statsCache.put(key, stats);
+    	}
+	return stats;
     }
 
     public void showTooltip(PNode component, Point2D pos) {
@@ -300,4 +307,5 @@ public class FlowMapCanvas extends PCanvas {
     public void hideTooltip() {
         tooltipBox.setVisible(false);
     }
+
 }
