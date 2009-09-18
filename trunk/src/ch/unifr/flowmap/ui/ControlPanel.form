@@ -41,10 +41,7 @@
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
                           </Group>
-                          <Group type="102" alignment="1" attributes="0">
-                              <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="jLabel4" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -70,18 +67,17 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSlider1" alignment="0" pref="227" max="32767" attributes="1"/>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="edgeMarkerOpacitySlider" pref="177" max="32767" attributes="1"/>
-                          <Component id="edgeOpacitySlider" alignment="1" pref="177" max="32767" attributes="1"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                          <Component id="edgeMarkerOpacitySpinner" max="32767" attributes="1"/>
-                          <Component id="edgeOpacitySpinner" alignment="1" max="32767" attributes="1"/>
-                      </Group>
+                  <Component id="maxEdgeWidthSlider" pref="173" max="32767" attributes="1"/>
+                  <Component id="edgeMarkerOpacitySlider" pref="173" max="32767" attributes="1"/>
+                  <Component id="edgeOpacitySlider" alignment="1" pref="173" max="32767" attributes="1"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                      <Component id="edgeMarkerOpacitySpinner" max="32767" attributes="1"/>
+                      <Component id="edgeOpacitySpinner" alignment="1" max="32767" attributes="1"/>
                   </Group>
+                  <Component id="maxEdgeWidthSpinner" pref="44" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -119,12 +115,15 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
+                          <Group type="102" attributes="0">
                               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
                           </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="jSlider1" pref="26" max="32767" attributes="1"/>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="maxEdgeWidthSpinner" alignment="0" pref="26" max="32767" attributes="0"/>
+                                  <Component id="maxEdgeWidthSlider" alignment="1" pref="26" max="32767" attributes="1"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -211,15 +210,20 @@
         <Property name="text" type="java.lang.String" value="Filter max:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JSlider" name="jSlider1">
+    <Component class="javax.swing.JSlider" name="maxEdgeWidthSlider">
       <Properties>
-        <Property name="enabled" type="boolean" value="false"/>
+        <Property name="minimum" type="int" value="1"/>
+        <Property name="value" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="(int)flowMapCanvas.getMaxEdgeWidth()" type="code"/>
+        </Property>
       </Properties>
+      <Events>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="maxEdgeWidthSliderStateChanged"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Edge color intensity:"/>
-        <Property name="enabled" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="Maximal edge width:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel5">
@@ -313,6 +317,19 @@
       </Properties>
       <Events>
         <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="autoAdjustColorScaleChkStateChanged"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JSpinner" name="maxEdgeWidthSpinner">
+      <Properties>
+        <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
+          <SpinnerModel initial="1" maximum="100" minimum="1" numberType="java.lang.Integer" stepSize="1" type="number"/>
+        </Property>
+        <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="(int)flowMapCanvas.getMaxEdgeWidth()" type="code"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="maxEdgeWidthSpinnerStateChanged"/>
       </Events>
     </Component>
   </SubComponents>

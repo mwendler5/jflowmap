@@ -82,7 +82,7 @@ public class VisualEdge extends PNode {
         addChild(endMarker);
 
 
-        final double width = 1.0;   // TODO: fix this
+        final double width = canvas.getMaxEdgeWidth();   // TODO: update dynamically
         line = new PPath(new Line2D.Double(
                 sm_x - sin_a * width, sm_y - cos_a * width,
                 em_x + sin_a * width, em_y + cos_a * width));
@@ -100,7 +100,7 @@ public class VisualEdge extends PNode {
         double nv;
         if (canvas.getAutoAdjustEdgeColorScale()) {
             double minLog = 1.0;
-            double maxLog = Math.log(canvas.getValueFilterMin() - canvas.getValueFilterMax());
+            double maxLog = Math.log(canvas.getValueFilterMax() - canvas.getValueFilterMin());
             nv = (Math.log(value - canvas.getValueFilterMin()) - minLog) / (maxLog - minLog);
         } else {
             Stats stats = canvas.getEdgeValueAttrStats();

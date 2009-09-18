@@ -42,7 +42,7 @@ public class FlowMapCanvas extends PCanvas {
     private int edgeMarkerAlpha = 50;
     private double valueFilterMin = Double.MIN_VALUE;
     private double valueFilterMax = Double.MAX_VALUE;
-    private double maxEdgeWidth = 10.0;
+    private double maxEdgeWidth = 1.0;
 
     private Map<Node, VisualNode> nodesToVisuals;
     private Map<Edge, VisualEdge> edgesToVisuals;
