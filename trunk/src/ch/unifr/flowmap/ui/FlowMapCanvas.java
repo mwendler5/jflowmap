@@ -5,21 +5,19 @@ import java.awt.Insets;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
-import prefuse.data.Tuple;
-import prefuse.data.tuple.TupleSet;
 import ch.unifr.flowmap.data.Stats;
 import ch.unifr.flowmap.util.PiccoloUtils;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 /**
  * @author Ilya Boyandin
@@ -44,11 +42,12 @@ public class FlowMapCanvas extends PCanvas {
     private int edgeMarkerAlpha = 50;
     private double valueFilterMin = Double.MIN_VALUE;
     private double valueFilterMax = Double.MAX_VALUE;
+    private double maxEdgeWidth = 10.0;
 
     private Map<Node, VisualNode> nodesToVisuals;
     private Map<Edge, VisualEdge> edgesToVisuals;
     private boolean autoAdjustEdgeColorScale;
-
+    
     public FlowMapCanvas(Graph graph, String edgeValueAttrName, String labelAttrName) {
     	this.graph = graph;
     	this.edgeValueAttr = edgeValueAttrName;
@@ -105,14 +104,21 @@ public class FlowMapCanvas extends PCanvas {
         Iterator<Integer> it = graph.getEdgeTable().rowsSortedBy(edgeValueAttrName, true);
         while (it.hasNext()) {
             Edge edge = graph.getEdge(it.next());
-
-            VisualNode fromNode = nodesToVisuals.get(edge.getSourceNode());
-            VisualNode toNode = nodesToVisuals.get(edge.getTargetNode());
-
-            VisualEdge ve = new VisualEdge(this, edge, fromNode, toNode);
-            edgeLayer.addChild(ve);
-
-            edgesToVisuals.put(edge, ve);
+            
+            double value = edge.getDouble(edgeValueAttrName);
+            if (Double.isNaN(value)) {
+                System.out.println("Warning: Omitting NaN value for edge: " + edge +
+                        ": (" + edge.getSourceNode().getString(labelAttr) + " -> " +
+                        edge.getTargetNode().getString(labelAttr) + ")");
+            } else {
+                VisualNode fromNode = nodesToVisuals.get(edge.getSourceNode());
+                VisualNode toNode = nodesToVisuals.get(edge.getTargetNode());
+    
+                VisualEdge ve = new VisualEdge(this, edge, fromNode, toNode);
+                edgeLayer.addChild(ve);
+    
+                edgesToVisuals.put(edge, ve);
+            }
         }
 
         getLayer().addChild(edgeLayer);
@@ -127,6 +133,15 @@ public class FlowMapCanvas extends PCanvas {
         nodeBounds = new PBounds(
         	0, 0, (xStats.max - xStats.min)/2, (yStats.max - yStats.min)/2
         );
+    }
+
+    public double getMaxEdgeWidth() {
+        return maxEdgeWidth;
+    }
+    
+    public void setMaxEdgeWidth(double maxEdgeWidth) {
+        this.maxEdgeWidth = maxEdgeWidth;
+        updateEdgeWidths();
     }
 
     public boolean getAutoAdjustEdgeColorScale() {
@@ -184,6 +199,12 @@ public class FlowMapCanvas extends PCanvas {
             ve.setVisible(visible);
             ve.setPickable(visible);
             ve.setChildrenPickable(visible);
+        }
+    }
+    
+    private void updateEdgeWidths() {
+        for (VisualEdge ve : edgesToVisuals.values()) {
+            ve.updateEdgeWidth();
         }
     }
 

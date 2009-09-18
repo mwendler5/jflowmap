@@ -102,12 +102,12 @@ public class VisualNode extends PPath {
                 fnode.setVisible(true);
                 for (VisualEdge flow : fnode.outgoingEdges) {
                     if (flow.getVisible()) {
-                        flow.setHighlighted(true, false);
+                        flow.setHighlighted(true, true, false);
                     }
                 }
                 for (VisualEdge flow : fnode.incomingEdges) {
                     if (flow.getVisible()) {
-                        flow.setHighlighted(true, true);
+                        flow.setHighlighted(true, true, true);
                     }
                 }
                 fnode.getVisualGraph().showTooltip(fnode, event.getPosition());
@@ -123,10 +123,10 @@ public class VisualNode extends PPath {
                 fnode.setPaint(PAINT);
                 fnode.setVisible(false);
                 for (VisualEdge flow : fnode.outgoingEdges) {
-                    flow.setHighlighted(false, false);
+                    flow.setHighlighted(false, true, false);
                 }
                 for (VisualEdge flow : fnode.incomingEdges) {
-                    flow.setHighlighted(false, true);
+                    flow.setHighlighted(false, true, true);
                 }
                 fnode.getVisualGraph().hideTooltip();
             }

@@ -1,6 +1,7 @@
 package ch.unifr.flowmap.data;
 
 import java.util.Iterator;
+
 import prefuse.data.Tuple;
 import prefuse.data.tuple.TupleSet;
 
@@ -8,28 +9,41 @@ import prefuse.data.tuple.TupleSet;
  * @author Ilya Boyandin
  */
 public class Stats {
-	public final double min;
+    public final double min;
 	public final double max;
-
-	public final double minLog;
+    public final double minLog;
     public final double maxLog;
 
     public Stats(double minValue, double maxValue) {
+        if (minValue > maxValue) {
+            throw new IllegalArgumentException("minValue > maxValue");
+        }
         this.min = minValue;
         this.max = maxValue;
-        this.minLog = Math.log(minValue);
-        this.maxLog = Math.log(maxValue);
+        this.minLog = Math.log(min);
+        this.maxLog = Math.log(max);
     }
-    
+
+    /**
+     * Returns a normalized value between 0 and 1.
+     */
+    public double normalize(double value) {
+        return (value - min) / (max - min);
+    }
+
+    /**
+     * Returns a normalized log(value) between 0 and 1.
+     */
+    public double normalizeLog(double value) {
+        return (Math.log(value) - minLog) / (maxLog - minLog);
+    }
+   
     @Override
     public String toString() {
     	return
     	 "[" +
     	 	"min = " + min + ", " +
     	 	"max = " + max + ", " +
-    	 	"minLog = " + minLog + ", " +
-    	 	"maxLog = " + maxLog +
-    	 	", e^maxLog = " + Math.pow(Math.E, maxLog) +
     	 "]"
     	;
     }
