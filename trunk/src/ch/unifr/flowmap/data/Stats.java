@@ -24,6 +24,25 @@ public class Stats {
         this.maxLog = Math.log(max);
     }
 
+    public static Stats getTupleStats(TupleSet tupleSet, String attrName) {
+        Iterator<?> it = tupleSet.tuples();
+
+        double max = Double.MIN_VALUE;
+        double min = Double.MAX_VALUE;
+
+        while (it.hasNext()) {
+            Tuple tuple = (Tuple) it.next();
+            final double v = tuple.getDouble(attrName);
+            if (v > max) {
+                max = v;
+            }
+            if (v < min) {
+                min = v;
+            }
+        }
+        return new Stats(min, max);
+    }
+
     /**
      * Returns a normalized value between 0 and 1.
      */
@@ -46,25 +65,6 @@ public class Stats {
     	 	"max = " + max + ", " +
     	 "]"
     	;
-    }
-
-    public static Stats getTupleStats(TupleSet tupleSet, String attrName) {
-        Iterator<?> it = tupleSet.tuples();
-
-        double max = Double.MIN_VALUE;
-        double min = Double.MAX_VALUE;
-
-        while (it.hasNext()) {
-            Tuple tuple = (Tuple) it.next();
-            final double v = tuple.getDouble(attrName);
-            if (v > max) {
-                max = v;
-            }
-            if (v < min) {
-                min = v;
-            }
-        }
-        return new Stats(min, max);
     }
 
 }

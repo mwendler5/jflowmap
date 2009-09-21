@@ -6,14 +6,12 @@ import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import prefuse.data.Graph;
 import prefuse.data.io.DataIOException;
 import prefuse.data.io.GraphMLReader;
-import ch.unifr.flowmap.ui.ControlPanel;
 import ch.unifr.flowmap.ui.FlowMapCanvas;
-import javax.swing.UIManager.LookAndFeelInfo;
+import ch.unifr.flowmap.ui.ControlPanel2;
 
 /**
  * @author Ilya Boyandin
@@ -37,7 +35,7 @@ public class FlowMapMain extends JFrame {
         FlowMapCanvas canvas = new FlowMapCanvas(graph, valueAttrName, labelAttrName);
         canvas.setValueFilterMin(1000);
         add(canvas);
-        add(new ControlPanel(canvas), BorderLayout.SOUTH);
+        add(new ControlPanel2(canvas).getPanel(), BorderLayout.SOUTH);
 
         final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(new Dimension(800, 600));

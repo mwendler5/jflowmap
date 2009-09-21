@@ -13,6 +13,7 @@ import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * @author Ilya Boyandin
@@ -21,7 +22,7 @@ public class VisualNode extends PPath {
 
     private static final long serialVersionUID = 1L;
     
-    private static final Stroke STROKE = new BasicStroke(1);
+    private static final Stroke STROKE = new PFixedWidthStroke(2);
     private static final Color PAINT = new Color(100, 100, 100, 120);
     private static final Color STROKE_PAINT = new Color(255, 255, 255, 100);
     private static final Color HIGHLIGHTED_PAINT = new Color(255, 0, 0, 120);

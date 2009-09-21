@@ -40,6 +40,8 @@ public class VisualEdge extends PNode {
     private final VisualNode sourceNode;
     private final VisualNode targetNode;
     private final Edge edge;
+
+    private final double edgeLength;
     
 
     public VisualEdge(FlowMapCanvas canvas, Edge edge, VisualNode sourceNode, VisualNode targetNode) {
@@ -59,16 +61,17 @@ public class VisualEdge extends PNode {
         value = edge.getDouble(canvas.getEdgeValueAttr());
 
         // Calc start/end marker positions
-        final double d = dist(x1, y1, x2, y2);
+        this.edgeLength = dist(x1, y1, x2, y2);
+
         double markerSize;
-        if (MARKER_SIZE > d / 3.0) {
-            markerSize = d / 3.0;
+        if (MARKER_SIZE > edgeLength / 3.0) {
+            markerSize = edgeLength / 3.0;
         } else {
             markerSize = MARKER_SIZE;
         }
         
-        final double sin_a = (x1 - x2) / d;
-        final double cos_a = (y1 - y2) / d;
+        final double sin_a = (x1 - x2) / edgeLength;
+        final double cos_a = (y1 - y2) / edgeLength;
         double sm_x = x1 - markerSize * sin_a;
         double sm_y = y1 - markerSize * cos_a;
 
@@ -104,9 +107,18 @@ public class VisualEdge extends PNode {
             double maxLog = Math.log(canvas.getValueFilterMax() - canvas.getValueFilterMin());
             nv = (Math.log(value - canvas.getValueFilterMin()) - minLog) / (maxLog - minLog);
         } else {
-            Stats stats = canvas.getEdgeValueAttrStats();
+            Stats stats = canvas.getGraphStats().getValueEdgeAttrStats();
             nv = stats.normalizeLog(value);
         }
+
+        return nv;
+    }
+
+    public double getNormalizedValue() {
+        double nv;
+
+        Stats stats = canvas.getGraphStats().getValueEdgeAttrStats();
+        nv = stats.normalize(value);
 
         return nv;
     }
@@ -122,7 +134,7 @@ public class VisualEdge extends PNode {
     }
 
     public void updateEdgeWidth() {
-        double nv = getNormalizedLogValue();
+        double nv = getNormalizedValue();
         float width = (float)(1 + nv * canvas.getMaxEdgeWidth());
         PFixedWidthStroke stroke = new PFixedWidthStroke(width);
         startMarker.setStroke(stroke);
@@ -228,4 +240,7 @@ public class VisualEdge extends PNode {
         getTargetNode().setVisible(value);
     }
 
+    public double getEdgeLength() {
+        return edgeLength;
+    }
 }

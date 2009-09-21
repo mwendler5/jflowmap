@@ -31,20 +31,20 @@ public class ControlPanel extends javax.swing.JPanel {
     }
 
     private SpinnerModel createMinValueFilterSpinnerModel() {
-        Stats stats = flowMapCanvas.getEdgeValueAttrStats();
+        Stats stats = flowMapCanvas.getGraphStats().getValueEdgeAttrStats();
         return new SpinnerNumberModel(
                 flowMapCanvas.getValueFilterMin(), stats.min, stats.max, 1);
     }
 
     private SpinnerModel createMaxValueFilterSpinnerModel() {
-        Stats stats = flowMapCanvas.getEdgeValueAttrStats();
+        Stats stats = flowMapCanvas.getGraphStats().getValueEdgeAttrStats();
         return new SpinnerNumberModel(
                 flowMapCanvas.getValueFilterMax(), stats.min, stats.max, 1);
     }
 
     private double fromLogValueFilter(final int v) {
         double value = Math.round(Math.pow(Math.E, v));
-        final Stats stats = flowMapCanvas.getEdgeValueAttrStats();
+        final Stats stats = flowMapCanvas.getGraphStats().getValueEdgeAttrStats();
         if (value < stats.min) {
             value = stats.min;
         }
@@ -150,16 +150,16 @@ public class ControlPanel extends javax.swing.JPanel {
             }
         });
 
-        maxValueFilterSlider.setMaximum((int)Math.round(flowMapCanvas.getEdgeValueAttrStats().maxLog));
-        maxValueFilterSlider.setMinimum((int)Math.round(flowMapCanvas.getEdgeValueAttrStats().minLog));
+        maxValueFilterSlider.setMaximum((int)Math.round(flowMapCanvas.getGraphStats().getValueEdgeAttrStats().maxLog));
+        maxValueFilterSlider.setMinimum((int)Math.round(flowMapCanvas.getGraphStats().getValueEdgeAttrStats().minLog));
         maxValueFilterSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 maxValueFilterSliderStateChanged(evt);
             }
         });
 
-        minValueFilterSlider.setMaximum((int)Math.round(flowMapCanvas.getEdgeValueAttrStats().maxLog));
-        minValueFilterSlider.setMinimum((int)Math.round(flowMapCanvas.getEdgeValueAttrStats().minLog));
+        minValueFilterSlider.setMaximum((int)Math.round(flowMapCanvas.getGraphStats().getValueEdgeAttrStats().maxLog));
+        minValueFilterSlider.setMinimum((int)Math.round(flowMapCanvas.getGraphStats().getValueEdgeAttrStats().minLog));
         minValueFilterSlider.setValue((int)Math.round(Math.log(flowMapCanvas.getValueFilterMin())));
         minValueFilterSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
