@@ -11,9 +11,10 @@
 
 package ch.unifr.flowmap.ui;
 
-import ch.unifr.flowmap.data.Stats;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+
+import ch.unifr.flowmap.data.Stats;
 
 /**
  *
@@ -64,33 +65,88 @@ public class ControlPanel extends javax.swing.JPanel {
 
         jSplitPane1 = new javax.swing.JSplitPane();
         jCheckBox1 = new javax.swing.JCheckBox();
-        minValueFilterSlider = new javax.swing.JSlider();
+        jSlider1 = new javax.swing.JSlider();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        jSlider3 = new javax.swing.JSlider();
+        jSlider2 = new javax.swing.JSlider();
+        jLabel7 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        autoAdjustColorScaleChk = new javax.swing.JCheckBox();
+        maxValueFilterSpinner = new javax.swing.JSpinner();
+        minValueFilterSpinner = new javax.swing.JSpinner();
         maxValueFilterSlider = new javax.swing.JSlider();
-        datasetCombo = new javax.swing.JComboBox();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        minValueFilterSlider = new javax.swing.JSlider();
         jLabel4 = new javax.swing.JLabel();
-        maxEdgeWidthSlider = new javax.swing.JSlider();
-        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
+        maxEdgeWidthSpinner = new javax.swing.JSpinner();
+        edgeOpacitySpinner = new javax.swing.JSpinner();
+        jLabel1 = new javax.swing.JLabel();
+        edgeMarkerOpacitySpinner = new javax.swing.JSpinner();
+        maxEdgeWidthSlider = new javax.swing.JSlider();
+        edgeMarkerOpacitySlider = new javax.swing.JSlider();
         edgeOpacitySlider = new javax.swing.JSlider();
         jLabel6 = new javax.swing.JLabel();
-        edgeMarkerOpacitySlider = new javax.swing.JSlider();
-        minValueFilterSpinner = new javax.swing.JSpinner();
-        maxValueFilterSpinner = new javax.swing.JSpinner();
-        edgeMarkerOpacitySpinner = new javax.swing.JSpinner();
-        edgeOpacitySpinner = new javax.swing.JSpinner();
-        autoAdjustColorScaleChk = new javax.swing.JCheckBox();
-        maxEdgeWidthSpinner = new javax.swing.JSpinner();
 
         jCheckBox1.setText("jCheckBox1");
 
-        minValueFilterSlider.setMaximum((int)Math.round(flowMapCanvas.getEdgeValueAttrStats().maxLog));
-        minValueFilterSlider.setMinimum((int)Math.round(flowMapCanvas.getEdgeValueAttrStats().minLog));
-        minValueFilterSlider.setValue((int)flowMapCanvas.getValueFilterMin());
-        minValueFilterSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+        jLabel8.setText("Min length:");
+
+        jLabel7.setText("Max length:");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSlider3, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSlider2, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel8)
+                        .addGap(16, 16, 16))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jSlider3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel7)
+                    .addComponent(jSlider2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        autoAdjustColorScaleChk.setSelected(flowMapCanvas.getAutoAdjustEdgeColorScale());
+        autoAdjustColorScaleChk.setText("Auto adjust color scale");
+        autoAdjustColorScaleChk.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                minValueFilterSliderStateChanged(evt);
+                autoAdjustColorScaleChkStateChanged(evt);
+            }
+        });
+
+        maxValueFilterSpinner.setModel(createMaxValueFilterSpinnerModel());
+        maxValueFilterSpinner.setValue(flowMapCanvas.getValueFilterMax());
+
+        minValueFilterSpinner.setModel(createMinValueFilterSpinnerModel());
+        minValueFilterSpinner.setValue(flowMapCanvas.getValueFilterMin());
+        minValueFilterSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                minValueFilterSpinnerStateChanged(evt);
             }
         });
 
@@ -102,68 +158,66 @@ public class ControlPanel extends javax.swing.JPanel {
             }
         });
 
-        datasetCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "refugee-flows-2008.xml", "migrations.xml", " " }));
-        datasetCombo.setEnabled(false);
-        datasetCombo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                datasetComboActionPerformed(evt);
-            }
-        });
-
-        jLabel3.setText("Dataset:");
-        jLabel3.setEnabled(false);
-
-        jLabel2.setText("Filter min:");
-
-        jLabel4.setText("Filter max:");
-
-        maxEdgeWidthSlider.setMinimum(1);
-        maxEdgeWidthSlider.setValue((int)flowMapCanvas.getMaxEdgeWidth());
-        maxEdgeWidthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+        minValueFilterSlider.setMaximum((int)Math.round(flowMapCanvas.getEdgeValueAttrStats().maxLog));
+        minValueFilterSlider.setMinimum((int)Math.round(flowMapCanvas.getEdgeValueAttrStats().minLog));
+        minValueFilterSlider.setValue((int)Math.round(Math.log(flowMapCanvas.getValueFilterMin())));
+        minValueFilterSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                maxEdgeWidthSliderStateChanged(evt);
+                minValueFilterSliderStateChanged(evt);
             }
         });
 
-        jLabel1.setText("Maximal edge width:");
+        jLabel4.setText("Max value:");
+
+        jLabel2.setText("Min value:");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(autoAdjustColorScaleChk)
+                    .addComponent(maxValueFilterSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                    .addComponent(minValueFilterSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(maxValueFilterSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
+                    .addComponent(minValueFilterSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(minValueFilterSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(minValueFilterSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(14, 14, 14)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(autoAdjustColorScaleChk, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(4, 4, 4)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(maxValueFilterSpinner, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                            .addComponent(maxValueFilterSlider, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                            .addComponent(jLabel4))
+                        .addGap(32, 32, 32))))
+        );
 
         jLabel5.setText("Edge opacity:");
 
-        edgeOpacitySlider.setMaximum(255);
-        edgeOpacitySlider.setValue(flowMapCanvas.getEdgeAlpha());
-        edgeOpacitySlider.addChangeListener(new javax.swing.event.ChangeListener() {
+        maxEdgeWidthSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 100, 1));
+        maxEdgeWidthSpinner.setValue((int)flowMapCanvas.getMaxEdgeWidth());
+        maxEdgeWidthSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                edgeOpacitySliderStateChanged(evt);
-            }
-        });
-
-        jLabel6.setText("Edge marker opacity:");
-
-        edgeMarkerOpacitySlider.setMaximum(255);
-        edgeMarkerOpacitySlider.setValue(flowMapCanvas.getEdgeMarkerAlpha());
-        edgeMarkerOpacitySlider.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                edgeMarkerOpacitySliderStateChanged(evt);
-            }
-        });
-
-        minValueFilterSpinner.setModel(createMinValueFilterSpinnerModel());
-        minValueFilterSpinner.setValue(flowMapCanvas.getValueFilterMin());
-        minValueFilterSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                minValueFilterSpinnerStateChanged(evt);
-            }
-        });
-
-        maxValueFilterSpinner.setModel(createMaxValueFilterSpinnerModel());
-        maxValueFilterSpinner.setValue(flowMapCanvas.getValueFilterMax());
-
-        edgeMarkerOpacitySpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
-        edgeMarkerOpacitySpinner.setOpaque(false);
-        edgeMarkerOpacitySpinner.setValue(flowMapCanvas.getEdgeMarkerAlpha());
-        edgeMarkerOpacitySpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                edgeMarkerOpacitySpinnerStateChanged(evt);
+                maxEdgeWidthSpinnerStateChanged(evt);
             }
         });
 
@@ -175,21 +229,97 @@ public class ControlPanel extends javax.swing.JPanel {
             }
         });
 
-        autoAdjustColorScaleChk.setSelected(flowMapCanvas.getAutoAdjustEdgeColorScale());
-        autoAdjustColorScaleChk.setText("Auto adjust color scale");
-        autoAdjustColorScaleChk.addChangeListener(new javax.swing.event.ChangeListener() {
+        jLabel1.setText("Edge width:");
+
+        edgeMarkerOpacitySpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, 255, 1));
+        edgeMarkerOpacitySpinner.setOpaque(false);
+        edgeMarkerOpacitySpinner.setValue(flowMapCanvas.getEdgeMarkerAlpha());
+        edgeMarkerOpacitySpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                autoAdjustColorScaleChkStateChanged(evt);
+                edgeMarkerOpacitySpinnerStateChanged(evt);
             }
         });
 
-        maxEdgeWidthSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 100, 1));
-        maxEdgeWidthSpinner.setValue((int)flowMapCanvas.getMaxEdgeWidth());
-        maxEdgeWidthSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+        maxEdgeWidthSlider.setMinimum(1);
+        maxEdgeWidthSlider.setValue((int)flowMapCanvas.getMaxEdgeWidth());
+        maxEdgeWidthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                maxEdgeWidthSpinnerStateChanged(evt);
+                maxEdgeWidthSliderStateChanged(evt);
             }
         });
+
+        edgeMarkerOpacitySlider.setMaximum(255);
+        edgeMarkerOpacitySlider.setValue(flowMapCanvas.getEdgeMarkerAlpha());
+        edgeMarkerOpacitySlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                edgeMarkerOpacitySliderStateChanged(evt);
+            }
+        });
+
+        edgeOpacitySlider.setMaximum(255);
+        edgeOpacitySlider.setValue(flowMapCanvas.getEdgeAlpha());
+        edgeOpacitySlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                edgeOpacitySliderStateChanged(evt);
+            }
+        });
+
+        jLabel6.setText("Edge marker opacity:");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(46, 46, 46)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel5)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel6)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(edgeOpacitySlider, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+                    .addComponent(edgeMarkerOpacitySlider, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+                    .addComponent(maxEdgeWidthSlider, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(edgeOpacitySpinner)
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(edgeMarkerOpacitySpinner)
+                        .addComponent(maxEdgeWidthSpinner)))
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(maxEdgeWidthSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
+                            .addComponent(jLabel1))
+                        .addGap(10, 10, 10))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(maxEdgeWidthSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel5)
+                    .addComponent(edgeMarkerOpacitySlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(edgeOpacitySpinner))
+                .addGap(10, 10, 10)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(edgeMarkerOpacitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel6)
+                        .addComponent(edgeOpacitySlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -197,98 +327,20 @@ public class ControlPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(datasetCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(8, 8, 8))
-                            .addComponent(jLabel4))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(maxValueFilterSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(minValueFilterSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
-                            .addComponent(autoAdjustColorScaleChk))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(maxValueFilterSpinner)
-                            .addComponent(minValueFilterSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE))))
-                .addGap(33, 33, 33)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(4, 4, 4)
-                        .addComponent(jLabel1))
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel6))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(maxEdgeWidthSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
-                    .addComponent(edgeMarkerOpacitySlider, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
-                    .addComponent(edgeOpacitySlider, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(edgeMarkerOpacitySpinner)
-                        .addComponent(edgeOpacitySpinner))
-                    .addComponent(maxEdgeWidthSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE))
-                .addContainerGap())
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(datasetCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(3, 3, 3)
-                                .addComponent(jLabel2))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(minValueFilterSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
-                                    .addComponent(minValueFilterSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(maxValueFilterSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(maxValueFilterSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
-                                    .addComponent(jLabel4)))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(16, 16, 16))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(maxEdgeWidthSpinner, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
-                                    .addComponent(maxEdgeWidthSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(edgeOpacitySlider, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
-                            .addComponent(edgeOpacitySpinner, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addGap(10, 10, 10)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(edgeMarkerOpacitySpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
-                            .addComponent(jLabel6)
-                            .addComponent(edgeMarkerOpacitySlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(autoAdjustColorScaleChk))
+            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void datasetComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_datasetComboActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_datasetComboActionPerformed
 
 
     private void edgeOpacitySliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_edgeOpacitySliderStateChanged
@@ -341,7 +393,6 @@ public class ControlPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox autoAdjustColorScaleChk;
-    private javax.swing.JComboBox datasetCombo;
     private javax.swing.JSlider edgeMarkerOpacitySlider;
     private javax.swing.JSpinner edgeMarkerOpacitySpinner;
     private javax.swing.JSlider edgeOpacitySlider;
@@ -349,11 +400,19 @@ public class ControlPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JSlider jSlider1;
+    private javax.swing.JSlider jSlider2;
+    private javax.swing.JSlider jSlider3;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JSlider maxEdgeWidthSlider;
     private javax.swing.JSpinner maxEdgeWidthSpinner;
     private javax.swing.JSlider maxValueFilterSlider;

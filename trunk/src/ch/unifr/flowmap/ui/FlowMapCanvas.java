@@ -30,22 +30,22 @@ public class FlowMapCanvas extends PCanvas {
     private final PValueTooltip tooltipBox;
     private final Graph graph;
     private final String edgeValueAttr;
-    private String xCoordAttr = "x";
-    private String yCoordAttr = "y";
+    private final String xCoordAttr = "x";
+    private final String yCoordAttr = "y";
     private String labelAttr = "tooltip";
-    private PBounds nodeBounds;
+    private final PBounds nodeBounds;
     
     private final PNode edgeLayer;
     private final PNode nodeLayer;
 
-    private int edgeAlpha = 5;
-    private int edgeMarkerAlpha = 50;
+    private int edgeAlpha = 10;
+    private int edgeMarkerAlpha = 120;
     private double valueFilterMin = Double.MIN_VALUE;
     private double valueFilterMax = Double.MAX_VALUE;
-    private double maxEdgeWidth = 1.0;
+    private double maxEdgeWidth = 10.0;
 
-    private Map<Node, VisualNode> nodesToVisuals;
-    private Map<Edge, VisualEdge> edgesToVisuals;
+    private final Map<Node, VisualNode> nodesToVisuals;
+    private final Map<Edge, VisualEdge> edgesToVisuals;
     private boolean autoAdjustEdgeColorScale;
     
     public FlowMapCanvas(Graph graph, String edgeValueAttrName, String labelAttrName) {
@@ -79,7 +79,7 @@ public class FlowMapCanvas extends PCanvas {
         System.out.println("xStats: " + xStats);
         System.out.println("yStats: " + yStats);
 
-	nodesToVisuals = new LinkedHashMap<Node, VisualNode>();
+        nodesToVisuals = new LinkedHashMap<Node, VisualNode>();
 
         for (int i = 0; i < numNodes; i++) {
             Node node = graph.getNode(i);
@@ -249,6 +249,7 @@ public class FlowMapCanvas extends PCanvas {
     }
 
     private final Map<String, Stats> statsCache = new HashMap<String, Stats>();
+    private VisualNode selectedNode;
     
     public String getEdgeValueAttr() {
         return edgeValueAttr;
@@ -327,6 +328,16 @@ public class FlowMapCanvas extends PCanvas {
 
     public void hideTooltip() {
         tooltipBox.setVisible(false);
+    }
+
+    public void setSelectedNode(VisualNode vnode) {
+        if (selectedNode != null) {
+            selectedNode.setSelected(false);
+        }
+        selectedNode = vnode;
+        if (vnode != null) {
+            vnode.setSelected(true);
+        }
     }
 
 }

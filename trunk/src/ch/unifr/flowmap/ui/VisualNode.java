@@ -24,20 +24,24 @@ public class VisualNode extends PPath {
     private static final Stroke STROKE = new BasicStroke(1);
     private static final Color PAINT = new Color(100, 100, 100, 120);
     private static final Color STROKE_PAINT = new Color(255, 255, 255, 100);
-    private static final Color SELECTED_PAINT = new Color(255, 0, 0, 120);
-    private static final Color SELECTED_STROKE_PAINT = Color.white /*new Color(255, 255, 0, 255)*/;
+    private static final Color HIGHLIGHTED_PAINT = new Color(255, 0, 0, 120);
+    private static final Color SELECTED_STROKE_PAINT = new Color(255, 255, 0, 255);
     
     private final List<VisualEdge> outgoingEdges = new ArrayList<VisualEdge>();
     private final List<VisualEdge> incomingEdges = new ArrayList<VisualEdge>();
 
-    private final FlowMapCanvas visualGraph;
+    private final FlowMapCanvas canvas;
 
-	private Node node;
+	private final Node node;
 
-	private double valueX;
-	private double valueY;
+	private final double valueX;
+	private final double valueY;
     
-    public VisualNode(FlowMapCanvas visualGraph, Node node, double x, double y, double size) {
+	private boolean selected;
+	private boolean highlighted;
+    private boolean alwaysVisible;
+	
+    public VisualNode(FlowMapCanvas canvas, Node node, double x, double y, double size) {
         super(new Ellipse2D.Double(x - size/2, y - size/2, size, size));
         this.valueX = x;
         this.valueY = y;
@@ -47,7 +51,7 @@ public class VisualNode extends PPath {
 //    	this.x = x;
 //    	this.y = y;
         this.node = node;
-        this.visualGraph = visualGraph;
+        this.canvas = canvas;
         addInputEventListener(INPUT_EVENT_HANDLER);
         setVisible(false);
 	}
@@ -84,33 +88,30 @@ public class VisualNode extends PPath {
 	}
    
     public FlowMapCanvas getVisualGraph() {
-		return visualGraph;
+		return canvas;
 	}
 
 	public String getLabel() {
-		return node.getString(visualGraph.getLabelAttr());
+		return node.getString(canvas.getLabelAttr());
 	}
 
     private static final PInputEventListener INPUT_EVENT_HANDLER = new PBasicInputEventHandler() {
         @Override
+        public void mouseClicked(PInputEvent event) {
+            PNode node = event.getPickedNode();
+            if (node instanceof VisualNode) {
+                VisualNode vnode = (VisualNode)node;
+                vnode.canvas.setSelectedNode(vnode.isSelected() ? null : vnode);
+            }
+        }
+        
+        @Override
         public void mouseEntered(PInputEvent event) {
             PNode node = event.getPickedNode();
             if (node instanceof VisualNode) {
-                VisualNode fnode = (VisualNode)node;
-//                fnode.setStrokePaint(SELECTED_STROKE_PAINT);
-                fnode.setPaint(SELECTED_PAINT);
-                fnode.setVisible(true);
-                for (VisualEdge flow : fnode.outgoingEdges) {
-                    if (flow.getVisible()) {
-                        flow.setHighlighted(true, true, false);
-                    }
-                }
-                for (VisualEdge flow : fnode.incomingEdges) {
-                    if (flow.getVisible()) {
-                        flow.setHighlighted(true, true, true);
-                    }
-                }
-                fnode.getVisualGraph().showTooltip(fnode, event.getPosition());
+                VisualNode vnode = (VisualNode)node;
+                vnode.setHighlighted(true);
+                vnode.getVisualGraph().showTooltip(vnode, event.getPosition());
             }
         }
 
@@ -118,17 +119,11 @@ public class VisualNode extends PPath {
         public void mouseExited(PInputEvent event) {
             PNode node = event.getPickedNode();
             if (node instanceof VisualNode) {
-                VisualNode fnode = (VisualNode)node;
-//                fnode.setStrokePaint(STROKE_PAINT);
-                fnode.setPaint(PAINT);
-                fnode.setVisible(false);
-                for (VisualEdge flow : fnode.outgoingEdges) {
-                    flow.setHighlighted(false, true, false);
+                VisualNode vnode = (VisualNode)node;
+                if (!vnode.isSelected()) {
+                    vnode.setHighlighted(false);
                 }
-                for (VisualEdge flow : fnode.incomingEdges) {
-                    flow.setHighlighted(false, true, true);
-                }
-                fnode.getVisualGraph().hideTooltip();
+                vnode.getVisualGraph().hideTooltip();
             }
         }
     };
@@ -139,6 +134,81 @@ public class VisualNode extends PPath {
 
     public void addIncomingEdge(VisualEdge flow) {
         incomingEdges.add(flow);
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+        setVisible(true);
+        setAlwaysVisible(selected);
+        if (selected) {
+            setStrokePaint(SELECTED_STROKE_PAINT);
+        } else {
+            setStrokePaint(STROKE_PAINT);
+        }
+        if (highlighted) {
+            for (VisualEdge flow : outgoingEdges) {
+                if (flow.getVisible()) {
+                    flow.getTargetNode().setAlwaysVisible(selected);
+                    flow.getTargetNode().setVisible(selected);
+                    flow.setHighlighted(selected, true, false);
+                }
+            }
+            for (VisualEdge flow : incomingEdges) {
+                if (flow.getVisible()) {
+                    flow.getSourceNode().setAlwaysVisible(selected);
+                    flow.getSourceNode().setVisible(selected);
+                    flow.setHighlighted(selected, true, true);
+                }
+            }
+            if (!selected) {
+                setEdgesHighlighted(false);
+            }
+        }
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
+        setVisible(highlighted);
+        if (highlighted) {
+            setPaint(HIGHLIGHTED_PAINT);
+        } else {
+            setPaint(PAINT);
+        }
+
+        setEdgesHighlighted(highlighted);
+    }
+
+    private void setEdgesHighlighted(boolean highlighted) {
+        for (VisualEdge flow : outgoingEdges) {
+            if (flow.getVisible()) {
+                flow.setHighlighted(highlighted, true, false);
+            }
+        }
+        for (VisualEdge flow : incomingEdges) {
+            if (flow.getVisible()) {
+                flow.setHighlighted(highlighted, true, true);
+            }
+        }
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        if (!visible  &&  alwaysVisible) {
+            return;
+        }
+        super.setVisible(visible);
+    }
+    
+    public boolean isAlwaysVisible() {
+        return alwaysVisible;
+    }
+
+    public void setAlwaysVisible(boolean alwaysVisible) {
+        this.alwaysVisible = alwaysVisible;
     }
 
 }

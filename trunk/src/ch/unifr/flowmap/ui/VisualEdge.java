@@ -1,6 +1,5 @@
 package ch.unifr.flowmap.ui;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.geom.Line2D;
 
@@ -11,6 +10,7 @@ import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * @author Ilya Boyandin
@@ -37,9 +37,10 @@ public class VisualEdge extends PNode {
     private final FlowMapCanvas canvas;
     private final double value;
 
-    private VisualNode sourceNode;
-    private VisualNode targetNode;
-    private Edge edge;
+    private final VisualNode sourceNode;
+    private final VisualNode targetNode;
+    private final Edge edge;
+    
 
     public VisualEdge(FlowMapCanvas canvas, Edge edge, VisualNode sourceNode, VisualNode targetNode) {
         this.edge = edge;
@@ -84,8 +85,8 @@ public class VisualEdge extends PNode {
 
         final double width = canvas.getMaxEdgeWidth();   // TODO: update dynamically
         line = new PPath(new Line2D.Double(
-                sm_x - sin_a * width, sm_y - cos_a * width,
-                em_x + sin_a * width, em_y + cos_a * width));
+                sm_x /*- sin_a * width*/, sm_y /*- cos_a * width*/,
+                em_x /*+ sin_a * width*/, em_y /*+ cos_a * width*/));
         
         addChild(line);
 
@@ -123,7 +124,7 @@ public class VisualEdge extends PNode {
     public void updateEdgeWidth() {
         double nv = getNormalizedLogValue();
         float width = (float)(1 + nv * canvas.getMaxEdgeWidth());
-        BasicStroke stroke = new BasicStroke(width);
+        PFixedWidthStroke stroke = new PFixedWidthStroke(width);
         startMarker.setStroke(stroke);
         endMarker.setStroke(stroke);
         line.setStroke(stroke);
