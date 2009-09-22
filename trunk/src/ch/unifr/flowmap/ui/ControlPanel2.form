@@ -18,6 +18,8 @@
             <rowspec value="center:24px:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:5dlu:noGrow"/>
             <rowspec value="center:d:noGrow"/>
             <colspec value="right:max(d;4px):noGrow"/>
@@ -50,7 +52,7 @@
               </component>
               <component id="1cc15" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="6" row-span="6" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="6" row-span="8" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -139,7 +141,7 @@
                 <rowspec value="center:d:grow"/>
                 <colspec value="fill:d:grow"/>
                 <constraints>
-                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties/>
@@ -270,7 +272,7 @@
                   <orientation value="1"/>
                 </properties>
               </component>
-              <component id="2e69d" class="javax.swing.JCheckBox" default-binding="true">
+              <component id="2e69d" class="javax.swing.JCheckBox" binding="useLogWidthScaleCheckbox">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
@@ -279,7 +281,7 @@
                   <text value="Use log width scale"/>
                 </properties>
               </component>
-              <component id="2455c" class="javax.swing.JCheckBox" binding="useLogColorScaleCheckBox" default-binding="true">
+              <component id="2455c" class="javax.swing.JCheckBox" binding="useLogColorScaleCheckbox">
                 <constraints>
                   <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
