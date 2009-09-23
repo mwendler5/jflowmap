@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ch.unifr.flowmap.ui.ControlPanel2">
   <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="730" height="400"/>
+      <xy x="20" y="20" width="789" height="400"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -12,6 +12,126 @@
         <properties/>
         <border type="none"/>
         <children>
+          <grid id="93099" layout-manager="FormLayout">
+            <rowspec value="center:d:noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:185px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:38px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:p:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:119px:noGrow"/>
+            <colspec value="left:23dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:119px:noGrow"/>
+            <colspec value="left:5dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):grow"/>
+            <constraints>
+              <tabbedpane title="Dataset"/>
+            </constraints>
+            <properties/>
+            <border type="empty">
+              <size top="10" left="10" bottom="10" right="10"/>
+            </border>
+            <children>
+              <component id="62b1f" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="f0853" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Dataset:"/>
+                </properties>
+              </component>
+              <component id="cb38e" class="javax.swing.JSeparator">
+                <constraints>
+                  <grid row="0" column="4" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <orientation value="1"/>
+                </properties>
+              </component>
+              <component id="d77cc" class="javax.swing.JComboBox" binding="comboBox2" default-binding="true">
+                <constraints>
+                  <grid row="0" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="22e9a" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Node X coord field:"/>
+                </properties>
+              </component>
+              <component id="986e3" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Node Y coord field:"/>
+                </properties>
+              </component>
+              <component id="ea815" class="javax.swing.JComboBox" binding="comboBox3" default-binding="true">
+                <constraints>
+                  <grid row="2" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="5077c" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Edge value field:"/>
+                </properties>
+              </component>
+              <component id="53beb" class="javax.swing.JComboBox" binding="comboBox4" default-binding="true">
+                <constraints>
+                  <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="83960" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Node label field:"/>
+                </properties>
+              </component>
+              <component id="1590" class="javax.swing.JComboBox" binding="comboBox6" default-binding="true">
+                <constraints>
+                  <grid row="2" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties/>
+              </component>
+            </children>
+          </grid>
           <grid id="5b542" default-binding="true" layout-manager="FormLayout">
             <rowspec value="center:26px:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
@@ -170,18 +290,21 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:24px:noGrow"/>
-            <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:23px:noGrow"/>
+            <rowspec value="top:6dlu:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <colspec value="fill:d:noGrow"/>
-            <colspec value="left:92dlu:noGrow"/>
-            <colspec value="fill:d:noGrow"/>
-            <colspec value="left:11dlu:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:p:noGrow"/>
+            <colspec value="fill:21px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:d:grow"/>
+            <colspec value="fill:p:noGrow"/>
+            <colspec value="left:15dlu:noGrow"/>
+            <colspec value="fill:max(p;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:162px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:53px:noGrow"/>
+            <colspec value="left:5dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):grow"/>
             <constraints>
               <tabbedpane title="Scales"/>
             </constraints>
@@ -192,7 +315,7 @@
             <children>
               <component id="1442e" class="javax.swing.JSlider" binding="maxEdgeWidthSlider">
                 <constraints>
-                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -203,7 +326,7 @@
               </component>
               <component id="335be" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -212,60 +335,14 @@
               </component>
               <component id="edf8f" class="javax.swing.JSpinner" binding="maxEdgeWidthSpinner">
                 <constraints>
-                  <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="2657" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Edge opacity:"/>
-                </properties>
-              </component>
-              <component id="82001" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Edge marker opacity:"/>
-                </properties>
-              </component>
-              <component id="20312" class="javax.swing.JSlider" binding="edgeOpacitySlider">
-                <constraints>
-                  <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="75c9c" class="javax.swing.JSlider" default-binding="true">
-                <constraints>
-                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="69f62" class="javax.swing.JSpinner" binding="edgeOpacitySpinner">
-                <constraints>
-                  <grid row="2" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="89e17" class="javax.swing.JSpinner" default-binding="true">
-                <constraints>
-                  <grid row="4" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
               </component>
               <component id="cf993" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="2" row-span="6" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="2" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -288,6 +365,131 @@
                 </constraints>
                 <properties>
                   <text value="Use log color scale"/>
+                </properties>
+              </component>
+              <component id="da79a" class="javax.swing.JCheckBox" binding="mapEdgeValueToCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Map edge value to color"/>
+                </properties>
+              </component>
+              <component id="ec6dd" class="javax.swing.JCheckBox" binding="mapEdgeValueToCheckBox1" default-binding="true">
+                <constraints>
+                  <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Map edge value to width"/>
+                </properties>
+              </component>
+              <component id="7fb43" class="javax.swing.JSeparator">
+                <constraints>
+                  <grid row="0" column="5" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <orientation value="1"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="31f8b" layout-manager="FormLayout">
+            <rowspec value="center:d:noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <colspec value="fill:d:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:110px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:44px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:39px:noGrow"/>
+            <colspec value="left:6dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):grow"/>
+            <constraints>
+              <tabbedpane title="Aesthetics"/>
+            </constraints>
+            <properties/>
+            <border type="empty">
+              <size top="10" left="10" bottom="10" right="10"/>
+            </border>
+            <children>
+              <component id="bb6a9" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Color scheme:"/>
+                </properties>
+              </component>
+              <component id="cbaa4" class="javax.swing.JComboBox" binding="comboBox5" default-binding="true">
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="f5650" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Edge opacity:"/>
+                </properties>
+              </component>
+              <component id="5065a" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Edge marker opacity:"/>
+                </properties>
+              </component>
+              <component id="e94f4" class="javax.swing.JSlider" binding="edgeOpacitySlider">
+                <constraints>
+                  <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="2ec9a" class="javax.swing.JSlider" binding="edgeMarkerOpacitySlider">
+                <constraints>
+                  <grid row="2" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="f9c2a" class="javax.swing.JSpinner" binding="edgeOpacitySpinner">
+                <constraints>
+                  <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="cd097" class="javax.swing.JSpinner" binding="edgeMarkerOpacitySpinner">
+                <constraints>
+                  <grid row="2" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="66cd7" class="javax.swing.JSeparator">
+                <constraints>
+                  <grid row="0" column="4" row-span="3" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <orientation value="1"/>
                 </properties>
               </component>
             </children>

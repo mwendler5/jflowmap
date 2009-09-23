@@ -12,8 +12,6 @@ public class FlowMapModel {
     private boolean autoAdjustColorScale;
     private boolean useLogColorScale;
     private boolean useLogWidthScale;
-    private double lengthFilterMin;
-    private double lengthFilterMax;
 
     private Graph graph;
 
@@ -22,8 +20,8 @@ public class FlowMapModel {
     private String yNodeAttr = "y";
     private String labelAttr = "tooltip";
 
-    private int edgeAlpha = 20;
-    private int edgeMarkerAlpha = 120;
+    private int edgeAlpha = 40;
+    private int edgeMarkerAlpha = 200;
 
     private double valueFilterMin = Double.MIN_VALUE;
     private double valueFilterMax = Double.MAX_VALUE;
@@ -47,9 +45,12 @@ public class FlowMapModel {
         this.graphStats = new GraphStats(graph, valueEdgeAttrName, xNodeAttr, yNodeAttr);
 
         Stats minMax = graphStats.getValueEdgeAttrStats();
-
         this.valueFilterMin = minMax.min;
         this.valueFilterMax = minMax.max;
+
+        Stats lengthStats = graphStats.getEdgeLengthStats();
+        this.edgeLengthFilterMin = lengthStats.min;
+        this.edgeLengthFilterMax = lengthStats.max;
 
 //        Stats xStats = graphStats.getNodeAttrStats(xNodeAttr);
 //        Stats yStats = graphStats.getNodeAttrStats(yNodeAttr);
@@ -64,9 +65,9 @@ public class FlowMapModel {
     }
 
     public void setAutoAdjustColorScale(final boolean autoAdjustColorScale) {
-        boolean oldValue = autoAdjustColorScale;
+        boolean old = this.autoAdjustColorScale;
         this.autoAdjustColorScale = autoAdjustColorScale;
-        changes.firePropertyChange(PROPERTY_AUTO_ADJUST_COLOR_SCALE, oldValue, autoAdjustColorScale);                                                              
+        changes.firePropertyChange(PROPERTY_AUTO_ADJUST_COLOR_SCALE, old, autoAdjustColorScale);
     }
 
     public boolean isUseLogColorScale() {
@@ -74,9 +75,9 @@ public class FlowMapModel {
     }
 
     public void setUseLogColorScale(final boolean useLogColorScale) {
-        boolean oldValue = useLogColorScale;
+        boolean old = this.useLogColorScale;
         this.useLogColorScale = useLogColorScale;
-        changes.firePropertyChange(PROPERTY_USE_LOG_COLOR_SCALE, oldValue, useLogColorScale);
+        changes.firePropertyChange(PROPERTY_USE_LOG_COLOR_SCALE, old, useLogColorScale);
     }
 
     public boolean isUseLogWidthScale() {
@@ -87,26 +88,6 @@ public class FlowMapModel {
         boolean old = useLogWidthScale;
         this.useLogWidthScale = useLogWidthScale;
         changes.firePropertyChange(PROPERTY_USE_LOG_WIDTH_SCALE, old, useLogWidthScale);
-    }
-
-    public double getLengthFilterMax() {
-        return lengthFilterMax;
-    }
-
-    public void setLengthFilterMax(double lengthFilterMax) {
-        double old = lengthFilterMax;
-        this.lengthFilterMax = lengthFilterMax;
-        changes.firePropertyChange(PROPERTY_MAX_LENGTH_FILTER, old, lengthFilterMax);
-    }
-
-    public double getLengthFilterMin() {
-        return lengthFilterMin;
-    }
-
-    public void setLengthFilterMin(double lengthFilterMin) {
-        double old = lengthFilterMin;
-        this.lengthFilterMin = lengthFilterMin;
-        changes.firePropertyChange(PROPERTY_MIN_LENGTH_FILTER, old, lengthFilterMin);
     }
 
     public String getXNodeAttr() {
@@ -166,49 +147,49 @@ public class FlowMapModel {
     }
 
     public void setEdgeMarkerAlpha(int edgeMarkerAlpha) {
-        int old = edgeMarkerAlpha;
+        int old = this.edgeMarkerAlpha;
         this.edgeMarkerAlpha = edgeMarkerAlpha;
         changes.firePropertyChange(PROPERTY_EDGE_MARKER_ALPHA, old, edgeMarkerAlpha);
     }
 
     public void setValueFilterMin(double valueFilterMin) {
-        double old = valueFilterMin;
+        double old = this.valueFilterMin;
         this.valueFilterMin = valueFilterMin;
         changes.firePropertyChange(PROPERTY_VALUE_FILTER_MIN, old, valueFilterMin);
     }
 
     public void setValueFilterMax(double valueFilterMax) {
-        double old = valueFilterMax;
+        double old = this.valueFilterMax;
         this.valueFilterMax = valueFilterMax;
         changes.firePropertyChange(PROPERTY_VALUE_FILTER_MAX, old, valueFilterMax);
     }
 
     public void setEdgeLengthFilterMin(double edgeLengthFilterMin) {
-        double old = edgeLengthFilterMin;
+        double old = this.edgeLengthFilterMin;
         this.edgeLengthFilterMin = edgeLengthFilterMin;
         changes.firePropertyChange(PROPERTY_EDGE_LENGTH_FILTER_MIN, old, edgeLengthFilterMin);
     }
 
     public void setEdgeLengthFilterMax(double edgeLengthFilterMax) {
-        double old = edgeLengthFilterMax;
+        double old = this.edgeLengthFilterMax;
         this.edgeLengthFilterMax = edgeLengthFilterMax;
         changes.firePropertyChange(PROPERTY_EDGE_LENGTH_FILTER_MAX, old, edgeLengthFilterMax);
     }
 
     public void setAutoAdjustEdgeColorScale(boolean autoAdjustEdgeColorScale) {
-        boolean old = autoAdjustEdgeColorScale;
+        boolean old = this.autoAdjustEdgeColorScale;
         this.autoAdjustEdgeColorScale = autoAdjustEdgeColorScale;
         changes.firePropertyChange(PROPERTY_AUTO_ADJUST_EDGE_COLOR_SCALE, old, autoAdjustEdgeColorScale);
     }
 
     public void setMaxEdgeWidth(double maxEdgeWidth) {
-        double old = maxEdgeWidth;
+        double old = this.maxEdgeWidth;
         this.maxEdgeWidth = maxEdgeWidth;
         changes.firePropertyChange(PROPERTY_MAX_EDGE_WIDTH, old, maxEdgeWidth);
     }
 
     public void setEdgeAlpha(int edgeAlpha) {
-        int old = edgeAlpha;
+        int old = this.edgeAlpha;
         this.edgeAlpha = edgeAlpha;
         changes.firePropertyChange(PROPERTY_EDGE_ALPHA, old, edgeAlpha);
     }
