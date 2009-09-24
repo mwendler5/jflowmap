@@ -42,7 +42,7 @@ public class VisualEdge extends PNode {
     private final Edge edge;
 
     private final double edgeLength;
-    
+
 
     public VisualEdge(FlowMapCanvas canvas, Edge edge, VisualNode sourceNode, VisualNode targetNode) {
         this.edge = edge;
@@ -58,7 +58,7 @@ public class VisualEdge extends PNode {
         final double x2 = targetNode.getValueX();
         final double y2 = targetNode.getValueY();
 
-        value = edge.getDouble(canvas.getEdgeValueAttr());
+        value = edge.getDouble(canvas.getModel().getValueEdgeAttr());
 
         // Calc start/end marker positions
         this.edgeLength = dist(x1, y1, x2, y2);
@@ -96,18 +96,20 @@ public class VisualEdge extends PNode {
         updateEdgeColors();
         updateEdgeMarkerColors();
         updateEdgeWidth();
+        updateEdgeVisibiliy();
 
         addInputEventListener(flowListener);
     }
 
     public double getNormalizedLogValue() {
+        FlowMapModel model = canvas.getModel();
         double nv;
-        if (canvas.getAutoAdjustEdgeColorScale()) {
+        if (model.getAutoAdjustEdgeColorScale()) {
             double minLog = 1.0;
-            double maxLog = Math.log(canvas.getValueFilterMax() - canvas.getValueFilterMin());
-            nv = (Math.log(value - canvas.getValueFilterMin()) - minLog) / (maxLog - minLog);
+            double maxLog = Math.log(model.getValueFilterMax() - model.getValueFilterMin());
+            nv = (Math.log(value - model.getValueFilterMin()) - minLog) / (maxLog - minLog);
         } else {
-            Stats stats = canvas.getGraphStats().getValueEdgeAttrStats();
+            Stats stats = model.getGraphStats().getValueEdgeAttrStats();
             nv = stats.normalizeLog(value);
         }
 
@@ -117,7 +119,7 @@ public class VisualEdge extends PNode {
     public double getNormalizedValue() {
         double nv;
 
-        Stats stats = canvas.getGraphStats().getValueEdgeAttrStats();
+        Stats stats = canvas.getModel().getGraphStats().getValueEdgeAttrStats();
         nv = stats.normalize(value);
 
         return nv;
@@ -140,6 +142,24 @@ public class VisualEdge extends PNode {
         startMarker.setStroke(stroke);
         endMarker.setStroke(stroke);
         line.setStroke(stroke);
+    }
+
+    public void updateEdgeVisibiliy() {
+        final FlowMapModel model = canvas.getModel();
+        double valueFilterMin = model.getValueFilterMin();
+        double valueFilterMax = model.getValueFilterMax();
+
+        double edgeLengthFilterMin = model.getEdgeLengthFilterMin();
+        double edgeLengthFilterMax = model.getEdgeLengthFilterMax();
+        final double value = getValue();
+        double length = getEdgeLength();
+        final boolean visible =
+                valueFilterMin <= value && value <= valueFilterMax    &&
+                edgeLengthFilterMin <= length && length <= edgeLengthFilterMax
+        ;
+        setVisible(visible);
+        setPickable(visible);
+        setChildrenPickable(visible);
     }
 
     public Edge getEdge() {
@@ -170,6 +190,7 @@ public class VisualEdge extends PNode {
     }
 
     private Color getValueColor(Color baseColor, boolean forMarker) {
+        FlowMapModel model = canvas.getModel();
         final double normalizedValue = getNormalizedLogValue();
         int r = (int) Math.round(normalizedValue * baseColor.getRed());
         int g = (int) Math.round(normalizedValue * baseColor.getGreen());
@@ -177,9 +198,9 @@ public class VisualEdge extends PNode {
         int alpha;
         if (baseColor.getAlpha() == 255) {
             if (forMarker) {
-                alpha = canvas.getEdgeMarkerAlpha();
+                alpha = model.getEdgeMarkerAlpha();
             } else {
-                alpha = canvas.getEdgeAlpha();
+                alpha = model.getEdgeAlpha();
             }
         } else {
             alpha = baseColor.getAlpha();
@@ -195,7 +216,7 @@ public class VisualEdge extends PNode {
             if (edge != null) {
                 edge.setHighlighted(true, false, false);
             }
-            edge.getVisualGraph().showTooltip(edge, event.getPosition());
+            edge.canvas.showTooltip(edge, event.getPosition());
 //            node.moveToFront();
         }
 
@@ -208,7 +229,7 @@ public class VisualEdge extends PNode {
             if (edge != null) {
                 edge.setHighlighted(false, false, false);
             }
-            edge.getVisualGraph().hideTooltip();
+            edge.canvas.hideTooltip();
         }
     };
 
@@ -220,11 +241,12 @@ public class VisualEdge extends PNode {
         return (VisualEdge) parent;
     }
 
-    public FlowMapCanvas getVisualGraph() {
+    public FlowMapCanvas getFlowMapCanvas() {
         return canvas;
     }
 
     public void setHighlighted(boolean value, boolean showDirection, boolean outgoing) {
+//        System.out.println(this + ".setHighlighted("  + value + ")");
         if (value) {
             Color paint;
             if (showDirection) {
@@ -238,6 +260,14 @@ public class VisualEdge extends PNode {
         }
         getSourceNode().setVisible(value);
         getTargetNode().setVisible(value);
+    }
+
+    @Override
+    public String toString() {
+        return "VisualEdge{" +
+                "label='" + getLabel() + "', " +
+                "value=" + value +
+                '}';
     }
 
     public double getEdgeLength() {

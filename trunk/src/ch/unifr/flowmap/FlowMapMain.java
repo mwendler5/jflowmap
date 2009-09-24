@@ -1,17 +1,12 @@
 package ch.unifr.flowmap;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import prefuse.data.Graph;
 import prefuse.data.io.DataIOException;
-import prefuse.data.io.GraphMLReader;
-import ch.unifr.flowmap.ui.FlowMapCanvas;
-import ch.unifr.flowmap.ui.ControlPanel2;
 
 /**
  * @author Ilya Boyandin
@@ -29,49 +24,35 @@ public class FlowMapMain extends JFrame {
         return OS_NAME.startsWith(osNamePrefix);
     }
 
-    public FlowMapMain(Graph graph, String valueAttrName, String labelAttrName) {
-        setTitle("FlowMap");
-        setLayout(new BorderLayout());
-        FlowMapCanvas canvas = new FlowMapCanvas(graph, valueAttrName, labelAttrName);
-        canvas.setValueFilterMin(1000);
-        add(canvas);
-        add(new ControlPanel2(canvas).getPanel(), BorderLayout.SOUTH);
+    private FlowMap flowMap;
 
-        final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        setPreferredSize(new Dimension(800, 600));
-//        setPreferredSize(new Dimension(screen.width, screen.height));
-        pack();
+    public FlowMapMain() {
+        setTitle("FlowMap");
+        flowMap = new FlowMap();
+        add(flowMap);
+
+        setExtendedState(MAXIMIZED_BOTH);
+//        setMinimumSize(new Dimension(800, 600));
+//        setPreferredSize(new Dimension(800, 600));
+//        pack();
 
         final Dimension size = getSize();
+        final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         final int locX = (screen.width - size.width) / 2;
         final int locY = (screen.height - size.height) / 2;
         setLocation(locX, locY);
-        setExtendedState(MAXIMIZED_BOTH);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     public static void main(String[] args) throws DataIOException {
         initLookAndFeel();
-        final GraphMLReader reader = new GraphMLReader();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                try {
-//                    new FlowMapMain(reader.readGraph("data/migrations.xml"), "value", "tooltip").setVisible(true);
-                  new FlowMapMain(reader.readGraph("data/refugee-flows-2008.xml"), "refugees", "name").setVisible(true);
-                } catch (DataIOException e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
+                new FlowMapMain().setVisible(true);
             }
         });
 
-    }
-
-    static class DatasetSpec {
-        private String filename;
-        private String valueAttrName;
-        private String labelAttrName;
     }
 
     private static void initLookAndFeel() {

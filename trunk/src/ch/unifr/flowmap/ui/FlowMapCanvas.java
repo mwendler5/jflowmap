@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 import prefuse.data.Edge;
 import prefuse.data.Graph;
@@ -27,74 +29,38 @@ public class FlowMapCanvas extends PCanvas {
     private static final int SHORT_ANIMATION_DURATION = 500;
     private static final long serialVersionUID = 1L;
     private final PValueTooltip tooltipBox;
-    private final Graph graph;
-    private final String valueEdgeAttr;
-    private final String xNodeAttr = "x";
-    private final String yNodeAttr = "y";
-    private String labelAttr = "tooltip";
     private final PBounds nodeBounds;
     
     private final PNode edgeLayer;
     private final PNode nodeLayer;
 
-    private int edgeAlpha = 20;
-    private int edgeMarkerAlpha = 120;
-
-    private double valueFilterMin = Double.MIN_VALUE;
-    private double valueFilterMax = Double.MAX_VALUE;
-
-    private double edgeLengthFilterMin = Double.MIN_VALUE;
-    private double edgeLengthFilterMax = Double.MAX_VALUE;
-
-    private double maxEdgeWidth = 10.0;
-
+    private FlowMapModel model;
     private final Map<Node, VisualNode> nodesToVisuals;
     private final Map<Edge, VisualEdge> edgesToVisuals;
-    private boolean autoAdjustEdgeColorScale;
 
-    private final GraphStats graphStats;
-    
-    public FlowMapCanvas(Graph graph, String valueEdgeAttrName, String labelAttrName) {
-    	this.graph = graph;
-    	this.valueEdgeAttr = valueEdgeAttrName;
-    	this.labelAttr = labelAttrName;
-
-        this.graphStats = new GraphStats(graph, valueEdgeAttrName, xNodeAttr, yNodeAttr);
-
-        Stats minMax = graphStats.getValueEdgeAttrStats();
-
-        valueFilterMin = minMax.min;
-        valueFilterMax = minMax.max;
-
-
-//        setBackground(new Color(47, 89, 134));
+    public FlowMapCanvas(FlowMapModel model) {
+    	this.model = model;
         setBackground(Color.BLACK);
         
         addInputEventListener(new ZoomHandler(.5, 50));
         setPanEventHandler(new PanHandler());
-        
-//        Stroke stroke = new BasicStroke(2);
-//        Color STROKE_PAINT = new Color(238, 238, 0, 100);
-//        Color STROKE_PAINT = new Color(255, 255, 255, 13);
 
         nodeLayer = new PNode();
-        
+
+        Graph graph = model.getGraph();
+
         final int numNodes = graph.getNodeCount();
-
-        Stats xStats = graphStats.getNodeAttrStats(xNodeAttr);
-        Stats yStats = graphStats.getNodeAttrStats(yNodeAttr);
-
-        System.out.println("xStats: " + xStats);
-        System.out.println("yStats: " + yStats);
-
         nodesToVisuals = new LinkedHashMap<Node, VisualNode>();
+
+        Stats xStats = model.getNodeAttrStats(model.getXNodeAttr());
+        Stats yStats = model.getNodeAttrStats(model.getYNodeAttr());
 
         for (int i = 0; i < numNodes; i++) {
             Node node = graph.getNode(i);
 
             VisualNode vnode = new VisualNode(this, node,
-                    node.getDouble(xNodeAttr) - xStats.min,
-                    node.getDouble(yNodeAttr) - yStats.min,
+                    node.getDouble(model.getXNodeAttr()) - xStats.min,
+                    node.getDouble(model.getYNodeAttr()) - yStats.min,
                     DEFAULT_NODE_SIZE);
             nodeLayer.addChild(vnode);
             nodesToVisuals.put(node, vnode);
@@ -108,15 +74,15 @@ public class FlowMapCanvas extends PCanvas {
         }
 
         edgesToVisuals = new LinkedHashMap<Edge, VisualEdge>();
-        Iterator<Integer> it = graph.getEdgeTable().rowsSortedBy(valueEdgeAttrName, true);
+        Iterator<Integer> it = graph.getEdgeTable().rowsSortedBy(model.getValueEdgeAttr(), true);
         while (it.hasNext()) {
             Edge edge = graph.getEdge(it.next());
 
-            double value = edge.getDouble(valueEdgeAttrName);
+            double value = edge.getDouble(model.getValueEdgeAttr());
             if (Double.isNaN(value)) {
                 System.out.println("Warning: Omitting NaN value for edge: " + edge +
-                        ": (" + edge.getSourceNode().getString(labelAttr) + " -> " +
-                        edge.getTargetNode().getString(labelAttr) + ")");
+                        ": (" + edge.getSourceNode().getString(model.getLabelAttr()) + " -> " +
+                        edge.getTargetNode().getString(model.getLabelAttr()) + ")");
             } else {
                 VisualNode fromNode = nodesToVisuals.get(edge.getSourceNode());
                 VisualNode toNode = nodesToVisuals.get(edge.getTargetNode());
@@ -140,126 +106,18 @@ public class FlowMapCanvas extends PCanvas {
         nodeBounds = new PBounds(
         	0, 0, (xStats.max - xStats.min)/2, (yStats.max - yStats.min)/2
         );
+
+        initModelChangeListeners(model);
     }
 
-    public GraphStats getGraphStats() {
-        return graphStats;
+    public FlowMapModel getModel() {
+        return model;
     }
 
     public double getMaxEdgeWidth() {
-        return maxEdgeWidth;
-    }
-    
-    public void setMaxEdgeWidth(double maxEdgeWidth) {
-        this.maxEdgeWidth = maxEdgeWidth;
-        updateEdgeWidths();
+        return model.getMaxEdgeWidth();
     }
 
-    public boolean getAutoAdjustEdgeColorScale() {
-        return autoAdjustEdgeColorScale;
-    }
-
-    public void setAutoAdjustEdgeColorScale(boolean autoAdjustEdgeColorScale) {
-        this.autoAdjustEdgeColorScale = autoAdjustEdgeColorScale;
-        updateEdgeColors();
-        updateEdgeMarkerColors();
-    }
-
-    public double getValueFilterMax() {
-        return valueFilterMax;
-    }
-
-    public void setValueFilterMax(double valueFilterMax) {
-        this.valueFilterMax = valueFilterMax;
-        updateEdgeVisibility();
-        updateEdgeColors();
-        updateEdgeMarkerColors();
-    }
-
-    public double getValueFilterMin() {
-        return valueFilterMin;
-    }
-
-    public void setValueFilterMin(double valueFilterMin) {
-        this.valueFilterMin = valueFilterMin;
-        updateEdgeVisibility();
-        updateEdgeColors();
-        updateEdgeMarkerColors();
-    }
-
-    public double getEdgeLengthFilterMin() {
-        return edgeLengthFilterMin;
-    }
-
-    public void setEdgeLengthFilterMin(double edgeLengthFilterMin) {
-        this.edgeLengthFilterMin = edgeLengthFilterMin;
-        updateEdgeVisibility();
-    }
-
-    public double getEdgeLengthFilterMax() {
-        return edgeLengthFilterMax;
-    }
-
-    public void setEdgeLengthFilterMax(double edgeLengthFilterMax) {
-        this.edgeLengthFilterMax = edgeLengthFilterMax;
-        updateEdgeVisibility();
-    }
-
-    private void updateEdgeColors() {
-        for (PNode node : (List<PNode>) edgeLayer.getChildrenReference()) {
-            if (node instanceof VisualEdge) {
-                ((VisualEdge) node).updateEdgeColors();
-            }
-        }
-    }
-
-    private void updateEdgeMarkerColors() {
-        for (PNode node : (List<PNode>) edgeLayer.getChildrenReference()) {
-            if (node instanceof VisualEdge) {
-                ((VisualEdge) node).updateEdgeMarkerColors();
-            }
-        }
-    }
-
-    private void updateEdgeVisibility() {
-        for (VisualEdge ve : edgesToVisuals.values()) {
-            final double value = ve.getValue();
-            double length = ve.getEdgeLength();
-            final boolean visible =
-                    valueFilterMin <= value && value <= valueFilterMax    &&
-                    edgeLengthFilterMin <= length && length <= edgeLengthFilterMax
-            ;
-            ve.setVisible(visible);
-            ve.setPickable(visible);
-            ve.setChildrenPickable(visible);
-        }
-    }
-    
-    private void updateEdgeWidths() {
-        for (VisualEdge ve : edgesToVisuals.values()) {
-            ve.updateEdgeWidth();
-        }
-    }
-
-
-    public int getEdgeAlpha() {
-        return edgeAlpha;
-    }
-
-    public void setEdgeAlpha(int edgeAlpha) {
-        this.edgeAlpha = edgeAlpha;
-        updateEdgeColors();
-    }
-
-    public int getEdgeMarkerAlpha() {
-        return edgeMarkerAlpha;
-    }
-
-    public void setEdgeMarkerAlpha(int edgeMarkerAlpha) {
-        this.edgeMarkerAlpha = edgeMarkerAlpha;
-        updateEdgeMarkerColors();
-    }
-    
     private static final Insets contentInsets = new Insets(10, 10, 10, 10);
     
     private Insets getContentInsets() {
@@ -283,12 +141,8 @@ public class FlowMapCanvas extends PCanvas {
 
     private VisualNode selectedNode;
     
-    public String getEdgeValueAttr() {
-        return valueEdgeAttr;
-    }
-
     public String getLabelAttr() {
-        return labelAttr;
+        return model.getLabelAttr();
     }
 
     public void showTooltip(PNode component, Point2D pos) {
@@ -307,7 +161,7 @@ public class FlowMapCanvas extends PCanvas {
             tooltipBox.setText(
 //                    flow.getStartNodeId() + " - " + flow.getEndNodeId(), 
                     edge.getLabel(),
-                    valueEdgeAttr + ": ", Double.toString(edge.getValue()));
+                    model.getValueEdgeAttr() + ": ", Double.toString(edge.getValue()));
         } else {
             return;
         }
@@ -348,4 +202,76 @@ public class FlowMapCanvas extends PCanvas {
         }
     }
 
+    private void initModelChangeListeners(FlowMapModel model) {
+        model.addPropertyChangeListener(FlowMapModel.PROPERTY_AUTO_ADJUST_COLOR_SCALE, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateEdgeColors();
+                updateEdgeMarkerColors();
+            }
+        });
+
+        model.addPropertyChangeListener(FlowMapModel.PROPERTY_MAX_EDGE_WIDTH, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateEdgeWidths();
+            }
+        });
+
+        model.addPropertyChangeListener(FlowMapModel.PROPERTY_EDGE_ALPHA, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateEdgeColors();
+            }
+        });
+
+        model.addPropertyChangeListener(FlowMapModel.PROPERTY_EDGE_MARKER_ALPHA, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateEdgeMarkerColors();
+            }
+        });
+
+        PropertyChangeListener valueFilterListener = new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateEdgeVisibility();
+                updateEdgeColors();
+                updateEdgeMarkerColors();
+            }
+        };
+        model.addPropertyChangeListener(FlowMapModel.PROPERTY_VALUE_FILTER_MIN, valueFilterListener);
+        model.addPropertyChangeListener(FlowMapModel.PROPERTY_VALUE_FILTER_MAX, valueFilterListener);
+
+        PropertyChangeListener edgeLengthFilterListener = new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateEdgeVisibility();
+            }
+        };
+        model.addPropertyChangeListener(FlowMapModel.PROPERTY_EDGE_LENGTH_FILTER_MIN, edgeLengthFilterListener);
+        model.addPropertyChangeListener(FlowMapModel.PROPERTY_EDGE_LENGTH_FILTER_MAX, edgeLengthFilterListener);
+    }
+
+    private void updateEdgeColors() {
+        for (PNode node : (List<PNode>) edgeLayer.getChildrenReference()) {
+            if (node instanceof VisualEdge) {
+                ((VisualEdge) node).updateEdgeColors();
+            }
+        }
+    }
+
+    private void updateEdgeMarkerColors() {
+        for (PNode node : (List<PNode>) edgeLayer.getChildrenReference()) {
+            if (node instanceof VisualEdge) {
+                ((VisualEdge) node).updateEdgeMarkerColors();
+            }
+        }
+    }
+
+    private void updateEdgeVisibility() {
+        for (VisualEdge ve : edgesToVisuals.values()) {
+            ve.updateEdgeVisibiliy();
+        }
+    }
+
+    private void updateEdgeWidths() {
+        for (VisualEdge ve : edgesToVisuals.values()) {
+            ve.updateEdgeWidth();
+        }
+    }
 }

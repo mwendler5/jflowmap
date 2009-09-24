@@ -142,6 +142,7 @@ public class VisualNode extends PPath {
     }
 
     public void setSelected(boolean selected) {
+//        System.out.println(this + ".setSelected("  + selected + ")");
         this.selected = selected;
         setVisible(true);
         setAlwaysVisible(selected);
@@ -151,14 +152,18 @@ public class VisualNode extends PPath {
             setStrokePaint(STROKE_PAINT);
         }
         if (highlighted) {
+//            System.out.println(" > " + this + " outgoing edges # = "  + outgoingEdges.size());
             for (VisualEdge flow : outgoingEdges) {
+//                System.out.println(" > " + this + " outgoing edge "  + flow + " visible=" + flow.getVisible());
                 if (flow.getVisible()) {
                     flow.getTargetNode().setAlwaysVisible(selected);
                     flow.getTargetNode().setVisible(selected);
                     flow.setHighlighted(selected, true, false);
                 }
             }
+//            System.out.println(" > " + this + " incoming edges # = "  + incomingEdges.size());
             for (VisualEdge flow : incomingEdges) {
+//                System.out.println(" > " + this + " incoming edge "  + flow + " visible=" + flow.getVisible());
                 if (flow.getVisible()) {
                     flow.getSourceNode().setAlwaysVisible(selected);
                     flow.getSourceNode().setVisible(selected);
@@ -212,4 +217,10 @@ public class VisualNode extends PPath {
         this.alwaysVisible = alwaysVisible;
     }
 
+    @Override
+    public String toString() {
+        return "VisualNode{" +
+                "label=" + getLabel() +
+                '}';
+    }
 }
