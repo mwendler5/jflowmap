@@ -12,6 +12,21 @@
    <key id="refugees-and-like-unhcr" for="edge" attr.name="refugees-and-like-unhcr"
         attr.type="double"/>
    <graph edgedefault="directed" name="Refugees of the year 2006">
+      <node id="NRU">
+         <data key="x">685.1733042000001</data>
+         <data key="y">356.9231219766742</data>
+         <data key="name">Nauru</data>
+      </node>
+      <node id="SMR">
+         <data key="x">380.1104434</data>
+         <data key="y">228.90466844694893</data>
+         <data key="name">San Marino</data>
+      </node>
+      <node id="MTQ">
+         <data key="x">234.99832762499997</data>
+         <data key="y">315.78211338652915</data>
+         <data key="name">Martinique</data>
+      </node>
       <node id="ABW">
          <data key="x">217.299928</data>
          <data key="y">321.61341768916174</data>
@@ -1191,16 +1206,6 @@
          <data key="x">425.0271179</data>
          <data key="y">266.57497964869435</data>
          <data key="name">Occupied Palestinian Territory</data>
-      </node>
-      <node id="NRU">
-         <data key="x">685.1971819500001</data>
-         <data key="y">356.93389427954</data>
-         <data key="name">Nauru</data>
-      </node>
-      <node id="SMR">
-         <data key="x">380.083715725</data>
-         <data key="y">228.95120346122854</data>
-         <data key="name">San Marino</data>
       </node>
       <edge source="IRQ" target="AFG" id="1">
          <data key="refugees">1</data>

@@ -15,7 +15,7 @@ import java.awt.event.ItemListener;
 public class ControlPanel {
 
     private static final FlowMap.DatasetSpec[] datasetSpecs = new FlowMap.DatasetSpec[]{
-            new FlowMap.DatasetSpec("data/migrations.xml", "value", "tooltip"),
+            new FlowMap.DatasetSpec("data/migrations-unique.xml", "value", "tooltip"),
             new FlowMap.DatasetSpec("data/refugee-flows-2008.xml", "refugees", "name"),
             new FlowMap.DatasetSpec("data/refugee-flows-2007.xml", "refugees", "name"),
             new FlowMap.DatasetSpec("data/refugee-flows-2006.xml", "refugees", "name"),
@@ -25,11 +25,31 @@ public class ControlPanel {
             new FlowMap.DatasetSpec("data/refugee-flows-2002.xml", "refugees", "name"),
             new FlowMap.DatasetSpec("data/refugee-flows-2001.xml", "refugees", "name"),
             new FlowMap.DatasetSpec("data/refugee-flows-2000.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1999.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1998.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1997.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1996.xml", "refugees", "name"),
             new FlowMap.DatasetSpec("data/refugee-flows-1995.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1994.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1993.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1992.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1991.xml", "refugees", "name"),
             new FlowMap.DatasetSpec("data/refugee-flows-1990.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1989.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1988.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1987.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1986.xml", "refugees", "name"),
             new FlowMap.DatasetSpec("data/refugee-flows-1985.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1984.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1983.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1982.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1981.xml", "refugees", "name"),
             new FlowMap.DatasetSpec("data/refugee-flows-1980.xml", "refugees", "name"),
-            new FlowMap.DatasetSpec("data/refugee-flows-1975.xml", "refugees", "name")
+            new FlowMap.DatasetSpec("data/refugee-flows-1979.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1978.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1977.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1976.xml", "refugees", "name"),
+            new FlowMap.DatasetSpec("data/refugee-flows-1975.xml", "refugees", "name"), 
     };
 
     private JTabbedPane tabbedPane1;
