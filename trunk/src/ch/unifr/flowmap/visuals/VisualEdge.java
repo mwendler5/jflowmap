@@ -1,10 +1,11 @@
-package ch.unifr.flowmap.ui;
+package ch.unifr.flowmap.visuals;
 
 import java.awt.Color;
 import java.awt.geom.Line2D;
 
 import prefuse.data.Edge;
 import ch.unifr.flowmap.data.Stats;
+import ch.unifr.flowmap.models.FlowMapModel;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;

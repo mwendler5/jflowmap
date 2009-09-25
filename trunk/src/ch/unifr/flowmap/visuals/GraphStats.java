@@ -1,4 +1,4 @@
-package ch.unifr.flowmap.ui;
+package ch.unifr.flowmap.visuals;
 
 import ch.unifr.flowmap.data.Stats;
 import prefuse.data.Graph;

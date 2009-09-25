@@ -1,24 +1,32 @@
-package ch.unifr.flowmap.ui;
+package ch.unifr.flowmap.visuals;
 
 import java.awt.Color;
 import java.awt.Insets;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
 
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import ch.unifr.flowmap.data.Stats;
 import ch.unifr.flowmap.util.PiccoloUtils;
+import ch.unifr.flowmap.models.FlowMapModel;
+import ch.unifr.flowmap.models.map.MapModel;
+import ch.unifr.flowmap.models.map.MapAreaModel;
+import ch.unifr.flowmap.models.map.Polygon;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
+import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * @author Ilya Boyandin
@@ -33,6 +41,7 @@ public class FlowMapCanvas extends PCanvas {
     
     private final PNode edgeLayer;
     private final PNode nodeLayer;
+    private final PNode mapLayer;
 
     private FlowMapModel model;
     private final Map<Node, VisualNode> nodesToVisuals;
@@ -59,8 +68,8 @@ public class FlowMapCanvas extends PCanvas {
             Node node = graph.getNode(i);
 
             VisualNode vnode = new VisualNode(this, node,
-                    node.getDouble(model.getXNodeAttr()) - xStats.min,
-                    node.getDouble(model.getYNodeAttr()) - yStats.min,
+                    node.getDouble(model.getXNodeAttr()),// - xStats.min,
+                    node.getDouble(model.getYNodeAttr()),// - yStats.min,
                     DEFAULT_NODE_SIZE);
             nodeLayer.addChild(vnode);
             nodesToVisuals.put(node, vnode);
@@ -94,9 +103,34 @@ public class FlowMapCanvas extends PCanvas {
             }
         }
 
+        mapLayer = new PNode();
+        loadMap(mapLayer);
+
+
+        getLayer().addChild(mapLayer);
         getLayer().addChild(edgeLayer);
         getLayer().addChild(nodeLayer);
-        
+
+//        mapLayer.setBounds(mapLayer.getX() - xStats.min, mapLayer.getY() - xStats.max, mapLayer.getWidth(), mapLayer.getHeight());
+//        mapLayer.addActivity(mapLayer.animateToBounds(100, 100, 200, 200, 1000));
+
+
+//        Rectangle2D.Double boundRect = new Rectangle2D.Double(xStats.min, yStats.min, xStats.max - xStats.min, yStats.max - yStats.min);
+        PBounds boundRect = getNodesBounds();
+        PPath boundRectPath = new PPath(boundRect);
+        getLayer().addChild(boundRectPath);
+        boundRectPath.setStrokePaint(Color.red);
+//        PiccoloUtils.setViewPaddedBounds(getCamera(), getNodesBounds(), new Insets(0, 0, 0, 0));
+//        PiccoloUtils.animateViewToPaddedBounds(getCamera(), getNodesBounds(), new Insets(0, 0, 0, 0), 1000);
+//        getCamera().viewToLocal(boundRect);
+        System.out.println(boundRect);
+        boundRect = (PBounds)getCamera().localToGlobal(boundRect);
+        boundRect = (PBounds)getCamera().globalToLocal(boundRect);
+        boundRect = (PBounds)getCamera().localToView(boundRect);
+        boundRect = (PBounds)getCamera().viewToLocal(boundRect);
+        System.out.println(boundRect);
+        getCamera().animateViewToCenterBounds(boundRect, true, 1000);
+
         tooltipBox = new PValueTooltip();
         tooltipBox.setVisible(false);
         tooltipBox.setPickable(false);
@@ -108,6 +142,38 @@ public class FlowMapCanvas extends PCanvas {
         );
 
         initModelChangeListeners(model);
+    }
+
+    private PBounds getNodesBounds() {
+        PBounds b = null;
+        for (VisualNode node : nodesToVisuals.values()) {
+            if (b == null) {
+                b = node.getBounds();
+            } else {
+                Rectangle2D.union(b, node.getBoundsReference(), b);
+            }
+        }
+        return b;
+    }
+
+    private void loadMap(PNode mapLayer) {
+        try {
+            final Color mapPaintColor = new Color(15, 15, 15);
+            final Color mapStrokeColor = new Color(20, 20, 20);
+            final PFixedWidthStroke mapStroke = new PFixedWidthStroke(1);
+            MapModel mapModel = MapModel.load("data/countries-areas.xml");
+            for (MapAreaModel area : mapModel.getAreas()) {
+                for (Polygon poly : area.getPolygons()) {
+                    PPath path = PPath.createPolyline(poly.getPoints());
+                    path.setPaint(mapPaintColor);
+                    path.setStrokePaint(mapStrokeColor);
+                    path.setStroke(mapStroke);
+                    mapLayer.addChild(path);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println(e);
+        }
     }
 
     public FlowMapModel getModel() {

@@ -2,11 +2,13 @@ package ch.unifr.flowmap;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import prefuse.data.io.DataIOException;
+import ch.unifr.flowmap.models.map.MapModel;
 
 /**
  * @author Ilya Boyandin
@@ -45,14 +47,13 @@ public class FlowMapMain extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
-    public static void main(String[] args) throws DataIOException {
+    public static void main(String[] args) throws IOException {
         initLookAndFeel();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 new FlowMapMain().setVisible(true);
             }
         });
-
     }
 
     private static void initLookAndFeel() {

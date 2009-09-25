@@ -1,6 +1,8 @@
 package ch.unifr.flowmap.ui;
 
 import ch.unifr.flowmap.FlowMap;
+import ch.unifr.flowmap.models.FlowMapModel;
+import ch.unifr.flowmap.visuals.FlowMapCanvas;
 import ch.unifr.flowmap.data.Stats;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -11,6 +13,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
+import prefuse.data.io.DataIOException;
 
 public class ControlPanel {
 
@@ -49,7 +53,7 @@ public class ControlPanel {
             new FlowMap.DatasetSpec("data/refugee-flows-1978.xml", "refugees", "name"),
             new FlowMap.DatasetSpec("data/refugee-flows-1977.xml", "refugees", "name"),
             new FlowMap.DatasetSpec("data/refugee-flows-1976.xml", "refugees", "name"),
-            new FlowMap.DatasetSpec("data/refugee-flows-1975.xml", "refugees", "name"), 
+            new FlowMap.DatasetSpec("data/refugee-flows-1975.xml", "refugees", "name"),
     };
 
     private JTabbedPane tabbedPane1;
@@ -239,9 +243,15 @@ public class ControlPanel {
     }
 
     private void updateFlowMapCanvas(FlowMap.DatasetSpec dataset) {
-        FlowMapModel model = flowMap.loadModel(dataset);
-        setFlowMapModel(model);
-        flowMap.setCanvas(new FlowMapCanvas(model));
+        FlowMapModel model = null;
+        try {
+            model = FlowMapModel.load(dataset);
+            setFlowMapModel(model);
+            flowMap.setCanvas(new FlowMapCanvas(model));
+        } catch (DataIOException e) {
+            JOptionPane.showMessageDialog(getPanel(), e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public FlowMapModel getFlowMapModel() {

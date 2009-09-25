@@ -1,7 +1,8 @@
 package ch.unifr.flowmap;
 
-import ch.unifr.flowmap.ui.FlowMapModel;
-import ch.unifr.flowmap.ui.FlowMapCanvas;
+import ch.unifr.flowmap.models.FlowMapModel;
+import ch.unifr.flowmap.models.map.MapModel;
+import ch.unifr.flowmap.visuals.FlowMapCanvas;
 import ch.unifr.flowmap.ui.ControlPanel;
 
 import javax.swing.*;
@@ -26,12 +27,6 @@ public class FlowMap extends JComponent {
         add(controlPanel.getPanel(), BorderLayout.SOUTH);
     }
 
-    public FlowMapModel loadModel(DatasetSpec spec) {
-        FlowMapModel model = new FlowMapModel(loadGraph(spec.filename), spec.valueAttrName, spec.labelAttrName);
-        model.setValueFilterMin(1000);
-        return model;
-    }
-
     public FlowMapCanvas getCanvas() {
         return canvas;
     }
@@ -42,17 +37,6 @@ public class FlowMap extends JComponent {
         }
         add(canvas, BorderLayout.CENTER);
         this.canvas = canvas;
-    }
-
-    private Graph loadGraph(String filename) {
-        try {
-            GraphMLReader reader = new GraphMLReader();
-            return reader.readGraph(filename);
-        } catch (DataIOException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
     }
 
     public static class DatasetSpec {

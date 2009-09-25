@@ -1,8 +1,13 @@
-package ch.unifr.flowmap.ui;
+package ch.unifr.flowmap.models;
 
 import prefuse.data.Graph;
+import prefuse.data.io.GraphMLReader;
+import prefuse.data.io.DataIOException;
 import ch.unifr.flowmap.data.Stats;
+import ch.unifr.flowmap.visuals.GraphStats;
+import ch.unifr.flowmap.FlowMap;
 
+import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -204,6 +209,13 @@ public class FlowMapModel {
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         changes.removePropertyChangeListener(listener);
+    }
+
+    public static final FlowMapModel load(FlowMap.DatasetSpec spec) throws DataIOException {
+        GraphMLReader reader = new GraphMLReader();
+        FlowMapModel model = new FlowMapModel(reader.readGraph(spec.filename), spec.valueAttrName, spec.labelAttrName);
+        model.setValueFilterMin(1000);
+        return model;
     }
 
     public static final String PROPERTY_AUTO_ADJUST_COLOR_SCALE = "autoAdjustColorScale";

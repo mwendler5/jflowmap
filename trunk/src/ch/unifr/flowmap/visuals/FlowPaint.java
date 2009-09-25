@@ -1,4 +1,4 @@
-package ch.unifr.flowmap.ui;
+package ch.unifr.flowmap.visuals;
 
 import java.awt.Paint;
 import java.awt.PaintContext;
