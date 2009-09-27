@@ -1,4 +1,4 @@
-package ch.unifr.flowmap.data;
+package ch.unifr.flowmap.util;
 
 import java.util.Iterator;
 

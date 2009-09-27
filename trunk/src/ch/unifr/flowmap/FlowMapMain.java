@@ -7,9 +7,6 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import prefuse.data.io.DataIOException;
-import ch.unifr.flowmap.models.map.MapModel;
-
 /**
  * @author Ilya Boyandin
  */
@@ -26,15 +23,15 @@ public class FlowMapMain extends JFrame {
         return OS_NAME.startsWith(osNamePrefix);
     }
 
-    private FlowMap flowMap;
+    private JFlowMap flowMap;
 
     public FlowMapMain() {
-        setTitle("FlowMap");
-        flowMap = new FlowMap();
+        setTitle("JFlowMap");
+        flowMap = new JFlowMap();
         add(flowMap);
 
         setExtendedState(MAXIMIZED_BOTH);
-//        setMinimumSize(new Dimension(800, 600));
+        setMinimumSize(new Dimension(800, 600));
 //        setPreferredSize(new Dimension(800, 600));
 //        pack();
 

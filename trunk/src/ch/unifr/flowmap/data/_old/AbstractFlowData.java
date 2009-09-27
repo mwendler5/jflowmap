@@ -1,4 +1,4 @@
-package ch.unifr.flowmap.data;
+package ch.unifr.flowmap.data._old;
 
 import java.util.ArrayList;
 import java.util.HashMap;

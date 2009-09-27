@@ -1,4 +1,4 @@
-package ch.unifr.flowmap.visuals;
+package ch.unifr.flowmap.util;
 
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PPanEventHandler;

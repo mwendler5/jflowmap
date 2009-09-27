@@ -1,4 +1,4 @@
-package ch.unifr.flowmap.visuals;
+package ch.unifr.flowmap.util;
 
 import java.awt.geom.Point2D;
 

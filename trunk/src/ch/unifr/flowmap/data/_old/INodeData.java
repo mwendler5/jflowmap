@@ -1,4 +1,4 @@
-package ch.unifr.flowmap.data;
+package ch.unifr.flowmap.data._old;
 
 import java.awt.geom.Point2D;
 

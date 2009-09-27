@@ -3,11 +3,10 @@ package ch.unifr.flowmap.models;
 import prefuse.data.Graph;
 import prefuse.data.io.GraphMLReader;
 import prefuse.data.io.DataIOException;
-import ch.unifr.flowmap.data.Stats;
-import ch.unifr.flowmap.visuals.GraphStats;
-import ch.unifr.flowmap.FlowMap;
+import ch.unifr.flowmap.util.Stats;
+import ch.unifr.flowmap.util.GraphStats;
+import ch.unifr.flowmap.JFlowMap;
 
-import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -211,7 +210,7 @@ public class FlowMapModel {
         changes.removePropertyChangeListener(listener);
     }
 
-    public static final FlowMapModel load(FlowMap.DatasetSpec spec) throws DataIOException {
+    public static final FlowMapModel load(JFlowMap.DatasetSpec spec) throws DataIOException {
         GraphMLReader reader = new GraphMLReader();
         FlowMapModel model = new FlowMapModel(reader.readGraph(spec.filename), spec.valueAttrName, spec.labelAttrName);
         model.setValueFilterMin(1000);

@@ -1,6 +1,6 @@
-package ch.unifr.flowmap.visuals;
+package ch.unifr.flowmap.util;
 
-import ch.unifr.flowmap.data.Stats;
+import ch.unifr.flowmap.util.Stats;
 import prefuse.data.Graph;
 import prefuse.data.Edge;
 import prefuse.data.Node;

@@ -21,7 +21,7 @@ public class VisualNode extends PPath {
 
     private static final long serialVersionUID = 1L;
     
-    private static final Stroke STROKE = new PFixedWidthStroke(2);
+    private static final Stroke STROKE = new PFixedWidthStroke(1);
     private static final Color PAINT = new Color(100, 100, 100, 120);
     private static final Color STROKE_PAINT = new Color(255, 255, 255, 100);
     private static final Color HIGHLIGHTED_PAINT = new Color(255, 0, 0, 120);
@@ -30,7 +30,7 @@ public class VisualNode extends PPath {
     private final List<VisualEdge> outgoingEdges = new ArrayList<VisualEdge>();
     private final List<VisualEdge> incomingEdges = new ArrayList<VisualEdge>();
 
-    private final FlowMapCanvas canvas;
+    private final VisualFlowMap visualFlowMap;
 
 	private final Node node;
 
@@ -40,8 +40,8 @@ public class VisualNode extends PPath {
 	private boolean selected;
 	private boolean highlighted;
     private boolean alwaysVisible;
-	
-    public VisualNode(FlowMapCanvas canvas, Node node, double x, double y, double size) {
+
+    public VisualNode(VisualFlowMap visualFlowMap, Node node, double x, double y, double size) {
         super(new Ellipse2D.Double(x - size/2, y - size/2, size, size));
         this.valueX = x;
         this.valueY = y;
@@ -51,7 +51,7 @@ public class VisualNode extends PPath {
 //    	this.x = x;
 //    	this.y = y;
         this.node = node;
-        this.canvas = canvas;
+        this.visualFlowMap = visualFlowMap;
         addInputEventListener(INPUT_EVENT_HANDLER);
         setVisible(false);
 	}
@@ -87,12 +87,12 @@ public class VisualNode extends PPath {
 		return node;
 	}
    
-    public FlowMapCanvas getVisualGraph() {
-		return canvas;
+    public VisualFlowMap getVisualGraph() {
+		return visualFlowMap;
 	}
 
 	public String getLabel() {
-		return node.getString(canvas.getLabelAttr());
+		return node.getString(visualFlowMap.getLabelAttr());
 	}
 
     private static final PInputEventListener INPUT_EVENT_HANDLER = new PBasicInputEventHandler() {
@@ -101,7 +101,7 @@ public class VisualNode extends PPath {
             PNode node = event.getPickedNode();
             if (node instanceof VisualNode) {
                 VisualNode vnode = (VisualNode)node;
-                vnode.canvas.setSelectedNode(vnode.isSelected() ? null : vnode);
+                vnode.visualFlowMap.setSelectedNode(vnode.isSelected() ? null : vnode);
             }
         }
         
@@ -221,5 +221,24 @@ public class VisualNode extends PPath {
         return "VisualNode{" +
                 "label=" + getLabel() +
                 '}';
+    }
+
+    public void updatePickability() {
+        boolean pickable = false;
+        for (VisualEdge ve : outgoingEdges) {
+            if (ve.getVisible()) {
+                pickable = true;
+                break;
+            }
+        }
+        if (!pickable)
+        for (VisualEdge ve : incomingEdges) {
+            if (ve.getVisible()) {
+                pickable = true;
+                break;
+            }
+        }
+        setPickable(pickable);
+        setChildrenPickable(pickable);
     }
 }

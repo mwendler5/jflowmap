@@ -1,7 +1,7 @@
 package ch.unifr.flowmap.data;
 
-import ch.unifr.flowmap.models.map.MapAreaModel;
-import ch.unifr.flowmap.models.map.MapModel;
+import ch.unifr.flowmap.models.map.Area;
+import ch.unifr.flowmap.models.map.AreaMap;
 import ch.unifr.flowmap.models.map.Polygon;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.builder.XmlDocument;
@@ -9,7 +9,6 @@ import org.xmlpull.v1.builder.XmlElement;
 import org.xmlpull.v1.builder.XmlInfosetBuilder;
 import org.xmlpull.v1.builder.xpath.Xb1XPath;
 
-import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileReader;
@@ -22,9 +21,9 @@ import java.util.List;
  * @author Ilya Boyandin
  *         Date: 25-Sep-2009
  */
-public class XmlMapModelReader {
+public class XmlAreaMapModelReader {
 
-    public MapModel readMap(String filename) throws IOException {
+    public AreaMap readMap(String filename) throws IOException {
         XmlInfosetBuilder builder = XmlInfosetBuilder.newInstance();
         try {
             File file = new File(filename);
@@ -34,14 +33,14 @@ public class XmlMapModelReader {
         }
     }
 
-    private static MapModel loadFrom(String name, XmlDocument doc) throws XmlPullParserException, IOException {
+    private static AreaMap loadFrom(String name, XmlDocument doc) throws XmlPullParserException, IOException {
         Xb1XPath
                 areaPath = new Xb1XPath("/areas/area"),
                 polygonPath = new Xb1XPath("polygons"),
                 polyPath = new Xb1XPath("poly");
 
 
-        List<MapAreaModel> areas = new ArrayList<MapAreaModel>();
+        List<Area> areas = new ArrayList<Area>();
         List<XmlElement> areaNodes = (List<XmlElement>) areaPath.selectNodes(doc);
         for (XmlElement areaNode : areaNodes) {
             String id = areaNode.getAttributeValue(null, "id");
@@ -52,7 +51,7 @@ public class XmlMapModelReader {
                 for (XmlElement polyNode : polyNodes) {
                     Iterator it = polyNode.children();
                     if (it.hasNext()) {
-                        Area poly = new Area();
+                        java.awt.geom.Area poly = new java.awt.geom.Area();
                         String coordsStr = it.next().toString().trim();
                         String[] coords = coordsStr.split("\\s*,\\s*");
                         Point2D[] points = new Point2D[coords.length / 2];
@@ -72,10 +71,10 @@ public class XmlMapModelReader {
                     }
                     
                 }
-                areas.add(new MapAreaModel(id, "", polygons));
+                areas.add(new Area(id, "", polygons));
             }
         }
 
-        return new MapModel(name, areas);
+        return new AreaMap(name, areas);
     }
 }

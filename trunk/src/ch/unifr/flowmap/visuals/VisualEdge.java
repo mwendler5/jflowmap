@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.geom.Line2D;
 
 import prefuse.data.Edge;
-import ch.unifr.flowmap.data.Stats;
+import ch.unifr.flowmap.util.Stats;
 import ch.unifr.flowmap.models.FlowMapModel;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
@@ -35,7 +35,7 @@ public class VisualEdge extends PNode {
     private final PPath line;
     private final PPath startMarker;
     private final PPath endMarker;
-    private final FlowMapCanvas canvas;
+    private final VisualFlowMap visualFlowMap;
     private final double value;
 
     private final VisualNode sourceNode;
@@ -45,11 +45,11 @@ public class VisualEdge extends PNode {
     private final double edgeLength;
 
 
-    public VisualEdge(FlowMapCanvas canvas, Edge edge, VisualNode sourceNode, VisualNode targetNode) {
+    public VisualEdge(VisualFlowMap visualFlowMap, Edge edge, VisualNode sourceNode, VisualNode targetNode) {
         this.edge = edge;
         this.sourceNode = sourceNode;
         this.targetNode = targetNode;
-        this.canvas = canvas;
+        this.visualFlowMap = visualFlowMap;
 
         targetNode.addIncomingEdge(this);
         sourceNode.addOutgoingEdge(this);
@@ -59,7 +59,7 @@ public class VisualEdge extends PNode {
         final double x2 = targetNode.getValueX();
         final double y2 = targetNode.getValueY();
 
-        value = edge.getDouble(canvas.getModel().getValueEdgeAttr());
+        value = edge.getDouble(visualFlowMap.getModel().getValueEdgeAttr());
 
         // Calc start/end marker positions
         this.edgeLength = dist(x1, y1, x2, y2);
@@ -87,7 +87,7 @@ public class VisualEdge extends PNode {
         addChild(endMarker);
 
 
-        final double width = canvas.getMaxEdgeWidth();   // TODO: update dynamically
+        final double width = visualFlowMap.getMaxEdgeWidth();   // TODO: update dynamically
         line = new PPath(new Line2D.Double(
                 sm_x /*- sin_a * width*/, sm_y /*- cos_a * width*/,
                 em_x /*+ sin_a * width*/, em_y /*+ cos_a * width*/));
@@ -97,13 +97,13 @@ public class VisualEdge extends PNode {
         updateEdgeColors();
         updateEdgeMarkerColors();
         updateEdgeWidth();
-        updateEdgeVisibiliy();
+        updateVisibiliy();
 
         addInputEventListener(flowListener);
     }
 
     public double getNormalizedLogValue() {
-        FlowMapModel model = canvas.getModel();
+        FlowMapModel model = visualFlowMap.getModel();
         double nv;
         if (model.getAutoAdjustEdgeColorScale()) {
             double minLog = 1.0;
@@ -120,7 +120,7 @@ public class VisualEdge extends PNode {
     public double getNormalizedValue() {
         double nv;
 
-        Stats stats = canvas.getModel().getGraphStats().getValueEdgeAttrStats();
+        Stats stats = visualFlowMap.getModel().getGraphStats().getValueEdgeAttrStats();
         nv = stats.normalize(value);
 
         return nv;
@@ -138,15 +138,15 @@ public class VisualEdge extends PNode {
 
     public void updateEdgeWidth() {
         double nv = getNormalizedValue();
-        float width = (float)(1 + nv * canvas.getMaxEdgeWidth());
+        float width = (float)(1 + nv * visualFlowMap.getMaxEdgeWidth());
         PFixedWidthStroke stroke = new PFixedWidthStroke(width);
         startMarker.setStroke(stroke);
         endMarker.setStroke(stroke);
         line.setStroke(stroke);
     }
 
-    public void updateEdgeVisibiliy() {
-        final FlowMapModel model = canvas.getModel();
+    public void updateVisibiliy() {
+        final FlowMapModel model = visualFlowMap.getModel();
         double valueFilterMin = model.getValueFilterMin();
         double valueFilterMax = model.getValueFilterMax();
 
@@ -168,8 +168,8 @@ public class VisualEdge extends PNode {
     }
 
     public String getLabel() {
-        return sourceNode.getNode().getString(canvas.getLabelAttr()) + " -> " +
-                targetNode.getNode().getString(canvas.getLabelAttr());
+        return sourceNode.getNode().getString(visualFlowMap.getLabelAttr()) + " -> " +
+                targetNode.getNode().getString(visualFlowMap.getLabelAttr());
     }
 
     public double getValue() {
@@ -191,7 +191,7 @@ public class VisualEdge extends PNode {
     }
 
     private Color getValueColor(Color baseColor, boolean forMarker) {
-        FlowMapModel model = canvas.getModel();
+        FlowMapModel model = visualFlowMap.getModel();
         final double normalizedValue = getNormalizedLogValue();
         int r = (int) Math.round(normalizedValue * baseColor.getRed());
         int g = (int) Math.round(normalizedValue * baseColor.getGreen());
@@ -217,7 +217,7 @@ public class VisualEdge extends PNode {
             if (edge != null) {
                 edge.setHighlighted(true, false, false);
             }
-            edge.canvas.showTooltip(edge, event.getPosition());
+            edge.visualFlowMap.showTooltip(edge, event.getPosition());
 //            node.moveToFront();
         }
 
@@ -230,7 +230,7 @@ public class VisualEdge extends PNode {
             if (edge != null) {
                 edge.setHighlighted(false, false, false);
             }
-            edge.canvas.hideTooltip();
+            edge.visualFlowMap.hideTooltip();
         }
     };
 
@@ -242,8 +242,8 @@ public class VisualEdge extends PNode {
         return (VisualEdge) parent;
     }
 
-    public FlowMapCanvas getFlowMapCanvas() {
-        return canvas;
+    public VisualFlowMap getFlowMapCanvas() {
+        return visualFlowMap;
     }
 
     public void setHighlighted(boolean value, boolean showDirection, boolean outgoing) {

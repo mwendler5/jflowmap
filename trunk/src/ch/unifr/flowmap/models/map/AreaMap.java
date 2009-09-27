@@ -1,6 +1,6 @@
 package ch.unifr.flowmap.models.map;
 
-import ch.unifr.flowmap.data.XmlMapModelReader;
+import ch.unifr.flowmap.data.XmlAreaMapModelReader;
 
 import java.util.List;
 import java.util.Collections;
@@ -11,12 +11,12 @@ import java.io.IOException;
  * @author Ilya Boyandin
  *         Date: 25-Sep-2009
  */
-public class MapModel {
+public class AreaMap {
 
     private String name;
-    private List<MapAreaModel> areas;
+    private List<Area> areas;
 
-    public MapModel(String name, List<MapAreaModel> areas) {
+    public AreaMap(String name, List<Area> areas) {
         this.name = name;
         this.areas = areas;
     }
@@ -25,12 +25,12 @@ public class MapModel {
         return name;
     }
 
-    public Collection<MapAreaModel> getAreas() {
+    public Collection<Area> getAreas() {
         return Collections.unmodifiableCollection(areas);
     }
 
-    public static final MapModel load(String filename) throws IOException {
-        XmlMapModelReader reader = new XmlMapModelReader();
+    public static final AreaMap load(String filename) throws IOException {
+        XmlAreaMapModelReader reader = new XmlAreaMapModelReader();
         return reader.readMap(filename);
     }
 }

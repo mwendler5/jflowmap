@@ -1,6 +1,5 @@
 package ch.unifr.flowmap.visuals;
 
-import java.awt.Color;
 import java.awt.Insets;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -10,49 +9,40 @@ import java.util.List;
 import java.util.Map;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
-import java.io.IOException;
 
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
-import ch.unifr.flowmap.data.Stats;
-import ch.unifr.flowmap.util.PiccoloUtils;
+import ch.unifr.flowmap.util.Stats;
 import ch.unifr.flowmap.models.FlowMapModel;
-import ch.unifr.flowmap.models.map.MapModel;
-import ch.unifr.flowmap.models.map.MapAreaModel;
-import ch.unifr.flowmap.models.map.Polygon;
 import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolox.util.PFixedWidthStroke;
+import org.apache.log4j.Logger;
 
 /**
  * @author Ilya Boyandin
  */
-public class FlowMapCanvas extends PCanvas {
+public class VisualFlowMap extends PNode {
 
-    private static final int DEFAULT_NODE_SIZE = 6;
+    private static Logger logger = Logger.getLogger(VisualFlowMap.class);
+    private static final int DEFAULT_NODE_SIZE = 4;
     private static final int SHORT_ANIMATION_DURATION = 500;
-    private static final long serialVersionUID = 1L;
-    private final PValueTooltip tooltipBox;
-    private final PBounds nodeBounds;
-    
+    private final Tooltip tooltipBox;
+    private PBounds nodeBounds;
+
     private final PNode edgeLayer;
     private final PNode nodeLayer;
-    private final PNode mapLayer;
 
     private FlowMapModel model;
     private final Map<Node, VisualNode> nodesToVisuals;
     private final Map<Edge, VisualEdge> edgesToVisuals;
+    private PCanvas canvas;
 
-    public FlowMapCanvas(FlowMapModel model) {
+    public VisualFlowMap(PCanvas canvas, FlowMapModel model) {
+        this.canvas = canvas;
     	this.model = model;
-        setBackground(Color.BLACK);
-        
-        addInputEventListener(new ZoomHandler(.5, 50));
-        setPanEventHandler(new PanHandler());
 
         nodeLayer = new PNode();
 
@@ -79,7 +69,7 @@ public class FlowMapCanvas extends PCanvas {
         edgeLayer = new PNode();
 
         for (int i = 0; i < graph.getEdgeTable().getColumnCount(); i++) {
-            System.out.println("Field: " + graph.getEdgeTable().getColumnName(i));
+            if (logger.isDebugEnabled()) logger.debug("Field: " + graph.getEdgeTable().getColumnName(i));
         }
 
         edgesToVisuals = new LinkedHashMap<Edge, VisualEdge>();
@@ -89,7 +79,7 @@ public class FlowMapCanvas extends PCanvas {
 
             double value = edge.getDouble(model.getValueEdgeAttr());
             if (Double.isNaN(value)) {
-                System.out.println("Warning: Omitting NaN value for edge: " + edge +
+                if (logger.isDebugEnabled()) logger.debug("Warning: Omitting NaN value for edge: " + edge +
                         ": (" + edge.getSourceNode().getString(model.getLabelAttr()) + " -> " +
                         edge.getTargetNode().getString(model.getLabelAttr()) + ")");
             } else {
@@ -103,77 +93,36 @@ public class FlowMapCanvas extends PCanvas {
             }
         }
 
-        mapLayer = new PNode();
-        loadMap(mapLayer);
+        addChild(edgeLayer);
+        addChild(nodeLayer);
 
-
-        getLayer().addChild(mapLayer);
-        getLayer().addChild(edgeLayer);
-        getLayer().addChild(nodeLayer);
-
-//        mapLayer.setBounds(mapLayer.getX() - xStats.min, mapLayer.getY() - xStats.max, mapLayer.getWidth(), mapLayer.getHeight());
-//        mapLayer.addActivity(mapLayer.animateToBounds(100, 100, 200, 200, 1000));
-
-
-//        Rectangle2D.Double boundRect = new Rectangle2D.Double(xStats.min, yStats.min, xStats.max - xStats.min, yStats.max - yStats.min);
-        PBounds boundRect = getNodesBounds();
-        PPath boundRectPath = new PPath(boundRect);
-        getLayer().addChild(boundRectPath);
-        boundRectPath.setStrokePaint(Color.red);
-//        PiccoloUtils.setViewPaddedBounds(getCamera(), getNodesBounds(), new Insets(0, 0, 0, 0));
-//        PiccoloUtils.animateViewToPaddedBounds(getCamera(), getNodesBounds(), new Insets(0, 0, 0, 0), 1000);
-//        getCamera().viewToLocal(boundRect);
-        System.out.println(boundRect);
-        boundRect = (PBounds)getCamera().localToGlobal(boundRect);
-        boundRect = (PBounds)getCamera().globalToLocal(boundRect);
-        boundRect = (PBounds)getCamera().localToView(boundRect);
-        boundRect = (PBounds)getCamera().viewToLocal(boundRect);
-        System.out.println(boundRect);
-        getCamera().animateViewToCenterBounds(boundRect, true, 1000);
-
-        tooltipBox = new PValueTooltip();
+        tooltipBox = new Tooltip();
         tooltipBox.setVisible(false);
         tooltipBox.setPickable(false);
         PCamera camera = getCamera();
 	    camera.addChild(tooltipBox);
         
-        nodeBounds = new PBounds(
-        	0, 0, (xStats.max - xStats.min)/2, (yStats.max - yStats.min)/2
-        );
-
         initModelChangeListeners(model);
+//        fitInCameraView();
+//        fitInCameraView(false);
     }
 
     private PBounds getNodesBounds() {
-        PBounds b = null;
-        for (VisualNode node : nodesToVisuals.values()) {
-            if (b == null) {
-                b = node.getBounds();
-            } else {
-                Rectangle2D.union(b, node.getBoundsReference(), b);
-            }
-        }
-        return b;
-    }
-
-    private void loadMap(PNode mapLayer) {
-        try {
-            final Color mapPaintColor = new Color(15, 15, 15);
-            final Color mapStrokeColor = new Color(20, 20, 20);
-            final PFixedWidthStroke mapStroke = new PFixedWidthStroke(1);
-            MapModel mapModel = MapModel.load("data/countries-areas.xml");
-            for (MapAreaModel area : mapModel.getAreas()) {
-                for (Polygon poly : area.getPolygons()) {
-                    PPath path = PPath.createPolyline(poly.getPoints());
-                    path.setPaint(mapPaintColor);
-                    path.setStrokePaint(mapStrokeColor);
-                    path.setStroke(mapStroke);
-                    mapLayer.addChild(path);
+        if (nodeBounds == null) {
+//            nodeBounds = new PBounds(
+//                    0, 0, (xStats.max - xStats.min) / 2, (yStats.max - yStats.min) / 2
+//            );
+            PBounds b = null;
+            for (VisualNode node : nodesToVisuals.values()) {
+                if (b == null) {
+                    b = node.getBounds();
+                } else {
+                    Rectangle2D.union(b, node.getBoundsReference(), b);
                 }
             }
-        } catch (IOException e) {
-            System.out.println(e);
+            nodeBounds = b;
         }
+        return nodeBounds;
     }
 
     public FlowMapModel getModel() {
@@ -190,19 +139,29 @@ public class FlowMapCanvas extends PCanvas {
         return contentInsets;
     }
     
-    public void fitInCameraView(boolean animate) {
-        if (nodeBounds != null) {
-            Insets insets = getContentInsets();
-            insets.left += 5;
-            insets.top += 5;
-            insets.bottom += 5;
-            insets.right += 5;
-            if (animate) {
-                PiccoloUtils.animateViewToPaddedBounds(getCamera(), nodeBounds, insets, SHORT_ANIMATION_DURATION);
-            } else {
-                PiccoloUtils.setViewPaddedBounds(getCamera(), nodeBounds, insets);
-            }
-        }
+//    public void fitInCameraView(boolean animate) {
+//        if (nodeBounds != null) {
+//            Insets insets = getContentInsets();
+//            insets.left += 5;
+//            insets.top += 5;
+//            insets.bottom += 5;
+//            insets.right += 5;
+//            if (animate) {
+//                PiccoloUtils.animateViewToPaddedBounds(getCamera(), nodeBounds, insets, SHORT_ANIMATION_DURATION);
+//            } else {
+//                PiccoloUtils.setViewPaddedBounds(getCamera(), nodeBounds, insets);
+//            }
+//        }
+//    }
+
+    public void fitInCameraView() {
+        PBounds boundRect = getNodesBounds();
+//        PPath boundRectPath = new PPath(boundRect);
+//        addChild(boundRectPath);
+//        boundRectPath.setStrokePaint(Color.red);
+        boundRect = (PBounds)getCamera().globalToLocal(boundRect);
+//        PiccoloUtils.setViewPaddedBounds(getCamera(), boundRect, new Insets(10, 10, 10, 10));
+        getCamera().animateViewToCenterBounds(boundRect, true, 0);
     }
 
     private VisualNode selectedNode;
@@ -331,7 +290,10 @@ public class FlowMapCanvas extends PCanvas {
 
     private void updateEdgeVisibility() {
         for (VisualEdge ve : edgesToVisuals.values()) {
-            ve.updateEdgeVisibiliy();
+            ve.updateVisibiliy();
+        }
+        for (VisualNode vn : nodesToVisuals.values()) {
+            vn.updatePickability();
         }
     }
 
@@ -339,5 +301,9 @@ public class FlowMapCanvas extends PCanvas {
         for (VisualEdge ve : edgesToVisuals.values()) {
             ve.updateEdgeWidth();
         }
+    }
+
+    public PCamera getCamera() {
+        return canvas.getCamera();
     }
 }
