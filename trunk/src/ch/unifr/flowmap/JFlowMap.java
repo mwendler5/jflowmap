@@ -1,21 +1,25 @@
 package ch.unifr.flowmap;
 
-import ch.unifr.flowmap.models.FlowMapModel;
-import ch.unifr.flowmap.models.map.*;
-import ch.unifr.flowmap.visuals.VisualFlowMap;
-import ch.unifr.flowmap.visuals.VisualAreaMap;
-import ch.unifr.flowmap.ui.ControlPanel;
-import ch.unifr.flowmap.util.ZoomHandler;
-import ch.unifr.flowmap.util.PanHandler;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.IOException;
 
-import prefuse.data.io.DataIOException;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import org.apache.log4j.Logger;
+
+import prefuse.data.io.DataIOException;
+import ch.unifr.flowmap.models.FlowMapModel;
+import ch.unifr.flowmap.models.map.AreaMap;
+import ch.unifr.flowmap.ui.ControlPanel;
+import ch.unifr.flowmap.util.PanHandler;
+import ch.unifr.flowmap.util.ZoomHandler;
+import ch.unifr.flowmap.visuals.VisualAreaMap;
+import ch.unifr.flowmap.visuals.VisualFlowMap;
 import edu.umd.cs.piccolo.PCanvas;
 
 /**
@@ -43,7 +47,8 @@ public class JFlowMap extends JComponent {
                 visualFlowMap.fitInCameraView();
             }
         });
-
+        
+        
         VisualFlowMap visFlowMap = loadFlowMap(datasetSpecs[0]);
         controlPanel = new ControlPanel(this, visFlowMap.getModel());
         add(controlPanel.getPanel(), BorderLayout.SOUTH);

@@ -3,23 +3,24 @@ package ch.unifr.flowmap.visuals;
 import java.awt.Insets;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
+
+import org.apache.log4j.Logger;
 
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
-import ch.unifr.flowmap.util.Stats;
 import ch.unifr.flowmap.models.FlowMapModel;
+import ch.unifr.flowmap.util.Stats;
 import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.PCanvas;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
-import org.apache.log4j.Logger;
 
 /**
  * @author Ilya Boyandin
@@ -86,7 +87,7 @@ public class VisualFlowMap extends PNode {
                 VisualNode fromNode = nodesToVisuals.get(edge.getSourceNode());
                 VisualNode toNode = nodesToVisuals.get(edge.getTargetNode());
 
-                VisualEdge ve = new VisualEdge(this, edge, fromNode, toNode);
+                VisualEdge ve = new LineVisualEdge(this, edge, fromNode, toNode);
                 edgeLayer.addChild(ve);
 
                 edgesToVisuals.put(edge, ve);
