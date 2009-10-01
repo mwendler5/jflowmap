@@ -1,11 +1,16 @@
 package ch.unifr.flowmap.visuals;
 
+import java.awt.Color;
+
 import prefuse.data.Edge;
 import ch.unifr.flowmap.models.FlowMapModel;
+import ch.unifr.flowmap.util.Stats;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventListener;
+import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * @author Ilya Boyandin
@@ -13,6 +18,11 @@ import edu.umd.cs.piccolo.event.PInputEventListener;
 public abstract class VisualEdge extends PNode {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Color STROKE_PAINT = new Color(255, 255, 255);
+    private static final Color STROKE_HIGHLIGHTED_PAINT = new Color(0, 0, 255, 200);
+    private static final Color STROKE_HIGHLIGHTED_INCOMING_PAINT = new Color(255, 0, 0, 200);
+    private static final Color STROKE_HIGHLIGHTED_OUTGOING_PAINT = new Color(0, 255, 0, 200);
 
     private final VisualFlowMap visualFlowMap;
 
@@ -37,11 +47,11 @@ public abstract class VisualEdge extends PNode {
         addInputEventListener(visualEdgeListener);
     }
 
-    public abstract void setHighlighted(boolean value, boolean showDirection, boolean outgoing);
+    public abstract PPath getEdgePPath();
 
-    public abstract void updateEdgeWidth();
-
-    public abstract void updateEdgeColors();
+    public void updateEdgeWidth() {
+        getEdgePPath().setStroke(getStroke());
+    }
 
     public abstract void updateEdgeMarkerColors();
 
@@ -98,6 +108,84 @@ public abstract class VisualEdge extends PNode {
                 "label='" + getLabel() + "', " +
                 "value=" + getValue() +
                 '}';
+    }
+
+    public double getNormalizedLogValue() {
+        FlowMapModel model = getVisualFlowMap().getModel();
+        double value = getValue();
+        double nv;
+        if (model.getAutoAdjustEdgeColorScale()) {
+            double minLog = 1.0;
+            double maxLog = Math.log(model.getValueFilterMax() - model.getValueFilterMin());
+            nv = (Math.log(value - model.getValueFilterMin()) - minLog) / (maxLog - minLog);
+        } else {
+            Stats stats = model.getGraphStats().getValueEdgeAttrStats();
+            nv = stats.normalizeLog(value);
+        }
+        return nv;
+    }
+
+    public double getNormalizedValue() {
+        double nv;
+    
+        Stats stats = getVisualFlowMap().getModel().getGraphStats().getValueEdgeAttrStats();
+        nv = stats.normalize(getValue());
+    
+        return nv;
+    }
+
+    protected Color getValueColor(Color baseColor, boolean forMarker) {
+        FlowMapModel model = getVisualFlowMap().getModel();
+        final double normalizedValue = getNormalizedLogValue();
+        int r = (int) Math.round(normalizedValue * baseColor.getRed());
+        int g = (int) Math.round(normalizedValue * baseColor.getGreen());
+        int b = (int) Math.round(normalizedValue * baseColor.getBlue());
+        int alpha;
+        if (baseColor.getAlpha() == 255) {
+            if (forMarker) {
+                alpha = model.getEdgeMarkerAlpha();
+            } else {
+                alpha = model.getEdgeAlpha();
+            }
+        } else {
+            alpha = baseColor.getAlpha();
+        }
+        return new Color(r, g, b,alpha);
+    }
+
+    public void updateEdgeColors() {
+        getEdgePPath().setStrokePaint(getValueColor(STROKE_PAINT, false));
+    }
+
+    public void setHighlighted(boolean value, boolean showDirection, boolean outgoing) {
+    //        System.out.println(this + ".setHighlighted("  + value + ")");
+            if (value) {
+                Color paint;
+                if (showDirection) {
+                    paint = (outgoing ? STROKE_HIGHLIGHTED_OUTGOING_PAINT : STROKE_HIGHLIGHTED_INCOMING_PAINT);
+                } else {
+                    paint = STROKE_HIGHLIGHTED_PAINT;
+                }
+                getEdgePPath().setStrokePaint(getValueColor(paint, false));
+            } else {
+                getEdgePPath().setStrokePaint(getValueColor(STROKE_PAINT, false));
+            }
+            getSourceNode().setVisible(value);
+            getTargetNode().setVisible(value);
+        }
+
+    protected PFixedWidthStroke getStroke() {
+        double nv = getNormalizedValue();
+        float width = (float)(1 + nv * getVisualFlowMap().getMaxEdgeWidth());
+        PFixedWidthStroke stroke = new PFixedWidthStroke(width);
+        return stroke;
+    }
+
+    public void update() {
+        updateEdgeColors();
+        updateEdgeMarkerColors();
+        updateEdgeWidth();
+        updateVisibiliy();
     }
 
     private static final PInputEventListener visualEdgeListener = new PBasicInputEventHandler() {

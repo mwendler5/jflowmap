@@ -87,7 +87,8 @@ public class VisualFlowMap extends PNode {
                 VisualNode fromNode = nodesToVisuals.get(edge.getSourceNode());
                 VisualNode toNode = nodesToVisuals.get(edge.getTargetNode());
 
-                VisualEdge ve = new LineVisualEdge(this, edge, fromNode, toNode);
+                VisualEdge ve = new BSplineVisualEdge(this, edge, fromNode, toNode);
+                ve.update();
                 edgeLayer.addChild(ve);
 
                 edgesToVisuals.put(edge, ve);
