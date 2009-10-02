@@ -9,7 +9,7 @@ public class Vector2D {
 
     private final double x;
     private final double y;
-    private double length;
+    private double length = Double.NaN;
 
     public Vector2D(double x, double y) {
         this.x = x;

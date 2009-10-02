@@ -82,7 +82,7 @@ public class JFlowMap extends JComponent {
                 map.moveToBack();
             }
             
-//            new ForceDirectedEdgeBundler(model.getGraph(), model.getXNodeAttr(), model.getYNodeAttr()).bundle(6);
+            new ForceDirectedEdgeBundler(model.getGraph(), model.getXNodeAttr(), model.getYNodeAttr()).bundle(6);
             return visualFlowMap;
         } catch (DataIOException e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
