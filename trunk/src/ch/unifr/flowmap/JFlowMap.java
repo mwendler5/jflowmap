@@ -13,7 +13,9 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 
 import prefuse.data.io.DataIOException;
+import prefuse.util.force.ForceConfigAction;
 import ch.unifr.flowmap.models.FlowMapModel;
+import ch.unifr.flowmap.models.ForceDirectedEdgeBundler;
 import ch.unifr.flowmap.models.map.AreaMap;
 import ch.unifr.flowmap.ui.ControlPanel;
 import ch.unifr.flowmap.util.PanHandler;
@@ -79,6 +81,8 @@ public class JFlowMap extends JComponent {
                 visualFlowMap.addChild(map);
                 map.moveToBack();
             }
+            
+//            new ForceDirectedEdgeBundler(model.getGraph(), model.getXNodeAttr(), model.getYNodeAttr()).bundle(6);
             return visualFlowMap;
         } catch (DataIOException e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
