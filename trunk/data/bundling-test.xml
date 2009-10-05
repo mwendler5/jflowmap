@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://graphml.graphdrawing.org/xmlns"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+
+   <key id="x" for="node" attr.name="x" attr.type="double"/>
+   <key id="y" for="node" attr.name="y" attr.type="double"/>
+   <key id="name" for="node" attr.name="name" attr.type="string"/>
+   <key id="data" for="edge" attr.name="data" attr.type="double"/>
+
+   <graph edgedefault="directed">
+      <node id="A">
+         <data key="x">0</data>
+         <data key="y">0</data>
+         <data key="name">A</data>
+      </node>
+      <node id="B">
+         <data key="x">100</data>
+         <data key="y">0</data>
+         <data key="name">B</data>
+      </node>
+      <node id="C">
+         <data key="x">10</data>
+         <data key="y">100</data>
+         <data key="name">C</data>
+      </node>
+      <node id="D">
+         <data key="x">110</data>
+         <data key="y">90</data>
+         <data key="name">D</data>
+      </node>
+      <node id="E">
+         <data key="x">120</data>
+         <data key="y">90</data>
+         <data key="name">E</data>
+      </node>
+      <node id="G">
+         <data key="x">160</data>
+         <data key="y">90</data>
+         <data key="name">G</data>
+      </node>
+
+      <edge source="A" target="B" id="1">
+         <data key="data">1000</data>
+      </edge>
+
+      <edge source="C" target="D" id="2">
+         <data key="data">1000</data>
+      </edge>
+
+      <edge source="A" target="D" id="3">
+         <data key="data">1000</data>
+      </edge>
+      <edge source="A" target="C" id="4">
+         <data key="data">1000</data>
+      </edge>
+      <edge source="B" target="E" id="5">
+         <data key="data">1000</data>
+      </edge>
+      <edge source="B" target="G" id="6">
+         <data key="data">1000</data>
+      </edge>
+   </graph>
+</graphml>

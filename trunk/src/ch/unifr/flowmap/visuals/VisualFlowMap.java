@@ -10,11 +10,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.SwingUtilities;
+
 import org.apache.log4j.Logger;
 
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
+import ch.unifr.flowmap.bundling.ForceDirectedEdgeBundler;
 import ch.unifr.flowmap.models.FlowMapModel;
 import ch.unifr.flowmap.util.Stats;
 import edu.umd.cs.piccolo.PCamera;
@@ -37,8 +40,8 @@ public class VisualFlowMap extends PNode {
     private final PNode nodeLayer;
 
     private FlowMapModel model;
-    private final Map<Node, VisualNode> nodesToVisuals;
-    private final Map<Edge, VisualEdge> edgesToVisuals;
+    private Map<Node, VisualNode> nodesToVisuals;
+    private Map<Edge, VisualEdge> edgesToVisuals;
     private PCanvas canvas;
 
     public VisualFlowMap(PCanvas canvas, FlowMapModel model) {
@@ -46,14 +49,35 @@ public class VisualFlowMap extends PNode {
     	this.model = model;
 
         nodeLayer = new PNode();
+        createNodes();
+        
+        edgeLayer = new PNode();
+        createEdges();
+
+        addChild(edgeLayer);
+        addChild(nodeLayer);
+        
+
+        tooltipBox = new Tooltip();
+        tooltipBox.setVisible(false);
+        tooltipBox.setPickable(false);
+        PCamera camera = getCamera();
+	    camera.addChild(tooltipBox);
+        
+        initModelChangeListeners(model);
+//        fitInCameraView();
+//        fitInCameraView(false);
+    }
+
+    private void createNodes() {
+        nodeLayer.removeAllChildren();
 
         Graph graph = model.getGraph();
-
         final int numNodes = graph.getNodeCount();
         nodesToVisuals = new LinkedHashMap<Node, VisualNode>();
 
-        Stats xStats = model.getNodeAttrStats(model.getXNodeAttr());
-        Stats yStats = model.getNodeAttrStats(model.getYNodeAttr());
+//        Stats xStats = model.getNodeAttrStats(model.getXNodeAttr());
+//        Stats yStats = model.getNodeAttrStats(model.getYNodeAttr());
 
         for (int i = 0; i < numNodes; i++) {
             Node node = graph.getNode(i);
@@ -65,48 +89,54 @@ public class VisualFlowMap extends PNode {
             nodeLayer.addChild(vnode);
             nodesToVisuals.put(node, vnode);
         }
-        
-        
-        edgeLayer = new PNode();
+    }
 
-        for (int i = 0; i < graph.getEdgeTable().getColumnCount(); i++) {
-            if (logger.isDebugEnabled()) logger.debug("Field: " + graph.getEdgeTable().getColumnName(i));
-        }
+    
+    private void createEdges() {
+        createEdges(null);
+    }
+    
+    private void createEdges(Point2D[][] edgeSplinePoints) {
+        edgeLayer.removeAllChildren();
+        
+        Graph graph = model.getGraph();
+
+//      for (int i = 0; i < graph.getEdgeTable().getColumnCount(); i++) {
+//      if (logger.isDebugEnabled()) logger.debug("Field: " + graph.getEdgeTable().getColumnName(i));
+//  }
 
         edgesToVisuals = new LinkedHashMap<Edge, VisualEdge>();
+        @SuppressWarnings("unchecked")
         Iterator<Integer> it = graph.getEdgeTable().rowsSortedBy(model.getValueEdgeAttr(), true);
+        int edgeCount = 0;
         while (it.hasNext()) {
             Edge edge = graph.getEdge(it.next());
 
             double value = edge.getDouble(model.getValueEdgeAttr());
             if (Double.isNaN(value)) {
-                if (logger.isDebugEnabled()) logger.debug("Warning: Omitting NaN value for edge: " + edge +
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Warning: Omitting NaN value for edge: " + edge +
                         ": (" + edge.getSourceNode().getString(model.getLabelAttr()) + " -> " +
                         edge.getTargetNode().getString(model.getLabelAttr()) + ")");
+                }
             } else {
                 VisualNode fromNode = nodesToVisuals.get(edge.getSourceNode());
                 VisualNode toNode = nodesToVisuals.get(edge.getTargetNode());
 
-                VisualEdge ve = new BSplineVisualEdge(this, edge, fromNode, toNode);
+                VisualEdge ve;
+                if (edgeSplinePoints == null) {
+                    ve = new LineVisualEdge(this, edge, fromNode, toNode);
+                } else {
+                    ve = new BSplineVisualEdge(this, edge, fromNode, toNode, edgeSplinePoints[edgeCount]);
+                }
                 ve.update();
                 edgeLayer.addChild(ve);
 
                 edgesToVisuals.put(edge, ve);
             }
+
+            edgeCount++;
         }
-
-        addChild(edgeLayer);
-        addChild(nodeLayer);
-
-        tooltipBox = new Tooltip();
-        tooltipBox.setVisible(false);
-        tooltipBox.setPickable(false);
-        PCamera camera = getCamera();
-	    camera.addChild(tooltipBox);
-        
-        initModelChangeListeners(model);
-//        fitInCameraView();
-//        fitInCameraView(false);
     }
 
     private PBounds getNodesBounds() {
@@ -195,8 +225,12 @@ public class VisualFlowMap extends PNode {
 //			Point2D pos = event.getPosition();
         final PBounds vb = getCamera().getBoundsReference();
         final PBounds tb = tooltipBox.getBoundsReference();
-        double x = pos.getX() + 8;
-        double y = pos.getY() + 8;
+        double x = pos.getX();
+        double y = pos.getY();
+        pos = new Point2D.Double(x, y);
+        getCamera().viewToLocal(pos);
+        x = pos.getX();
+        y = pos.getY();
         if (x + tb.getWidth() > vb.getWidth()) {
             final double _x = pos.getX() - tb.getWidth() - 8;
             if (vb.getX() - _x < x + tb.getWidth() - vb.getMaxX()) {
@@ -209,8 +243,7 @@ public class VisualFlowMap extends PNode {
                 y = _y;
             }
         }
-        pos = new Point2D.Double(x, y);
-        getCamera().viewToLocal(pos);
+        pos.setLocation(x + 8, y + 8);
         tooltipBox.setPosition(pos.getX(), pos.getY());
         tooltipBox.setVisible(true);
     }
@@ -307,5 +340,34 @@ public class VisualFlowMap extends PNode {
 
     public PCamera getCamera() {
         return canvas.getCamera();
+    }
+    
+    private ForceDirectedEdgeBundler bundler = null;
+
+    public void resetBundling() {
+        createEdges();
+        bundler = null;
+    }
+
+    public void bundlingCycle() {
+        if (bundler == null) {
+            initBundler(10);
+        }
+        bundler.nextCycle();
+        createEdges(bundler.getEdgePoints());
+    }
+
+    private void initBundler(int numCycles) {
+        bundler = new ForceDirectedEdgeBundler(
+                model.getGraph(), model.getXNodeAttr(), model.getYNodeAttr());
+        bundler.init(numCycles, .25);
+    }
+    
+    public void bundleEdges(int numCycles) {
+        initBundler(numCycles);
+        for (int cycle = 0; cycle < numCycles; cycle++) {
+            bundlingCycle();
+        }
+        bundler = null;
     }
 }

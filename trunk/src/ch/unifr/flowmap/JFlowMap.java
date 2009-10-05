@@ -2,20 +2,22 @@ package ch.unifr.flowmap;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.IOException;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
 import prefuse.data.io.DataIOException;
-import prefuse.util.force.ForceConfigAction;
 import ch.unifr.flowmap.models.FlowMapModel;
-import ch.unifr.flowmap.models.ForceDirectedEdgeBundler;
 import ch.unifr.flowmap.models.map.AreaMap;
 import ch.unifr.flowmap.ui.ControlPanel;
 import ch.unifr.flowmap.util.PanHandler;
@@ -54,6 +56,49 @@ public class JFlowMap extends JComponent {
         VisualFlowMap visFlowMap = loadFlowMap(datasetSpecs[0]);
         controlPanel = new ControlPanel(this, visFlowMap.getModel());
         add(controlPanel.getPanel(), BorderLayout.SOUTH);
+
+        JPanel bundleButs = new JPanel();
+        add(bundleButs, BorderLayout.NORTH);
+        
+        JButton resetButton = new JButton("Reset");
+        bundleButs.add(resetButton);
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                visualFlowMap.resetBundling();
+            }
+        });
+        JButton bundleButton = new JButton("Bundle");
+        bundleButs.add(bundleButton);
+        bundleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    visualFlowMap.bundleEdges(6);
+                } catch (Exception ex) {
+                    logger.error("Bundling error", ex);
+                    JOptionPane.showMessageDialog(JFlowMap.this,
+                            "Bundling couldn't be performed: [" + ex.getClass().getSimpleName()+ "] " + ex.getMessage()
+                    );
+                }
+            }
+        });
+        JButton bundlingStepButton = new JButton("Bundling cycle");
+        bundleButs.add(bundlingStepButton);
+        bundlingStepButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    visualFlowMap.bundlingCycle();
+                } catch (Exception ex) {
+                    logger.error("Bundling error", ex);
+                    JOptionPane.showMessageDialog(JFlowMap.this,
+                            "Bundling couldn't be performed: [" + ex.getClass().getSimpleName()+ "] " + ex.getMessage()
+                    );
+                }
+            }
+        });
+        
         setVisualFlowMap(visFlowMap);
     }
 
@@ -81,12 +126,10 @@ public class JFlowMap extends JComponent {
                 visualFlowMap.addChild(map);
                 map.moveToBack();
             }
-            
-            new ForceDirectedEdgeBundler(model.getGraph(), model.getXNodeAttr(), model.getYNodeAttr()).bundle(6);
             return visualFlowMap;
         } catch (DataIOException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
             logger.error("Couldn't load flow map " + dataset, e);
+            JOptionPane.showMessageDialog(this,  "Couldn't load flow map: [" + e.getClass().getSimpleName()+ "] " + e.getMessage());
         }
         return null;
     }
@@ -122,6 +165,7 @@ public class JFlowMap extends JComponent {
     }
     
     public static final DatasetSpec[] datasetSpecs = new DatasetSpec[] {
+            new DatasetSpec("data/bundling-test.xml", "data", "name", null),
             new DatasetSpec("data/migrations-unique.xml", "value", "tooltip", null),
             new DatasetSpec("data/refugee-flows-2008.xml", "refugees", "name", "data/countries-areas.xml"),
             new DatasetSpec("data/refugee-flows-2007.xml", "refugees", "name", "data/countries-areas.xml"),

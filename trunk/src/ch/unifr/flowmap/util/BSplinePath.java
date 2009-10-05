@@ -21,7 +21,7 @@ public class BSplinePath extends Path2D.Double {
 
     public BSplinePath(List<Point2D> points) {
         int n = points.size();
-        if (n < 3) {
+        if (n < 4) {
             throw new IllegalArgumentException(
                     "BSplinePath needs at least 4 points");
         }
@@ -70,7 +70,7 @@ public class BSplinePath extends Path2D.Double {
         y4 = (p2.getY() + p3.getY()) / 2.0f;
         x3 = (x2 + x4) / 2.0f;
         y3 = (y2 + y4) / 2.0f;
-        curveTo(x1, y1, x2, y2, x3, y3);
+//        curveTo(x1, y1, x2, y2, x3, y3);          // TODO: why does this cause a "tail" to be painted?
         p2 = p3;
         p3 = points.get(n - 1);
         x1 = x4;
@@ -79,7 +79,8 @@ public class BSplinePath extends Path2D.Double {
         y2 = p2.getY();
         x3 = p3.getX();
         y3 = p3.getY();
-        curveTo(x1, y1, x2, y2, x3, y3);
+//        curveTo(x1, y1, x2, y2, x3, y3);
+        curveTo(x1, y1, x3, y3, x3, y3);
     }
     
 }

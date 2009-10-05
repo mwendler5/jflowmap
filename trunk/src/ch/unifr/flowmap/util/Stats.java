@@ -45,15 +45,19 @@ public class Stats {
 
     /**
      * Returns a normalized value between 0 and 1.
+     * In case if max == min the method returns 1. 
      */
     public double normalize(double value) {
+        if (max == min) return 1.0;
         return (value - min) / (max - min);
     }
 
     /**
      * Returns a normalized log(value) between 0 and 1.
+     * In case if max == min the method returns 1. 
      */
     public double normalizeLog(double value) {
+        if (max == min) return 1.0;
         return (Math.log(value) - minLog) / (maxLog - minLog);
     }
    

@@ -83,7 +83,7 @@ public abstract class VisualEdge extends PNode {
 
     public String getLabel() {
         return sourceNode.getNode().getString(visualFlowMap.getLabelAttr()) + " -> " +
-                targetNode.getNode().getString(visualFlowMap.getLabelAttr());
+               targetNode.getNode().getString(visualFlowMap.getLabelAttr());
     }
 
     public double getValue() {
@@ -107,7 +107,7 @@ public abstract class VisualEdge extends PNode {
         return "VisualEdge{" +
                 "label='" + getLabel() + "', " +
                 "value=" + getValue() +
-                '}';
+        '}';
     }
 
     public double getNormalizedLogValue() {
@@ -117,7 +117,11 @@ public abstract class VisualEdge extends PNode {
         if (model.getAutoAdjustEdgeColorScale()) {
             double minLog = 1.0;
             double maxLog = Math.log(model.getValueFilterMax() - model.getValueFilterMin());
-            nv = (Math.log(value - model.getValueFilterMin()) - minLog) / (maxLog - minLog);
+            if (maxLog == minLog) {
+                nv = 1.0;
+            } else {
+                nv = (Math.log(value - model.getValueFilterMin()) - minLog) / (maxLog - minLog);
+            }
         } else {
             Stats stats = model.getGraphStats().getValueEdgeAttrStats();
             nv = stats.normalizeLog(value);
