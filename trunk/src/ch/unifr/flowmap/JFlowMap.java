@@ -16,8 +16,10 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
+import prefuse.data.Graph;
 import prefuse.data.io.DataIOException;
-import ch.unifr.flowmap.models.FlowMapModel;
+import prefuse.data.io.GraphMLReader;
+import ch.unifr.flowmap.models.FlowMapParamsModel;
 import ch.unifr.flowmap.models.map.AreaMap;
 import ch.unifr.flowmap.ui.ControlPanel;
 import ch.unifr.flowmap.util.PanHandler;
@@ -117,10 +119,13 @@ public class JFlowMap extends JComponent {
     }
 
     public VisualFlowMap loadFlowMap(DatasetSpec dataset) {
-        FlowMapModel model = null;
+        logger.info("> Loading flow map \"" + dataset + "\"");
+        FlowMapParamsModel model = null;
         try {
-            model = FlowMapModel.load(dataset);
-            VisualFlowMap visualFlowMap = new VisualFlowMap(canvas, model);
+            Graph graph = loadGraph(dataset.filename);
+            model = new FlowMapParamsModel(graph, dataset.valueAttrName, dataset.labelAttrName);
+            model.setValueFilterMin(1000);
+            VisualFlowMap visualFlowMap = new VisualFlowMap(canvas, graph, model);
             if (dataset.areaMapFilename != null) {
                 VisualAreaMap map = loadAreaMap(dataset.areaMapFilename);
                 visualFlowMap.addChild(map);
@@ -132,6 +137,12 @@ public class JFlowMap extends JComponent {
             JOptionPane.showMessageDialog(this,  "Couldn't load flow map: [" + e.getClass().getSimpleName()+ "] " + e.getMessage());
         }
         return null;
+    }
+
+    private Graph loadGraph(String filename) throws DataIOException {
+        logger.info("Loading graph \"" + filename + "\"");
+        GraphMLReader reader = new GraphMLReader();
+        return reader.readGraph(filename);
     }
 
     private VisualAreaMap loadAreaMap(String areaMapFilename) {

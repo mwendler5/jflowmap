@@ -3,7 +3,7 @@ package ch.unifr.flowmap.ui;
 import ch.unifr.flowmap.JFlowMap;
 import ch.unifr.flowmap.visuals.VisualFlowMap;
 import ch.unifr.flowmap.util.Stats;
-import ch.unifr.flowmap.models.FlowMapModel;
+import ch.unifr.flowmap.models.FlowMapParamsModel;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -11,6 +11,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -43,17 +45,18 @@ public class ControlPanel {
     private JCheckBox mapEdgeValueToCheckBox1;
     private JSlider edgeMarkerOpacitySlider;
     private JSpinner edgeMarkerOpacitySpinner;
-    private FlowMapModel flowMapModel;
-    private JFlowMap flowMap;
+    private FlowMapParamsModel flowMapModel;
+    private JFlowMap jFlowMap;
+    private boolean initializing;
 
-    public ControlPanel(JFlowMap flowMap, FlowMapModel model) {
-        this.flowMap = flowMap;
+    public ControlPanel(JFlowMap flowMap, FlowMapParamsModel model) {
+        this.jFlowMap = flowMap;
         initModelsOnce();
-        setFlowMapModel(model);
+        setFlowMapParamsModel(model);
         initChangeListeners();
     }
 
-    public void setFlowMapModel(FlowMapModel model) {
+    public void setFlowMapParamsModel(FlowMapParamsModel model) {
         this.flowMapModel = model;
         initModels();
         setData(model);
@@ -64,6 +67,7 @@ public class ControlPanel {
     }
 
     private void initModels() {
+        initializing = true;
         Stats valueStats = flowMapModel.getGraphStats().getValueEdgeAttrStats();
 
         minValueFilterSpinner.setModel(new SpinnerNumberModel(valueStats.min, valueStats.min, valueStats.max, 1));
@@ -95,23 +99,28 @@ public class ControlPanel {
         maxEdgeWidthSpinner.setModel(new SpinnerNumberModel(0, 0, 100, 1));
         maxEdgeWidthSlider.setMinimum(0);
         maxEdgeWidthSlider.setMaximum(100);
+        initializing = false;
     }
 
     private void initChangeListeners() {
-        datasetCombo.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
+        datasetCombo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (initializing) return;
                 loadFlowMap((JFlowMap.DatasetSpec) datasetCombo.getSelectedItem());
             }
-        });
+        }); 
 
         // Edge value filter
         minValueFilterSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 minValueFilterSlider.setValue(toValueEdgeFilterSliderValue((Double) minValueFilterSpinner.getValue()));
             }
         });
         minValueFilterSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 double value = fromValueEdgeFilterSliderValue(minValueFilterSlider.getValue());
                 getFlowMapModel().setValueFilterMin(value);
                 minValueFilterSpinner.setValue(value);
@@ -119,11 +128,13 @@ public class ControlPanel {
         });
         maxValueFilterSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 maxValueFilterSlider.setValue(toValueEdgeFilterSliderValue((Double) maxValueFilterSpinner.getValue()));
             }
         });
         maxValueFilterSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 double value = fromValueEdgeFilterSliderValue(maxValueFilterSlider.getValue());
                 getFlowMapModel().setValueFilterMax(value);
                 maxValueFilterSpinner.setValue(value);
@@ -134,11 +145,13 @@ public class ControlPanel {
         // Edge length filter
         minLengthFilterSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 minLengthFilterSlider.setValue(toEdgeLengthFilterSliderValue((Double) minLengthFilterSpinner.getValue()));
             }
         });
         minLengthFilterSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 double value = fromLengthEdgeFilterSliderValue(minLengthFilterSlider.getValue());
                 getFlowMapModel().setEdgeLengthFilterMin(value);
                 minLengthFilterSpinner.setValue(value);
@@ -146,11 +159,13 @@ public class ControlPanel {
         });
         maxLengthFilterSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 maxLengthFilterSlider.setValue(toEdgeLengthFilterSliderValue((Double) maxLengthFilterSpinner.getValue()));
             }
         });
         maxLengthFilterSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 double value = fromLengthEdgeFilterSliderValue(maxLengthFilterSlider.getValue());
                 getFlowMapModel().setEdgeLengthFilterMax(value);
                 maxLengthFilterSpinner.setValue(value);
@@ -161,11 +176,13 @@ public class ControlPanel {
         // Edge opacity
         edgeOpacitySpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 edgeOpacitySlider.setValue((Integer) edgeOpacitySpinner.getValue());
             }
         });
         edgeOpacitySlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 int value = edgeOpacitySlider.getValue();
                 getFlowMapModel().setEdgeAlpha(value);
                 edgeOpacitySpinner.setValue(value);
@@ -175,11 +192,13 @@ public class ControlPanel {
         // Edge marker opacity
         edgeMarkerOpacitySpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 edgeMarkerOpacitySlider.setValue((Integer) edgeMarkerOpacitySpinner.getValue());
             }
         });
         edgeMarkerOpacitySlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 int value = edgeMarkerOpacitySlider.getValue();
                 getFlowMapModel().setEdgeMarkerAlpha(value);
                 edgeMarkerOpacitySpinner.setValue(value);
@@ -189,11 +208,13 @@ public class ControlPanel {
         // Edge width
         maxEdgeWidthSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 maxEdgeWidthSlider.setValue((int) Math.round(((Number) maxEdgeWidthSpinner.getValue()).doubleValue()));
             }
         });
         maxEdgeWidthSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
                 int value = maxEdgeWidthSlider.getValue();
                 getFlowMapModel().setMaxEdgeWidth(value);
                 maxEdgeWidthSpinner.setValue(value);
@@ -202,12 +223,12 @@ public class ControlPanel {
     }
 
     private void loadFlowMap(JFlowMap.DatasetSpec dataset) {
-        VisualFlowMap visualFlowMap = flowMap.loadFlowMap(dataset);
-        flowMap.setVisualFlowMap(visualFlowMap);
-        setFlowMapModel(visualFlowMap.getModel());
+        VisualFlowMap visualFlowMap = jFlowMap.loadFlowMap(dataset);
+        jFlowMap.setVisualFlowMap(visualFlowMap);
+        setFlowMapParamsModel(visualFlowMap.getModel());
     }
 
-    public FlowMapModel getFlowMapModel() {
+    public FlowMapParamsModel getFlowMapModel() {
         return flowMapModel;
     }
 
@@ -248,7 +269,7 @@ public class ControlPanel {
         return panel1;
     }
 
-    public void setData(FlowMapModel data) {
+    public void setData(FlowMapParamsModel data) {
         autoAdjustColorScaleCheckBox.setSelected(data.getAutoAdjustColorScale());
         useLogWidthScaleCheckbox.setSelected(data.isUseLogWidthScale());
         useLogColorScaleCheckbox.setSelected(data.isUseLogColorScale());

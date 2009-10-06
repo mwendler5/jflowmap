@@ -1,23 +1,25 @@
 package ch.unifr.flowmap.models;
 
-import prefuse.data.Graph;
-import prefuse.data.io.GraphMLReader;
-import prefuse.data.io.DataIOException;
-import ch.unifr.flowmap.util.Stats;
-import ch.unifr.flowmap.util.GraphStats;
-import ch.unifr.flowmap.JFlowMap;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import org.apache.log4j.Logger;
 
-public class FlowMapModel {
+import prefuse.data.Graph;
+import prefuse.data.io.DataIOException;
+import prefuse.data.io.GraphMLReader;
+import ch.unifr.flowmap.JFlowMap;
+import ch.unifr.flowmap.util.GraphStats;
+import ch.unifr.flowmap.util.Stats;
+
+
+public class FlowMapParamsModel {
+
+    private static Logger logger = Logger.getLogger(FlowMapParamsModel.class);
 
     private boolean autoAdjustColorScale;
     private boolean useLogColorScale;
     private boolean useLogWidthScale;
-
-    private Graph graph;
 
     private String valueEdgeAttr = "value";
     private String xNodeAttr = "x";
@@ -40,9 +42,7 @@ public class FlowMapModel {
 
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
 
-    public FlowMapModel(Graph graph, String valueEdgeAttrName, String labelAttrName) {
-        this.graph = graph;
-
+    public FlowMapParamsModel(Graph graph, String valueEdgeAttrName, String labelAttrName) {
         this.valueEdgeAttr = valueEdgeAttrName;
         this.labelAttr = labelAttrName;
 
@@ -60,9 +60,9 @@ public class FlowMapModel {
 //        Stats yStats = graphStats.getNodeAttrStats(yNodeAttr);
     }
 
-    public Graph getGraph() {
-        return graph;
-    }
+//    public Graph getGraph() {
+//        return graph;
+//    }
 
     public boolean getAutoAdjustColorScale() {
         return autoAdjustColorScale;
@@ -100,10 +100,6 @@ public class FlowMapModel {
 
     public String getYNodeAttr() {
         return yNodeAttr;
-    }
-
-    public Stats getNodeAttrStats(String attrName) {
-        return graphStats.getNodeAttrStats(attrName);
     }
 
     public String getValueEdgeAttr() {
@@ -208,13 +204,6 @@ public class FlowMapModel {
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         changes.removePropertyChangeListener(listener);
-    }
-
-    public static final FlowMapModel load(JFlowMap.DatasetSpec spec) throws DataIOException {
-        GraphMLReader reader = new GraphMLReader();
-        FlowMapModel model = new FlowMapModel(reader.readGraph(spec.filename), spec.valueAttrName, spec.labelAttrName);
-        model.setValueFilterMin(1000);
-        return model;
     }
 
     public static final String PROPERTY_AUTO_ADJUST_COLOR_SCALE = "autoAdjustColorScale";

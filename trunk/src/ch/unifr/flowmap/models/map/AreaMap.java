@@ -1,17 +1,21 @@
 package ch.unifr.flowmap.models.map;
 
-import ch.unifr.flowmap.data.XmlAreaMapModelReader;
-
-import java.util.List;
-import java.util.Collections;
-import java.util.Collection;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import ch.unifr.flowmap.data.XmlAreaMapModelReader;
 
 /**
  * @author Ilya Boyandin
  *         Date: 25-Sep-2009
  */
 public class AreaMap {
+
+    private static Logger logger = Logger.getLogger(AreaMap.class);
 
     private String name;
     private List<Area> areas;
@@ -30,6 +34,7 @@ public class AreaMap {
     }
 
     public static final AreaMap load(String filename) throws IOException {
+        logger.info("Loading area map \"" + filename + "\"");
         XmlAreaMapModelReader reader = new XmlAreaMapModelReader();
         return reader.readMap(filename);
     }

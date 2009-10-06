@@ -23,6 +23,14 @@ public class Vector2D {
     public double y() {
         return y;
     }
+    
+    public boolean isNaN() {
+        return Double.isNaN(x)  ||  Double.isNaN(y);
+    }
+    
+    public boolean isZero() {
+        return Math.abs(x) == 0.0  &&  Math.abs(y) == 0.0;
+    }
 
     public double distanceTo(Vector2D that) {
         return this.minus(that).length();
@@ -58,5 +66,13 @@ public class Vector2D {
     public void movePoint(Point2D.Double point) {
         point.x = point.x + x;
         point.y = point.y + y;
+    }
+    
+    @Override
+    public String toString() {
+        return "[Vector2D:" +
+                " x = " + x + 
+                ", y = " + y + 
+        		"]";
     }
 }

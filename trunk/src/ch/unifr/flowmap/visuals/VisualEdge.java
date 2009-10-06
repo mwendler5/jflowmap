@@ -2,8 +2,10 @@ package ch.unifr.flowmap.visuals;
 
 import java.awt.Color;
 
+import org.apache.log4j.Logger;
+
 import prefuse.data.Edge;
-import ch.unifr.flowmap.models.FlowMapModel;
+import ch.unifr.flowmap.models.FlowMapParamsModel;
 import ch.unifr.flowmap.util.Stats;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
@@ -16,6 +18,8 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
  * @author Ilya Boyandin
  */
 public abstract class VisualEdge extends PNode {
+
+    private static Logger logger = Logger.getLogger(VisualEdge.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -31,6 +35,8 @@ public abstract class VisualEdge extends PNode {
     private final Edge edge;
 
     private final double edgeLength;
+
+    private PPath edgePPath;
     
     public VisualEdge(VisualFlowMap visualFlowMap, Edge edge, VisualNode sourceNode, VisualNode targetNode) {
         this.edge = edge;
@@ -38,25 +44,43 @@ public abstract class VisualEdge extends PNode {
         this.targetNode = targetNode;
         this.visualFlowMap = visualFlowMap;
     
-        final double x1 = sourceNode.getValueX();
-        final double y1 = sourceNode.getValueY();
-        final double x2 = targetNode.getValueX();
-        final double y2 = targetNode.getValueY();
-        this.edgeLength = dist(x1, y1, x2, y2);
+        if (isSelfLoop()) {
+            this.edgeLength = 0;
+        } else {
+            final double x1 = sourceNode.getValueX();
+            final double y1 = sourceNode.getValueY();
+            final double x2 = targetNode.getValueX();
+            final double y2 = targetNode.getValueY();
+            this.edgeLength = dist(x1, y1, x2, y2);
+        }
 
         addInputEventListener(visualEdgeListener);
     }
 
-    public abstract PPath getEdgePPath();
-
+    
+    protected void setEdgePPath(PPath ppath) {
+        this.edgePPath = ppath;
+    }    
+    
+    protected PPath getEdgePPath() {
+        return edgePPath;
+    }
+    
+    public boolean isSelfLoop() {
+        return sourceNode == targetNode;
+    }
+    
     public void updateEdgeWidth() {
-        getEdgePPath().setStroke(getStroke());
+        PPath ppath = getEdgePPath();
+        if (ppath != null) {
+            ppath.setStroke(getStroke());
+        }
     }
 
     public abstract void updateEdgeMarkerColors();
 
     public void updateVisibiliy() {
-        final FlowMapModel model = visualFlowMap.getModel();
+        final FlowMapParamsModel model = visualFlowMap.getModel();
         double valueFilterMin = model.getValueFilterMin();
         double valueFilterMax = model.getValueFilterMax();
 
@@ -111,7 +135,7 @@ public abstract class VisualEdge extends PNode {
     }
 
     public double getNormalizedLogValue() {
-        FlowMapModel model = getVisualFlowMap().getModel();
+        FlowMapParamsModel model = getVisualFlowMap().getModel();
         double value = getValue();
         double nv;
         if (model.getAutoAdjustEdgeColorScale()) {
@@ -126,6 +150,9 @@ public abstract class VisualEdge extends PNode {
             Stats stats = model.getGraphStats().getValueEdgeAttrStats();
             nv = stats.normalizeLog(value);
         }
+        if (Double.isNaN(nv)) {
+            logger.error("NaN normalized log value for edge: " + this);
+        }
         return nv;
     }
 
@@ -134,12 +161,16 @@ public abstract class VisualEdge extends PNode {
     
         Stats stats = getVisualFlowMap().getModel().getGraphStats().getValueEdgeAttrStats();
         nv = stats.normalize(getValue());
+
+        if (Double.isNaN(nv)) {
+            logger.error("NaN normalized value for edge: " + this);
+        }
     
         return nv;
     }
 
     protected Color getValueColor(Color baseColor, boolean forMarker) {
-        FlowMapModel model = getVisualFlowMap().getModel();
+        FlowMapParamsModel model = getVisualFlowMap().getModel();
         final double normalizedValue = getNormalizedLogValue();
         int r = (int) Math.round(normalizedValue * baseColor.getRed());
         int g = (int) Math.round(normalizedValue * baseColor.getGreen());
@@ -154,15 +185,20 @@ public abstract class VisualEdge extends PNode {
         } else {
             alpha = baseColor.getAlpha();
         }
-        return new Color(r, g, b,alpha);
+        return new Color(r, g, b, alpha);
     }
 
     public void updateEdgeColors() {
-        getEdgePPath().setStrokePaint(getValueColor(STROKE_PAINT, false));
+        PPath ppath = getEdgePPath();
+        if (ppath != null) {
+            ppath.setStrokePaint(getValueColor(STROKE_PAINT, false));
+        }
     }
 
     public void setHighlighted(boolean value, boolean showDirection, boolean outgoing) {
-    //        System.out.println(this + ".setHighlighted("  + value + ")");
+//        System.out.println(this + ".setHighlighted("  + value + ")");
+        PPath ppath = getEdgePPath();
+        if (ppath != null) {
             if (value) {
                 Color paint;
                 if (showDirection) {
@@ -170,13 +206,14 @@ public abstract class VisualEdge extends PNode {
                 } else {
                     paint = STROKE_HIGHLIGHTED_PAINT;
                 }
-                getEdgePPath().setStrokePaint(getValueColor(paint, false));
+                ppath.setStrokePaint(getValueColor(paint, false));
             } else {
-                getEdgePPath().setStrokePaint(getValueColor(STROKE_PAINT, false));
+                ppath.setStrokePaint(getValueColor(STROKE_PAINT, false));
             }
             getSourceNode().setVisible(value);
             getTargetNode().setVisible(value);
         }
+    }
 
     protected PFixedWidthStroke getStroke() {
         double nv = getNormalizedValue();

@@ -18,7 +18,7 @@ import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import ch.unifr.flowmap.bundling.ForceDirectedEdgeBundler;
-import ch.unifr.flowmap.models.FlowMapModel;
+import ch.unifr.flowmap.models.FlowMapParamsModel;
 import ch.unifr.flowmap.util.Stats;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
@@ -39,12 +39,14 @@ public class VisualFlowMap extends PNode {
     private final PNode edgeLayer;
     private final PNode nodeLayer;
 
-    private FlowMapModel model;
+    private FlowMapParamsModel model;
     private Map<Node, VisualNode> nodesToVisuals;
     private Map<Edge, VisualEdge> edgesToVisuals;
     private PCanvas canvas;
+    private Graph graph;
 
-    public VisualFlowMap(PCanvas canvas, FlowMapModel model) {
+    public VisualFlowMap(PCanvas canvas, Graph graph, FlowMapParamsModel model) {
+        this.graph = graph;
         this.canvas = canvas;
     	this.model = model;
 
@@ -72,7 +74,6 @@ public class VisualFlowMap extends PNode {
     private void createNodes() {
         nodeLayer.removeAllChildren();
 
-        Graph graph = model.getGraph();
         final int numNodes = graph.getNodeCount();
         nodesToVisuals = new LinkedHashMap<Node, VisualNode>();
 
@@ -99,26 +100,35 @@ public class VisualFlowMap extends PNode {
     private void createEdges(Point2D[][] edgeSplinePoints) {
         edgeLayer.removeAllChildren();
         
-        Graph graph = model.getGraph();
-
 //      for (int i = 0; i < graph.getEdgeTable().getColumnCount(); i++) {
 //      if (logger.isDebugEnabled()) logger.debug("Field: " + graph.getEdgeTable().getColumnName(i));
 //  }
 
         edgesToVisuals = new LinkedHashMap<Edge, VisualEdge>();
         @SuppressWarnings("unchecked")
+        
         Iterator<Integer> it = graph.getEdgeTable().rowsSortedBy(model.getValueEdgeAttr(), true);
-        int edgeCount = 0;
+
         while (it.hasNext()) {
             Edge edge = graph.getEdge(it.next());
-
+            
+            if (edge.getSourceNode().equals(edge.getTargetNode())) {
+                logger.warn(
+                        "Self-loop edge: " +
+                        edge.getSourceNode().getString(model.getLabelAttr()) + " -> " +
+                        edge.getTargetNode().getString(model.getLabelAttr()) + 
+                        " [" + edge + "]"
+                );
+            }
+            
             double value = edge.getDouble(model.getValueEdgeAttr());
             if (Double.isNaN(value)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Warning: Omitting NaN value for edge: " + edge +
-                        ": (" + edge.getSourceNode().getString(model.getLabelAttr()) + " -> " +
-                        edge.getTargetNode().getString(model.getLabelAttr()) + ")");
-                }
+                logger.warn(
+                    "Omitting NaN value for edge: " +
+                    edge.getSourceNode().getString(model.getLabelAttr()) + " -> " +
+                    edge.getTargetNode().getString(model.getLabelAttr()) + 
+                    " [" + edge + "]"
+                );
             } else {
                 VisualNode fromNode = nodesToVisuals.get(edge.getSourceNode());
                 VisualNode toNode = nodesToVisuals.get(edge.getTargetNode());
@@ -127,15 +137,13 @@ public class VisualFlowMap extends PNode {
                 if (edgeSplinePoints == null) {
                     ve = new LineVisualEdge(this, edge, fromNode, toNode);
                 } else {
-                    ve = new BSplineVisualEdge(this, edge, fromNode, toNode, edgeSplinePoints[edgeCount]);
+                    ve = new BSplineVisualEdge(this, edge, fromNode, toNode, edgeSplinePoints[edge.getRow()]);
                 }
                 ve.update();
                 edgeLayer.addChild(ve);
 
                 edgesToVisuals.put(edge, ve);
             }
-
-            edgeCount++;
         }
     }
 
@@ -157,7 +165,7 @@ public class VisualFlowMap extends PNode {
         return nodeBounds;
     }
 
-    public FlowMapModel getModel() {
+    public FlowMapParamsModel getModel() {
         return model;
     }
 
@@ -262,27 +270,27 @@ public class VisualFlowMap extends PNode {
         }
     }
 
-    private void initModelChangeListeners(FlowMapModel model) {
-        model.addPropertyChangeListener(FlowMapModel.PROPERTY_AUTO_ADJUST_COLOR_SCALE, new PropertyChangeListener() {
+    private void initModelChangeListeners(FlowMapParamsModel model) {
+        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_AUTO_ADJUST_COLOR_SCALE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 updateEdgeColors();
                 updateEdgeMarkerColors();
             }
         });
 
-        model.addPropertyChangeListener(FlowMapModel.PROPERTY_MAX_EDGE_WIDTH, new PropertyChangeListener() {
+        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_MAX_EDGE_WIDTH, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 updateEdgeWidths();
             }
         });
 
-        model.addPropertyChangeListener(FlowMapModel.PROPERTY_EDGE_ALPHA, new PropertyChangeListener() {
+        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_EDGE_ALPHA, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 updateEdgeColors();
             }
         });
 
-        model.addPropertyChangeListener(FlowMapModel.PROPERTY_EDGE_MARKER_ALPHA, new PropertyChangeListener() {
+        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_EDGE_MARKER_ALPHA, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 updateEdgeMarkerColors();
             }
@@ -295,16 +303,16 @@ public class VisualFlowMap extends PNode {
                 updateEdgeMarkerColors();
             }
         };
-        model.addPropertyChangeListener(FlowMapModel.PROPERTY_VALUE_FILTER_MIN, valueFilterListener);
-        model.addPropertyChangeListener(FlowMapModel.PROPERTY_VALUE_FILTER_MAX, valueFilterListener);
+        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_VALUE_FILTER_MIN, valueFilterListener);
+        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_VALUE_FILTER_MAX, valueFilterListener);
 
         PropertyChangeListener edgeLengthFilterListener = new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 updateEdgeVisibility();
             }
         };
-        model.addPropertyChangeListener(FlowMapModel.PROPERTY_EDGE_LENGTH_FILTER_MIN, edgeLengthFilterListener);
-        model.addPropertyChangeListener(FlowMapModel.PROPERTY_EDGE_LENGTH_FILTER_MAX, edgeLengthFilterListener);
+        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_EDGE_LENGTH_FILTER_MIN, edgeLengthFilterListener);
+        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_EDGE_LENGTH_FILTER_MAX, edgeLengthFilterListener);
     }
 
     private void updateEdgeColors() {
@@ -358,9 +366,9 @@ public class VisualFlowMap extends PNode {
     }
 
     private void initBundler(int numCycles) {
-        bundler = new ForceDirectedEdgeBundler(
-                model.getGraph(), model.getXNodeAttr(), model.getYNodeAttr());
-        bundler.init(numCycles, .25);
+        bundler = new ForceDirectedEdgeBundler(graph, model.getXNodeAttr(), model.getYNodeAttr());
+//        bundler.init(numCycles, .04);
+        bundler.init(numCycles, 4);
     }
     
     public void bundleEdges(int numCycles) {

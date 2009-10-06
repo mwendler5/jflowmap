@@ -20,7 +20,6 @@ public class LineVisualEdge extends VisualEdge {
 
     private static final double MARKER_SIZE = 6;
 
-    private final PPath line;
     private final PPath startMarker;
     private final PPath endMarker;
 
@@ -62,11 +61,11 @@ public class LineVisualEdge extends VisualEdge {
         addChild(endMarker);
 
 
-        final double width = getVisualFlowMap().getMaxEdgeWidth();   // TODO: update dynamically
-        line = new PPath(new Line2D.Double(
+//        final double width = getVisualFlowMap().getMaxEdgeWidth();   // TODO: update dynamically
+        PPath line = new PPath(new Line2D.Double(
                 sm_x /*- sin_a * width*/, sm_y /*- cos_a * width*/,
                 em_x /*+ sin_a * width*/, em_y /*+ cos_a * width*/));
-        
+        setEdgePPath(line);
         addChild(line);
     }
 
@@ -80,10 +79,5 @@ public class LineVisualEdge extends VisualEdge {
         startMarker.setStroke(stroke);
         endMarker.setStroke(stroke);
         getEdgePPath().setStroke(stroke);
-    }
-
-    @Override
-    public PPath getEdgePPath() {
-        return line;
     }
 }

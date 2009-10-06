@@ -7,11 +7,15 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Ilya Boyandin
  */
 public class FlowMapMain extends JFrame {
 
+    private static Logger logger = Logger.getLogger(FlowMapMain.class);
+    
     private static final long serialVersionUID = 1L;
     public static final String OS_NAME = System.getProperty("os.name");
     public static boolean IS_OS_MAC = getOSMatches("Mac");
@@ -45,6 +49,7 @@ public class FlowMapMain extends JFrame {
     }
 
     public static void main(String[] args) throws IOException {
+        logger.info(">>> Starting JFlowMap");
         initLookAndFeel();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

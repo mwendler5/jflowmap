@@ -6,6 +6,8 @@ import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import prefuse.data.Node;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
@@ -18,6 +20,8 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
  * @author Ilya Boyandin
  */
 public class VisualNode extends PPath {
+
+    private static Logger logger = Logger.getLogger(VisualNode.class);
 
     private static final long serialVersionUID = 1L;
     
@@ -43,6 +47,10 @@ public class VisualNode extends PPath {
 
     public VisualNode(VisualFlowMap visualFlowMap, Node node, double x, double y, double size) {
         super(new Ellipse2D.Double(x - size/2, y - size/2, size, size));
+        if (Double.isNaN(x)  ||  Double.isNaN(y)) {
+            logger.error("NaN coordinates passed in for node: " + node);
+            throw new IllegalArgumentException("NaN coordinates passed in for node " + node);
+        }
         this.valueX = x;
         this.valueY = y;
         setStrokePaint(STROKE_PAINT);
