@@ -63,9 +63,12 @@ public class Vector2D {
         return new Vector2D(point.getX(), point.getY());
     }
 
-    public void movePoint(Point2D.Double point) {
-        point.x = point.x + x;
-        point.y = point.y + y;
+    public static Vector2D valueOf(Point2D.Double startPoint, Point2D.Double endPoint) {
+        return new Vector2D(endPoint.getX() - startPoint.getX(), endPoint.getY() - startPoint.getY());
+    }
+
+    public Point2D.Double movePoint(Point2D.Double point) {
+        return new Point2D.Double(point.x + x, point.y + y);
     }
     
     @Override

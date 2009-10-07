@@ -40,6 +40,22 @@
          <data key="name">G</data>
       </node>
 
+      <node id="H">
+         <data key="x">420</data>
+         <data key="y">390</data>
+         <data key="name">H</data>
+      </node>
+      <node id="I">
+         <data key="x">560</data>
+         <data key="y">430</data>
+         <data key="name">I</data>
+      </node>
+      <node id="K">
+         <data key="x">440</data>
+         <data key="y">530</data>
+         <data key="name">K</data>
+      </node>
+
       <edge source="A" target="B" id="1">
          <data key="data">1000</data>
       </edge>
@@ -58,6 +74,12 @@
          <data key="data">1000</data>
       </edge>
       <edge source="B" target="G" id="6">
+         <data key="data">1000</data>
+      </edge>
+      <edge source="H" target="I" id="7">
+         <data key="data">1000</data>
+      </edge>
+      <edge source="K" target="I" id="8">
          <data key="data">1000</data>
       </edge>
    </graph>

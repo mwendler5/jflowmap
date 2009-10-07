@@ -16,14 +16,19 @@ import edu.umd.cs.piccolo.nodes.PPath;
  */
 public class BSplineVisualEdge extends VisualEdge {
 
-    private static final Color DOT_COLOR = new Color(255,0,0,50);
+    private static final Color DOT_COLOR = new Color(255,0,0,100);
     private static final Font AFONT = new Font("arial", Font.PLAIN, 1);
 
     private static final long serialVersionUID = 1L;
+    
+    private boolean showSplinePoints;
 
     public BSplineVisualEdge(VisualFlowMap visualFlowMap, Edge edge,
-            VisualNode sourceNode, VisualNode targetNode, Point2D[] splinePoints) {
+            VisualNode sourceNode, VisualNode targetNode, Point2D[] splinePoints,
+            boolean showSplinePoints) {
         super(visualFlowMap, edge, sourceNode, targetNode);
+        
+        this.showSplinePoints = showSplinePoints;
 
         Point2D start = splinePoints[0];
         Point2D end = splinePoints[splinePoints.length - 1];
@@ -56,15 +61,17 @@ public class BSplineVisualEdge extends VisualEdge {
         addChild(ppath);
         
         // add spline points
-//        int cnt = 0;
-//        for (Point2D p : points) {
-//            PPath ell = new PPath(new Ellipse2D.Double(p.getX(), p.getY(), .5, .5));
-//            ell.setStrokePaint(DOT_COLOR);
-//            ell.setPaint(DOT_COLOR);
-//            ell.moveToFront();
-//            addChild(ell);
-//            cnt++;
-//        }
+        if (showSplinePoints) {
+            int cnt = 0;
+            for (Point2D p : points) {
+                PPath ell = new PPath(new Ellipse2D.Double(p.getX()-.2, p.getY()-.2, .4, .4));
+                ell.setStrokePaint(DOT_COLOR);
+                ell.setPaint(DOT_COLOR);
+                ell.moveToFront();
+                addChild(ell);
+                cnt++;
+            }
+        }
 
         update();
     }

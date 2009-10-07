@@ -1,13 +1,14 @@
 package ch.unifr.flowmap.bundling;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import prefuse.data.Edge;
 import prefuse.data.Graph;
-import ch.unifr.flowmap.JFlowMap;
 import ch.unifr.flowmap.util.Vector2D;
 
 /**
@@ -15,13 +16,15 @@ import ch.unifr.flowmap.util.Vector2D;
  */
 public class ForceDirectedEdgeBundler {
 
+    private static final double MIN_EDGE_COMPATIBILITY = 0.3;
+
     private static Logger logger = Logger.getLogger(ForceDirectedEdgeBundler.class);
     
     private Point2D.Double[][] edgePoints;
     private double[] edgeLengths;
-    private String xNodeAttr;
-    private String yNodeAttr;
-    private Graph graph;
+    private final String xNodeAttr;
+    private final String yNodeAttr;
+    private final Graph graph;
     private double K = 1.0;
 
     private int numEdges;
@@ -31,7 +34,9 @@ public class ForceDirectedEdgeBundler {
     
     private int cycle;
 
-    private int numCycles;
+    private Point2D.Double[] edgeStarts;
+    private Point2D.Double[] edgeEnds;
+    private double[][] edgeCompatibilityMeasures;
     
     public ForceDirectedEdgeBundler(Graph graph, String xNodeAttr, String yNodeAttr) {
         this.graph = graph;
@@ -49,8 +54,9 @@ public class ForceDirectedEdgeBundler {
     public Point2D[][] getEdgePoints() {
         Point2D[][] points = new Point2D[numEdges][P + 2];
         for (int i = 0; i < numEdges; i++) {
-            System.arraycopy(edgePoints[i], 0, points[i], 0, P + 1);
-            points[i][P + 1] = edgePoints[i][edgePoints[i].length - 1];
+            points[i][0] = edgeStarts[i];
+            System.arraycopy(edgePoints[i], 0, points[i], 1, P);
+            points[i][P + 1] = edgeEnds[i];
         }
         return points;
     }
@@ -66,123 +72,113 @@ public class ForceDirectedEdgeBundler {
         if (logger.isDebugEnabled()) {
             logger.debug("ForceDirectedEdgeBundler.bundle()");
         }
-        init(numCycles, initialStepSize);
+        init(initialStepSize);
         // iterative refinement scheme
         for (int i = 0; i < numCycles; i++) {
+            logger.debug("Cycle " + i + " of " + numCycles);
             nextCycle();
         }
     }
     
-    public void init(int numCycles, double initialStepSize) {
+    public void init(double initialStepSize) {
         if (logger.isDebugEnabled()) {
             logger.debug("ForceDirectedEdgeBundler.init()");
         }
-        if (numCycles < 2) {
-            throw new IllegalArgumentException("numCycles must be at least 2");
-        }
-        this.numCycles = numCycles; 
         numEdges = graph.getEdgeCount();
-        int maxP = (0x01 << (numCycles - 1));   // maximum number of subdivision points 
-                                                // (maximum = for the last cycle)
-        edgePoints = new Point2D.Double[numEdges][maxP + 2];
         edgeLengths = new double[numEdges];
+        edgeStarts = new Point2D.Double[numEdges];
+        edgeEnds = new Point2D.Double[numEdges];
         for (int i = 0; i < numEdges; i++) {
             Edge edge = graph.getEdge(i);
-            
-            Point2D.Double start = new Point2D.Double(getStartX(edge), getStartY(edge));
-            Point2D.Double end = new Point2D.Double(getEndX(edge), getEndY(edge));
-            edgePoints[i][0] = start;
-            edgePoints[i][maxP + 1] = end;
-            
-            edgeLengths[i] = start.distance(end);
-        } 
+            edgeStarts[i] = new Point2D.Double(getStartX(edge), getStartY(edge));
+            edgeEnds[i] = new Point2D.Double(getEndX(edge), getEndY(edge));
+            edgeLengths[i] = edgeStarts[i].distance(edgeEnds[i]);
+        }
+        
+        calcEdgeCompatibilityMeasures();
 
-        P = 1;          // number of subdivision points 
+        P = 1;          // number of subdivision points
         S = initialStepSize;     // step size
 //        S = .04;
+//        I = 50;         // number of iteration steps performed during a cycle
         I = 50;         // number of iteration steps performed during a cycle
 //        I = 1;         // number of iteration steps performed during a cycle
         
         cycle = 0;
     }
     
-    public boolean canPerformMoreCycles() {
-        return (cycle < numCycles);
-    }
-
     private boolean isSelfLoop(int edgeIdx) {
         return Math.abs(edgeLengths[edgeIdx]) == 0.0;
     }
     
+    private void calcEdgeCompatibilityMeasures() {
+        edgeCompatibilityMeasures = new double[numEdges][numEdges];
+        
+        for (int i = 0; i < numEdges; i++) {
+            Vector2D p = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
+            Point2D pm = middle(edgeStarts[i], edgeEnds[i]);
+            for (int j = 0; j < i; j++) {
+                Vector2D q = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
+                Point2D qm = middle(edgeStarts[j], edgeEnds[j]);
+                double l_avg = (edgeLengths[i] + edgeLengths[j])/2;
+                
+                // angle compatibility
+                double Ca = 1.0;
+                // TODO
+                
+                // scale compatibility
+//                double Cs = 2 / (l_avg * Math.min(edgeLengths[i], edgeLengths[j])  + (Math.max(edgeLengths[i], edgeLengths[j]) / l_avg));
+                double Cs = 1.0;
+                
+                
+                // position compatibility
+                double Cp = l_avg / (l_avg + pm.distance(qm));
+                
+                // visibility compatibility
+                double Cv = Math.min(visibility(p, q), visibility(q, p));
+                
+                edgeCompatibilityMeasures[i][j] = edgeCompatibilityMeasures[j][i] = Ca * Cs * Cp * Cv;
+            }
+        }
+    }
+    
+    private double visibility(Vector2D p, Vector2D q) {
+        return Math.max(
+                0,
+                1 //- 2 * middle(edgeStarts[i], edgeEnds[i]) / middle()
+                
+        );
+    }
+
     public void nextCycle() {
         if (logger.isDebugEnabled()) {
             logger.debug("ForceDirectedEdgeBundler.nextCycle()");
         }
-        if (!canPerformMoreCycles()) {
-            throw new IllegalStateException("Bundler was initialized only for " + numCycles + " cycles");
-        }
-        // set parameters for the next cycle
+        
+        int P = this.P;
+        double S = this.S;
+        int I = this.I;
+        
+        // Set parameters for the next cycle
         if (cycle > 0) {
             P *= 2;
             S /= 2;
             I = (I * 2) / 3;
         }
-
-        // add subdivision points
-        for (int i = 0, numEdges = edgePoints.length; i < numEdges; i++) {
-            if (isSelfLoop(i)) {
-                continue;       // ignore self-loops
-            }
-            Point2D[] points = edgePoints[i]; 
-            for (int j = P; j > 0; j--) {
-                Point2D left = points[j/2];
-                Point2D right;
-                if (j == P) {
-                    right = points[points.length - 1];
-                } else {
-                    right = points[j/2 + 1];
-                }
-                points[j] = middle(left, right); //between(left, right, 2.0/3.0);
-            }
-        }
         
-        // perform simulation cycle
-//            for (int step = 0; step < I; step++) {
-//                
-//                for (int pe = 0; pe < numEdges; pe++) {
-//                    Point2D.Double[] p = edgePoints[pe];
-//
-//                    final int numOfSegments = P + 1;
-//                    double k_p = K / (edgeLengths[pe] * numOfSegments);
-//                    
-//                    for (int i = 1; i <= maxP; i++) {
-//                        // spring forces
-//                        double F_s_i_left = k_p * (p[i].distance(p[i - 1]));
-//                        double F_s_i_right = k_p * (p[i].distance(p[i + 1]));
-//                        
-//                        // attracting electrostatic forces (for each other edge)
-//                        double F_e_i = 0; 
-//                        for (int qe = 0; qe < numEdges; qe++) {
-//                            if (qe != pe) {
-//                                Point2D.Double[] q = edgePoints[qe];
-//                                F_e_i += 1 / (p[i].distance(q[i]));      // using inverse-linear model (not square)
-//                            }
-//                        }
-//  
-//                        double F_p_i = F_s_i_left + F_s_i_right + F_e_i;
-////                        p[i] += S;
-//                        
-//                    }
-//                }
-//            }
+        addSubdivisionPoints(P);
+        
+        // Perform simulation steps
+        Point2D.Double[][] tmpEdgePoints = new Point2D.Double[numEdges][P];
         
         for (int step = 0; step < I; step++) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Cycle " + (cycle + 1) + " of " + numCycles + "; Step " + (step + 1) + " of " + I);
+                logger.debug("Cycle " + (cycle + 1) + "; Step " + (step + 1) + " of " + I);
             }
             
             for (int pe = 0; pe < numEdges; pe++) {
                 Point2D.Double[] p = edgePoints[pe];
+                Point2D.Double[] newP = tmpEdgePoints[pe];
                 if (isSelfLoop(pe)) {
                     continue;       // ignore self-loops
                 }
@@ -193,11 +189,11 @@ public class ForceDirectedEdgeBundler {
                 if (Double.isInfinite(k_p)) {
                     logger.warn("Infinite value of k_p for edge " + graph.getEdge(pe));
                 }
-                for (int i = 1; i <= P; i++) {
+                for (int i = 0; i < P; i++) {
                     // spring forces
                     Vector2D p_i = Vector2D.valueOf(p[i]);
-                    Vector2D p_prev = Vector2D.valueOf(p[i - 1]);
-                    Vector2D p_next = Vector2D.valueOf(i == P ? p[p.length - 1] : p[i + 1]);
+                    Vector2D p_prev = Vector2D.valueOf(i == 0 ? edgeStarts[pe] : p[i - 1]);
+                    Vector2D p_next = Vector2D.valueOf(i == P - 1 ? edgeEnds[pe] : p[i + 1]);
                     Vector2D F_s_i = (
                         p_prev.minus(p_i).times(k_p) //  * p_i.distanceTo(p_prev))
                     ).plus(
@@ -207,14 +203,11 @@ public class ForceDirectedEdgeBundler {
                     // attracting electrostatic forces (for each other edge)
                     Vector2D F_e_i = null;
                     for (int qe = 0; qe < numEdges; qe++) {
-                        if (isSelfLoop(qe)) {
-                            continue;       // ignore self-loops
-                        }
-                        if (qe != pe) {
+                        if (qe != pe  &&  !isSelfLoop(qe)  &&  edgeCompatibilityMeasures[pe][qe] > MIN_EDGE_COMPATIBILITY) {
                             Vector2D q_i = Vector2D.valueOf(edgePoints[qe][i]);
                             Vector2D v = q_i.minus(p_i);
                             if (!v.isZero()) {  // zero vector has no direction
-                                v = v.direction().times(1 / p_i.distanceTo(q_i));
+                                v = v.times(edgeCompatibilityMeasures[pe][qe] / p_i.distanceTo(q_i));
                                 if (F_e_i == null) {
                                     F_e_i = v;
                                 } else {
@@ -245,22 +238,90 @@ public class ForceDirectedEdgeBundler {
                         }
                         F_p_i = F_s_i.plus(F_e_i);
                     }
-                    F_p_i.times(S).movePoint(p[i]);
+                    newP[i] = F_p_i.times(S).movePoint(p[i]);
                 }
             }
+            copy(tmpEdgePoints, edgePoints);
         }
+        
+        // update params only in case of success (i.e. no exception)
+        this.P = P;
+        this.S = S;
+        this.I = I;
         
         cycle++;
     }
+
+    private void addSubdivisionPoints(int P) {
+        // bigger array for subdivision points of the next cycle
+        Point2D.Double[][] newEdgePoints = new Point2D.Double[numEdges][P];
+
+        // Add subdivision points
+        for (int i = 0, numEdges = newEdgePoints.length; i < numEdges; i++) {
+            if (isSelfLoop(i)) {
+                continue;   // ignore self-loops
+            }
+            Point2D[] newPoints = newEdgePoints[i];
+            if (cycle == 0) {
+                assert(P == 1);
+                newPoints[0] = middle(edgeStarts[i], edgeEnds[i]);
+            } else {
+                List<Point2D> points = new ArrayList<Point2D>(Arrays.asList(edgePoints[i]));
+                points.add(0, edgeStarts[i]);
+                points.add(edgeEnds[i]);
+                
+                final int prevP = edgePoints[i].length;
+                
+                double polylineLen = 0;
+                double[] segmentLen = new double[prevP + 1];
+                for (int j = 0; j < prevP + 1; j++) {
+                    double segLen = points.get(j).distance(points.get(j + 1));
+                    segmentLen[j] = segLen;
+                    polylineLen += segLen;
+                }
+                
+                double L = polylineLen / (P + 1);
+                int curSegment = 0;
+                double prevSegmentsLen = 0;
+                Point2D p = points.get(0);
+                Point2D nextP = points.get(1);
+                for (int j = 0; j < P; j++) {
+                    while (segmentLen[curSegment] < L * (j + 1) - prevSegmentsLen) {
+                        prevSegmentsLen += segmentLen[curSegment];
+                        curSegment++;
+                        p = points.get(curSegment);
+                        nextP = points.get(curSegment + 1);
+                    }
+                    double d = L * (j + 1) - prevSegmentsLen;
+                    newPoints[j] = between(p, nextP, d / segmentLen[curSegment]);
+                }
+                
+            }
+        }
+        edgePoints = newEdgePoints;
+    }
     
+    private void copy(Point2D.Double[][] src, Point2D.Double[][] dest) {
+        if (src.length != dest.length) {
+            throw new ArrayIndexOutOfBoundsException("Src and dest array sizes mismatch");
+        }
+        for (int i = 0; i < src.length; i++) {
+            System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
+        }
+    }
+
     private Point2D middle(Point2D a, Point2D b) {
         return between(a, b, 0.5);
     }
     
+    /**
+     * Returns a point on a segment between the two points
+     * @param alpha Between 0 and 1
+     */
     private Point2D between(Point2D a, Point2D b, double alpha) {
         return new Point2D.Double(
-                Math.min(a.getX(), b.getX()) + Math.abs(b.getX() - a.getX()) * alpha,
-                Math.min(a.getY(), b.getY()) + Math.abs(b.getY() - a.getY()) * alpha
+                a.getX() + (b.getX() - a.getX()) * alpha,
+                a.getY() + (b.getY() - a.getY()) * alpha
         );
     }
     

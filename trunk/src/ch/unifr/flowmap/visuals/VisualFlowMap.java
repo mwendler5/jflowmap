@@ -10,8 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.SwingUtilities;
-
 import org.apache.log4j.Logger;
 
 import prefuse.data.Edge;
@@ -19,7 +17,6 @@ import prefuse.data.Graph;
 import prefuse.data.Node;
 import ch.unifr.flowmap.bundling.ForceDirectedEdgeBundler;
 import ch.unifr.flowmap.models.FlowMapParamsModel;
-import ch.unifr.flowmap.util.Stats;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
@@ -39,11 +36,11 @@ public class VisualFlowMap extends PNode {
     private final PNode edgeLayer;
     private final PNode nodeLayer;
 
-    private FlowMapParamsModel model;
+    private final FlowMapParamsModel model;
     private Map<Node, VisualNode> nodesToVisuals;
     private Map<Edge, VisualEdge> edgesToVisuals;
-    private PCanvas canvas;
-    private Graph graph;
+    private final PCanvas canvas;
+    private final Graph graph;
 
     public VisualFlowMap(PCanvas canvas, Graph graph, FlowMapParamsModel model) {
         this.graph = graph;
@@ -137,7 +134,7 @@ public class VisualFlowMap extends PNode {
                 if (edgeSplinePoints == null) {
                     ve = new LineVisualEdge(this, edge, fromNode, toNode);
                 } else {
-                    ve = new BSplineVisualEdge(this, edge, fromNode, toNode, edgeSplinePoints[edge.getRow()]);
+                    ve = new BSplineVisualEdge(this, edge, fromNode, toNode, edgeSplinePoints[edge.getRow()], true);
                 }
                 ve.update();
                 edgeLayer.addChild(ve);
@@ -359,20 +356,20 @@ public class VisualFlowMap extends PNode {
 
     public void bundlingCycle() {
         if (bundler == null) {
-            initBundler(10);
+            initBundler();
         }
         bundler.nextCycle();
         createEdges(bundler.getEdgePoints());
     }
 
-    private void initBundler(int numCycles) {
+    private void initBundler() {
         bundler = new ForceDirectedEdgeBundler(graph, model.getXNodeAttr(), model.getYNodeAttr());
 //        bundler.init(numCycles, .04);
-        bundler.init(numCycles, 4);
+        bundler.init(1);
     }
     
     public void bundleEdges(int numCycles) {
-        initBundler(numCycles);
+        initBundler();
         for (int cycle = 0; cycle < numCycles; cycle++) {
             bundlingCycle();
         }
