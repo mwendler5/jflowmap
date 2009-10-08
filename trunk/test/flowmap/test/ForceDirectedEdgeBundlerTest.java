@@ -12,14 +12,14 @@ public class ForceDirectedEdgeBundlerTest extends TestCase {
     }
 
     /**
-     * Test method for {@link ch.unifr.flowmap.bundling.ForceDirectedEdgeBundler#getEdgePoints()}.
+     * Test method for {@link jflowmap.bundling.ForceDirectedEdgeBundler#getEdgePoints()}.
      */
     public void testGetEdgePoints() {
         fail("Not yet implemented");
     }
 
     /**
-     * Test method for {@link ch.unifr.flowmap.bundling.ForceDirectedEdgeBundler#bundle(int)}.
+     * Test method for {@link jflowmap.bundling.ForceDirectedEdgeBundler#bundle(int)}.
      */
     public void testBundle() {
         fail("Not yet implemented");

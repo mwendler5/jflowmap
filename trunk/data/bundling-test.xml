@@ -50,6 +50,11 @@
          <data key="y">430</data>
          <data key="name">I</data>
       </node>
+      <node id="J">
+         <data key="x">440</data>
+         <data key="y">1030</data>
+         <data key="name">J</data>
+      </node>
       <node id="K">
          <data key="x">440</data>
          <data key="y">530</data>
@@ -57,30 +62,33 @@
       </node>
 
       <edge source="A" target="B" id="1">
-         <data key="data">1000</data>
+         <data key="data">1</data>
       </edge>
 
       <edge source="C" target="D" id="2">
-         <data key="data">1000</data>
+         <data key="data">1</data>
       </edge>
 
       <edge source="A" target="D" id="3">
-         <data key="data">1000</data>
+         <data key="data">1</data>
       </edge>
       <edge source="A" target="C" id="4">
-         <data key="data">1000</data>
+         <data key="data">1</data>
       </edge>
       <edge source="B" target="E" id="5">
-         <data key="data">1000</data>
+         <data key="data">1</data>
       </edge>
       <edge source="B" target="G" id="6">
-         <data key="data">1000</data>
+         <data key="data">1</data>
       </edge>
       <edge source="H" target="I" id="7">
-         <data key="data">1000</data>
+         <data key="data">1</data>
       </edge>
       <edge source="K" target="I" id="8">
-         <data key="data">1000</data>
+         <data key="data">1</data>
+      </edge>
+      <edge source="J" target="I" id="8">
+         <data key="data">1</data>
       </edge>
    </graph>
 </graphml>
