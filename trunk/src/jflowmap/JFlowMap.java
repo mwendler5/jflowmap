@@ -2,6 +2,7 @@ package jflowmap;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -37,19 +38,23 @@ public class JFlowMap extends JComponent {
 
     private static Logger logger = Logger.getLogger(JFlowMap.class);
 
-    private PCanvas canvas;
-    private ControlPanel controlPanel;
+    private final PCanvas canvas;
+    private final ControlPanel controlPanel;
     private VisualFlowMap visualFlowMap;
+    private final FlowMapMain app;
 
-    public JFlowMap() {
+    public JFlowMap(FlowMapMain app) {
         setLayout(new BorderLayout());
 
+        this.app = app;
+        
         canvas = new PCanvas();
         canvas.setBackground(Color.BLACK);
         canvas.addInputEventListener(new ZoomHandler(.5, 50));
         canvas.setPanEventHandler(new PanHandler());
         add(canvas, BorderLayout.CENTER);
         addComponentListener(new ComponentAdapter() {
+            @Override
             public void componentResized(ComponentEvent e) {
                 visualFlowMap.fitInCameraView();
             }
@@ -81,28 +86,32 @@ public class JFlowMap extends JComponent {
                 } catch (Exception ex) {
                     logger.error("Bundling error", ex);
                     JOptionPane.showMessageDialog(JFlowMap.this,
-                            "Bundling couldn't be performed: [" + ex.getClass().getSimpleName()+ "] " + ex.getMessage()
+                            "Error: [" + ex.getClass().getSimpleName()+ "] " + ex.getMessage()
                     );
                 }
             }
         });
-        JButton bundlingStepButton = new JButton("Bundling cycle");
-        bundleButs.add(bundlingStepButton);
-        bundlingStepButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    visualFlowMap.bundlingCycle();
-                } catch (Exception ex) {
-                    logger.error("Bundling error", ex);
-                    JOptionPane.showMessageDialog(JFlowMap.this,
-                            "Bundling couldn't be performed: [" + ex.getClass().getSimpleName()+ "] " + ex.getMessage()
-                    );
-                }
-            }
-        });
+//        JButton bundlingStepButton = new JButton("Bundling cycle");
+//        bundleButs.add(bundlingStepButton);
+//        bundlingStepButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                try {
+//                    visualFlowMap.bundlingCycle(true);
+//                } catch (Exception ex) {
+//                    logger.error("Bundling error", ex);
+//                    JOptionPane.showMessageDialog(JFlowMap.this,
+//                            "Bundling couldn't be performed: [" + ex.getClass().getSimpleName()+ "] " + ex.getMessage()
+//                    );
+//                }
+//            }
+//        });
         
         setVisualFlowMap(visFlowMap);
+    }
+
+    public Frame getApp() {
+        return app;
     }
 
     public void setVisualFlowMap(VisualFlowMap newFlowMap) {
@@ -126,7 +135,7 @@ public class JFlowMap extends JComponent {
             Graph graph = loadGraph(dataset.filename);
             model = new FlowMapParamsModel(graph, dataset.valueAttrName, dataset.labelAttrName);
             model.setValueFilterMin(1000);
-            VisualFlowMap visualFlowMap = new VisualFlowMap(canvas, graph, model);
+            VisualFlowMap visualFlowMap = new VisualFlowMap(this, canvas, graph, model);
             if (dataset.areaMapFilename != null) {
                 VisualAreaMap map = loadAreaMap(dataset.areaMapFilename);
                 visualFlowMap.addChild(map);
@@ -177,8 +186,11 @@ public class JFlowMap extends JComponent {
     }
     
     public static final DatasetSpec[] datasetSpecs = new DatasetSpec[] {
-            new DatasetSpec("data/bundling-test.xml", "data", "name", null),
             new DatasetSpec("data/airlines.xml", "value", "tooltip", null),
+            new DatasetSpec("data/refugee-flows-1985.xml", "refugees", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/bundling-test.xml", "data", "name", null),
+            new DatasetSpec("data/bundling-test2.xml", "data", "name", null),
+            new DatasetSpec("data/bundling-test3.xml", "data", "name", null),
             new DatasetSpec("data/migrations-unique.xml", "value", "tooltip", null),
             new DatasetSpec("data/refugee-flows-2008.xml", "refugees", "name", "data/countries-areas.xml"),
             new DatasetSpec("data/refugee-flows-2007.xml", "refugees", "name", "data/countries-areas.xml"),

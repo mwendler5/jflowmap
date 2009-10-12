@@ -1,4 +1,4 @@
-package flowmap.test;
+package jflowmap.test;
 
 import junit.framework.TestCase;
 

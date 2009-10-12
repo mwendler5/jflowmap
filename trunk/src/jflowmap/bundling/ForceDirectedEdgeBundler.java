@@ -11,8 +11,13 @@ import org.apache.log4j.Logger;
 
 import prefuse.data.Edge;
 import prefuse.data.Graph;
+import at.fhj.utils.misc.ProgressTracker;
 
 /**
+ * This is an implementation of the algorithm described in the paper
+ * "Force-Directed Edge Bundling for Graph Visualization" by
+ * Danny Holten and Jarke J. van Wijk.
+ * 
  * @author Ilya Boyandin
  */
 public class ForceDirectedEdgeBundler {
@@ -24,7 +29,7 @@ public class ForceDirectedEdgeBundler {
     private final String xNodeAttr;
     private final String yNodeAttr;
     private final Graph graph;
-    private double K = 1.0;
+    private double K;
 
     private int numEdges;
     private int P;      // number of subdivision points
@@ -36,6 +41,10 @@ public class ForceDirectedEdgeBundler {
     private Point2D.Double[] edgeStarts;
     private Point2D.Double[] edgeEnds;
     private double[][] edgeCompatibilityMeasures;
+
+    private ProgressTracker progressTracker;
+
+    private double minEdgeCompatibility;
     
     public ForceDirectedEdgeBundler(Graph graph, String xNodeAttr, String yNodeAttr) {
         this.graph = graph;
@@ -43,12 +52,16 @@ public class ForceDirectedEdgeBundler {
         this.yNodeAttr = yNodeAttr;
     }
     
+    public ProgressTracker getProgressTracker() {
+        return progressTracker;
+    }
+    
     /**
      * Global spring constant (to control the amount of edge bundling)
      */
-    public void setK(double k) {
-        K = k;
-    }
+//    public void setK(double k) {
+//        K = k;
+//    }
     
     public Point2D[][] getEdgePoints() {
         Point2D[][] points = new Point2D[numEdges][P + 2];
@@ -67,22 +80,23 @@ public class ForceDirectedEdgeBundler {
         return P;
     }
     
-    public void bundle(int numCycles, double initialStepSize) {
+    public void bundle(ProgressTracker progressTracker, int numCycles) {
         if (logger.isDebugEnabled()) {
             logger.debug("ForceDirectedEdgeBundler.bundle()");
         }
-        init(initialStepSize);
+        init(progressTracker);
         // iterative refinement scheme
         for (int i = 0; i < numCycles; i++) {
             logger.debug("Cycle " + i + " of " + numCycles);
             nextCycle();
         }
     }
-    
-    public void init(double initialStepSize) {
+
+    public void init(ProgressTracker progressTracker) {
         if (logger.isDebugEnabled()) {
             logger.debug("ForceDirectedEdgeBundler.init()");
         }
+        this.progressTracker = progressTracker;
         numEdges = graph.getEdgeCount();
         edgeLengths = new double[numEdges];
         edgeStarts = new Point2D.Double[numEdges];
@@ -96,42 +110,46 @@ public class ForceDirectedEdgeBundler {
         
         calcEdgeCompatibilityMeasures();
 
-        P = 1;          // number of subdivision points
-        S = initialStepSize;     // step size
-//        S = .04;
-//        I = 50;         // number of iteration steps performed during a cycle
+        K = 0.1;          // global spring constant (used to control the amount of edge bundling by
+                        // determining the stiffness of the edges)
+        P = 1;          // initial number of subdivision points (will double with every cycle)
+        S = 0.4;         // step size - shouldn't be higher than 1.0
         I = 50;         // number of iteration steps performed during a cycle
-//        I = 1;         // number of iteration steps performed during a cycle
+        minEdgeCompatibility = 0.60;
         
         cycle = 0;
     }
-    
-    private boolean isSelfLoop(int edgeIdx) {
-        return Math.abs(edgeLengths[edgeIdx]) == 0.0;
-    }
-    
+
     private void calcEdgeCompatibilityMeasures() {
-        edgeCompatibilityMeasures = new double[numEdges][numEdges];
+        progressTracker.startSubtask("Allocating memory", .05);
+        edgeCompatibilityMeasures = new double[numEdges][];
+        progressTracker.subtaskCompleted();
         
+        progressTracker.startSubtask("Precalculating edge compatibility measures", .95);
+        progressTracker.setSubtaskIncUnit(100.0 / numEdges);
         for (int i = 0; i < numEdges; i++) {
+            if (progressTracker.isCancelled()) {
+                edgeCompatibilityMeasures = null;
+                return;
+            }
             Vector2D p = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
             Point2D pm = middle(edgeStarts[i], edgeEnds[i]);
+            edgeCompatibilityMeasures[i] = new double[i];
             for (int j = 0; j < i; j++) {
                 Vector2D q = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
                 Point2D qm = middle(edgeStarts[j], edgeEnds[j]);
                 double l_avg = (edgeLengths[i] + edgeLengths[j])/2;
                 
                 // angle compatibility
-//                double Ca = Math.abs(Math.cos(Math.acos(p.dot(q) / (p.length() * q.length()))));
-//                double Ca = Math.cos(Math.acos(p.dot(q) / (p.length() * q.length())));
-                double Ca = p.dot(q) / (p.length() * q.length());
-                if (Ca < 0.0) Ca = 0; 
+//                double Ca = ((p.dot(q) / (p.length() * q.length())) + 1.0)/2.0;
+                double Ca = Math.abs(p.dot(q) / (p.length() * q.length()));
 //                double Ca = 1.0;
                 
                 
                 // scale compatibility
 //                double Cs = 2 / (l_avg * Math.min(edgeLengths[i], edgeLengths[j])  + (Math.max(edgeLengths[i], edgeLengths[j]) / l_avg));
-                double Cs = Math.min(edgeLengths[i], edgeLengths[j])  / Math.max(edgeLengths[i], edgeLengths[j]);
+//                double Cs = Math.min(edgeLengths[i], edgeLengths[j])  / Math.max(edgeLengths[i], edgeLengths[j]);
+                double Cs = 2 / ((l_avg / Math.min(edgeLengths[i], edgeLengths[j]))  + (Math.max(edgeLengths[i], edgeLengths[j]) / l_avg));
 //                double Cs = 1.0;
                 
                 // position compatibility
@@ -139,21 +157,37 @@ public class ForceDirectedEdgeBundler {
 //                double Cp = 1.0;
                 
                 // visibility compatibility
-                double Cv = Math.min(visibility(p, q), visibility(q, p));
+                double Cv = Math.min(visibility(p, q, pm, qm), visibility(q, p, pm, qm));
+//                double Cv = 1.0;
 
                 
 //                double Cdir = (p.dot(q) / (p.length() * q.length()) > 0 ? 1.0 : 0.0)
                 
-                edgeCompatibilityMeasures[i][j] = edgeCompatibilityMeasures[j][i] = Ca * Cs * Cp * Cv;
+                edgeCompatibilityMeasures[i][j] = Ca * Cs * Cp * Cv;
+                
             }
+            progressTracker.incSubtaskProgress();
         }
     }
     
-    private double visibility(Vector2D p, Vector2D q) {
+    private double getEdgeCompatibility(int edgeI, int edgeJ) {
+        if (edgeI == edgeJ) return 0;
+        if (edgeI > edgeJ)
+            return edgeCompatibilityMeasures[edgeI][edgeJ];
+        else
+            return edgeCompatibilityMeasures[edgeJ][edgeI];
+    }
+    
+    private double visibility(Vector2D p, Vector2D q, Point2D pm, Point2D qm) {
+        
         return Math.max(
                 0,
                 1 //- 2 * middle(edgeStarts[i], edgeEnds[i]) / middle()
         );
+    }
+    
+    private boolean isSelfLoop(int edgeIdx) {
+        return Math.abs(edgeLengths[edgeIdx]) == 0.0;
     }
 
     public void nextCycle() {
@@ -161,7 +195,6 @@ public class ForceDirectedEdgeBundler {
             logger.debug("ForceDirectedEdgeBundler.nextCycle()");
         }
         
-        final double minEdgeCompatibility = 0.6;
         int P = this.P;
         double S = this.S;
         int I = this.I;
@@ -170,20 +203,33 @@ public class ForceDirectedEdgeBundler {
         if (cycle > 0) {
             P *= 2;
             S /= 2;
+//            S /= 1.2;
             I = (I * 2) / 3;
         }
         
+        if (progressTracker.isCancelled()) {
+            return;
+        }
+        progressTracker.startSubtask("Adding subdivision points", .1);
         addSubdivisionPoints(P);
+        progressTracker.subtaskCompleted();
         
         // Perform simulation steps
         Point2D.Double[][] tmpEdgePoints = new Point2D.Double[numEdges][P];
         
         for (int step = 0; step < I; step++) {
+            if (progressTracker.isCancelled()) {
+                return;
+            }
+            progressTracker.startSubtask("Step " + (step + 1) + " of " + I, (1.0 - .1) / I);
+            progressTracker.setSubtaskIncUnit(100.0 / numEdges);
             if (logger.isDebugEnabled()) {
                 logger.debug("Cycle " + (cycle + 1) + "; Step " + (step + 1) + " of " + I);
             }
-            
             for (int pe = 0; pe < numEdges; pe++) {
+                if (progressTracker.isCancelled()) {
+                    return;
+                }
                 Point2D.Double[] p = edgePoints[pe];
                 Point2D.Double[] newP = tmpEdgePoints[pe];
                 if (isSelfLoop(pe)) {
@@ -193,70 +239,86 @@ public class ForceDirectedEdgeBundler {
                 final int numOfSegments = P + 1;
                 double k_p = K / (edgeLengths[pe] * numOfSegments);
                 
-                if (Double.isInfinite(k_p)) {
-                    logger.warn("Infinite value of k_p for edge " + graph.getEdge(pe));
-                }
                 for (int i = 0; i < P; i++) {
                     // spring forces
                     Vector2D p_i = Vector2D.valueOf(p[i]);
                     Vector2D p_prev = Vector2D.valueOf(i == 0 ? edgeStarts[pe] : p[i - 1]);
                     Vector2D p_next = Vector2D.valueOf(i == P - 1 ? edgeEnds[pe] : p[i + 1]);
                     Vector2D F_s_i = (
-                        p_prev.minus(p_i).times(k_p) //  * p_i.distanceTo(p_prev))
+                        p_prev.minus(p_i) //.times(k_p)  * p_i.distanceTo(p_prev))
                     ).plus(
-                        p_next.minus(p_i).times(k_p) //  * p_i.distanceTo(p_next))
+                        p_next.minus(p_i) //.times(k_p)  * p_i.distanceTo(p_next))
                     );
+                    
+                    if (Math.abs(k_p) < 1.0) {
+                        F_s_i = F_s_i.times(k_p);
+                    }
 
                     // attracting electrostatic forces (for each other edge)
-                    Vector2D F_e_i = null;
+                    Vector2D F_e_i = Vector2D.ZERO;
                     for (int qe = 0; qe < numEdges; qe++) {
-                        if (qe != pe  &&  !isSelfLoop(qe)  &&  edgeCompatibilityMeasures[pe][qe] > minEdgeCompatibility) {
-                            Vector2D q_i = Vector2D.valueOf(edgePoints[qe][i]);
-                            Vector2D v = q_i.minus(p_i);
-                            if (!v.isZero()) {  // zero vector has no direction
-                                v = v.times(edgeCompatibilityMeasures[pe][qe] / p_i.distanceTo(q_i));
-                                if (F_e_i == null) {
-                                    F_e_i = v;
-                                } else {
+                        if (qe != pe  &&  !isSelfLoop(qe)) {
+                            double ec = getEdgeCompatibility(pe, qe);
+                            if (ec > minEdgeCompatibility) {
+                                Vector2D q_i = Vector2D.valueOf(edgePoints[qe][i]);
+                                Vector2D v = q_i.minus(p_i);
+                                if (!v.isZero()) {  // zero vector has no direction
+                                    double d = v.length();  // shouldn't be zero
+                                    double m = ec / (d * d);
+                                    if (Math.abs(m) < 1.0) {
+                                        v = v.times(m);
+                                    }
+//                                    if (v.isNaN()) {
+//                                        // can happen if d is Infinity and ec is zero
+//                                        logger.warn("v is NaN");
+//                                    }
                                     F_e_i = F_e_i.plus(v);
                                 }
+//                              F_e_i_v += 1 / (p[i].distance(q[i]));      // using inverse-linear model (not square)
                             }
-//                          F_e_i_v += 1 / (p[i].distance(q[i]));      // using inverse-linear model (not square)
                         }
                     }
 
-//                    if (logger.isDebugEnabled()) {
-//                        logger.debug(
-//                                "Edge " + graph.getEdge(pe) + ", subdiv point " + i + ": " +
-//                                "F_s_i = " + F_s_i + ", " +
-//                                "F_e_i = " + F_e_i
-//                        );
-//                    }
+                    if (Math.abs(F_s_i.length()) < 1e-5  &&  Math.abs(F_e_i.length()) < 1e-5) {
+                        newP[i] = p[i];
+                        continue;
+                    }
+                    Vector2D F_p_i = F_s_i.plus(F_e_i);
+                    newP[i] = F_p_i.times(S).movePoint(p[i]);
 
                     if (F_s_i.isNaN()) {
-                        logger.warn("F_s_i is NaN (Edge " + graph.getEdge(pe) + ", subdiv point " + i + ")");
+                        throw new RuntimeException("F_s_i is NaN");
                     }
-                    Vector2D F_p_i;
-                    if (F_e_i == null) {
-                        F_p_i = F_s_i;
-                    } else {
-                        if (F_e_i.isNaN()) {
-                            logger.warn("F_e_i is NaN (Edge " + graph.getEdge(pe) + ", subdiv point " + i + ")");
-                        }
-                        F_p_i = F_s_i.plus(F_e_i);
+                    if (F_e_i.isNaN()) {
+                        throw new RuntimeException("F_e_i is NaN");
                     }
-                    newP[i] = F_p_i.times(S).movePoint(p[i]);
+                    if (Double.isInfinite(newP[i].x)  &&  Double.isInfinite(newP[i].y)) {
+                        throw new RuntimeException("Point moved to infinity");
+                    }
+//                    if (Math.abs(F_s_i.length() / F_e_i.length()) > 1e5  ||  Math.abs(F_e_i.length() / F_s_i.length()) > 1e5) {
+//                        logger.warn("F_s_i and F_e_i differ in more than five orders of magnitude: F_s_i = " + F_s_i.length() + ", F_e_i = " + F_e_i.length());
+//                    }
+//                    if (F_s_i.length() > 1e10) {
+//                        logger.warn("Extremely high F_s_i value: F_s_i = " + F_s_i.length());
+//                    }
+//                    if (F_e_i.length() > 1e10) {
+//                        logger.warn("Extremely high F_e_i value: F_e_i = " + F_e_i.length());
+//                    }
                 }
+                progressTracker.incSubtaskProgress();
             }
             copy(tmpEdgePoints, edgePoints);
+            progressTracker.subtaskCompleted();
         }
         
-        // update params only in case of success (i.e. no exception)
-        this.P = P;
-        this.S = S;
-        this.I = I;
-        
-        cycle++;
+        if (!progressTracker.isCancelled()) {
+            // update params only in case of success (i.e. no exception)
+            this.P = P;
+            this.S = S;
+            this.I = I;
+            
+            cycle++;
+        }
     }
 
     private void addSubdivisionPoints(int P) {

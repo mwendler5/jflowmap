@@ -18,7 +18,7 @@ import edu.umd.cs.piccolo.nodes.PPath;
 public class BSplineVisualEdge extends VisualEdge {
 
     private static final Color DOT_COLOR = new Color(255,0,0,100);
-    private static final Font AFONT = new Font("arial", Font.PLAIN, 1);
+//    private static final Font AFONT = new Font("arial", Font.PLAIN, 1);
 
     private static final long serialVersionUID = 1L;
     

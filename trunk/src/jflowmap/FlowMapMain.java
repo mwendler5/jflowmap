@@ -31,7 +31,7 @@ public class FlowMapMain extends JFrame {
 
     public FlowMapMain() {
         setTitle("JFlowMap");
-        flowMap = new JFlowMap();
+        flowMap = new JFlowMap(this);
         add(flowMap);
 
         setExtendedState(MAXIMIZED_BOTH);

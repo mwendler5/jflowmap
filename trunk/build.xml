@@ -5,7 +5,7 @@
 	<property name="path.lib" value="lib"/>
 	<property name="path.build" value="build"/>
 
-	<target name="build" depends="mkdirs, compile, one-big-jar" />
+	<target name="build" depends="mkdirs, clean, compile, one-big-jar" />
 
 	<path id="master-classpath">
 		<fileset dir="${path.lib}">
@@ -38,7 +38,7 @@
 		<copy file="log4j-prod.properties" tofile="${path.build}/log4j.properties" overwrite="true"/>
 		<jar basedir="." jarfile="${path.build}/JFlowMap.jar">
 			<manifest>
-				<attribute name="Main-Class" value="ch.unifr.flowmap.FlowMapMain" />
+				<attribute name="Main-Class" value="jflowmap.FlowMapMain" />
 			</manifest>
 			<exclude name="**/*" />
 			<fileset dir="${path.classes}">

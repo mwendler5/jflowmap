@@ -192,25 +192,26 @@ public abstract class VisualEdge extends PNode {
     public void updateEdgeColors() {
         PPath ppath = getEdgePPath();
         if (ppath != null) {
-            ppath.setStrokePaint(getValueColor(STROKE_PAINT, false));
+            Color color = getValueColor(STROKE_PAINT, false);
+            ppath.setStrokePaint(color);
         }
     }
 
     public void setHighlighted(boolean value, boolean showDirection, boolean outgoing) {
-//        System.out.println(this + ".setHighlighted("  + value + ")");
         PPath ppath = getEdgePPath();
         if (ppath != null) {
+            Color paint;
             if (value) {
-                Color paint;
                 if (showDirection) {
                     paint = (outgoing ? STROKE_HIGHLIGHTED_OUTGOING_PAINT : STROKE_HIGHLIGHTED_INCOMING_PAINT);
                 } else {
                     paint = STROKE_HIGHLIGHTED_PAINT;
                 }
-                ppath.setStrokePaint(getValueColor(paint, false));
             } else {
-                ppath.setStrokePaint(getValueColor(STROKE_PAINT, false));
+                paint = STROKE_PAINT;
             }
+            Color color = getValueColor(paint, false);
+            ppath.setStrokePaint(color);
             getSourceNode().setVisible(value);
             getTargetNode().setVisible(value);
         }

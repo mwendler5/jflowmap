@@ -1,15 +1,8 @@
 package jflowmap.data;
 
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.builder.XmlDocument;
-import org.xmlpull.v1.builder.XmlElement;
-import org.xmlpull.v1.builder.XmlInfosetBuilder;
-import org.xmlpull.v1.builder.xpath.Xb1XPath;
-
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,17 +11,24 @@ import jflowmap.models.map.Area;
 import jflowmap.models.map.AreaMap;
 import jflowmap.models.map.Polygon;
 
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.builder.XmlDocument;
+import org.xmlpull.v1.builder.XmlElement;
+import org.xmlpull.v1.builder.XmlInfosetBuilder;
+import org.xmlpull.v1.builder.xpath.Xb1XPath;
+
+import prefuse.util.io.IOLib;
+
 /**
  * @author Ilya Boyandin
  *         Date: 25-Sep-2009
  */
 public class XmlAreaMapModelReader {
 
-    public AreaMap readMap(String filename) throws IOException {
+    public AreaMap readMap(String location) throws IOException {
         XmlInfosetBuilder builder = XmlInfosetBuilder.newInstance();
         try {
-            File file = new File(filename);
-            return loadFrom(file.getName(), builder.parseReader(new FileReader(file)));
+            return loadFrom(location, builder.parseReader(new InputStreamReader(IOLib.streamFromString(location))));
         } catch (XmlPullParserException e) {
             throw new IOException(e);
         }

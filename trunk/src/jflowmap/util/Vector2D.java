@@ -7,6 +7,7 @@ import java.awt.geom.Point2D;
  */
 public class Vector2D {
 
+    public final static Vector2D ZERO = new Vector2D(0, 0);
     private final double x;
     private final double y;
     private double length = Double.NaN;

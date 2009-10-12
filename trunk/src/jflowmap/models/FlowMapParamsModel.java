@@ -3,15 +3,12 @@ package jflowmap.models;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-import jflowmap.JFlowMap;
 import jflowmap.util.GraphStats;
 import jflowmap.util.Stats;
 
 import org.apache.log4j.Logger;
 
 import prefuse.data.Graph;
-import prefuse.data.io.DataIOException;
-import prefuse.data.io.GraphMLReader;
 
 
 public class FlowMapParamsModel {
@@ -37,7 +34,7 @@ public class FlowMapParamsModel {
     private double edgeLengthFilterMax = Double.MAX_VALUE;
 
     private boolean autoAdjustEdgeColorScale;
-    private double maxEdgeWidth = 10.0;
+    private double maxEdgeWidth = 1.0;
 
     private final GraphStats graphStats;
 
@@ -53,6 +50,11 @@ public class FlowMapParamsModel {
         this.valueFilterMin = minMax.min;
         this.valueFilterMax = minMax.max;
 
+        if (minMax.max - minMax.min > 10.0) {
+            maxEdgeWidth = 10.0;
+        } else {
+            maxEdgeWidth = Math.floor(minMax.max - minMax.min);
+        }
         Stats lengthStats = graphStats.getEdgeLengthStats();
         this.edgeLengthFilterMin = lengthStats.min;
         this.edgeLengthFilterMax = lengthStats.max;

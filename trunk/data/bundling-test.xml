@@ -60,6 +60,11 @@
          <data key="y">530</data>
          <data key="name">K</data>
       </node>
+      <node id="L">
+         <data key="x">10</data>
+         <data key="y">550</data>
+         <data key="name">L</data>
+      </node>
 
       <edge source="A" target="B" id="1">
          <data key="data">1</data>
@@ -88,6 +93,9 @@
          <data key="data">1</data>
       </edge>
       <edge source="J" target="I" id="8">
+         <data key="data">1</data>
+      </edge>
+      <edge source="L" target="K" id="8">
          <data key="data">1</data>
       </edge>
    </graph>

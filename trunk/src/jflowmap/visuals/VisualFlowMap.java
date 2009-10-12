@@ -10,6 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
+import jflowmap.JFlowMap;
 import jflowmap.bundling.ForceDirectedEdgeBundler;
 import jflowmap.models.FlowMapParamsModel;
 
@@ -18,6 +21,9 @@ import org.apache.log4j.Logger;
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
+import at.fhj.utils.misc.ProgressTracker;
+import at.fhj.utils.swing.ProgressDialog;
+import at.fhj.utils.swing.ProgressWorker;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
@@ -42,8 +48,10 @@ public class VisualFlowMap extends PNode {
     private Map<Edge, VisualEdge> edgesToVisuals;
     private final PCanvas canvas;
     private final Graph graph;
+    private final JFlowMap jFlowMap;
 
-    public VisualFlowMap(PCanvas canvas, Graph graph, FlowMapParamsModel model) {
+    public VisualFlowMap(JFlowMap jFlowMap, PCanvas canvas, Graph graph, FlowMapParamsModel model) {
+        this.jFlowMap = jFlowMap;
         this.graph = graph;
         this.canvas = canvas;
     	this.model = model;
@@ -92,10 +100,10 @@ public class VisualFlowMap extends PNode {
 
     
     private void createEdges() {
-        createEdges(null);
+        createEdges(null, false);
     }
     
-    private void createEdges(Point2D[][] edgeSplinePoints) {
+    private void createEdges(Point2D[][] edgeSplinePoints, boolean showPoints) {
         edgeLayer.removeAllChildren();
         
 //      for (int i = 0; i < graph.getEdgeTable().getColumnCount(); i++) {
@@ -135,7 +143,7 @@ public class VisualFlowMap extends PNode {
                 if (edgeSplinePoints == null) {
                     ve = new LineVisualEdge(this, edge, fromNode, toNode);
                 } else {
-                    ve = new BSplineVisualEdge(this, edge, fromNode, toNode, edgeSplinePoints[edge.getRow()], false);
+                    ve = new BSplineVisualEdge(this, edge, fromNode, toNode, edgeSplinePoints[edge.getRow()], showPoints);
                 }
                 ve.update();
                 edgeLayer.addChild(ve);
@@ -353,32 +361,77 @@ public class VisualFlowMap extends PNode {
     public void resetBundling() {
         createEdges();
         bundler = null;
+        repaint();
     }
 
-    public void bundlingCycle() {
+    public void bundlingCycle(boolean showPoints) {
         if (bundler == null) {
-            initBundler();
+            initBundler(new ProgressTracker());
         }
         bundler.nextCycle();
-        createEdges(bundler.getEdgePoints());
+        if (!bundler.getProgressTracker().isCancelled()) {
+            createEdges(bundler.getEdgePoints(), showPoints);
+            repaint();
+        }
     }
 
-    private void initBundler() {
+    private void initBundler(ProgressTracker progressTracker) {
         bundler = new ForceDirectedEdgeBundler(graph, model.getXNodeAttr(), model.getYNodeAttr());
-//        bundler.init(numCycles, .04);
-        bundler.init(1);
+        bundler.init(progressTracker);
     }
     
     public void bundleEdges(int numCycles) {
-//        ProgressDialog dialog = new ProgressDialog(app, "Edge bundling", worker, false);
-//        progress.addProgressListener(dialog);
-//        worker.start();
-//        dialog.setVisible(true);
-
-        initBundler();
-        for (int cycle = 0; cycle < numCycles; cycle++) {
-            bundlingCycle();
-        }
-        bundler = null;
+        ProgressTracker progress = new ProgressTracker();
+        EdgeBundlerWorker worker = new EdgeBundlerWorker(progress, numCycles);
+        ProgressDialog dialog = new ProgressDialog(jFlowMap.getApp(), "Edge bundling", worker, true);
+        progress.addProgressListener(dialog);
+        worker.start();
+        dialog.setVisible(true);
     }
+    
+    private class EdgeBundlerWorker extends ProgressWorker {
+
+        private final int numCycles;
+
+        public EdgeBundlerWorker(ProgressTracker progress, int numCycles) {
+            super(progress);
+            this.numCycles = numCycles;
+        }
+
+        @Override
+        public Object construct() {
+            try {
+                ProgressTracker pt = getProgressTracker();
+                bundler = null;
+                pt.startTask("Initializing", .05);
+                initBundler(pt);
+                if (pt.isCancelled()) {
+                    return null;
+                }
+                pt.taskCompleted();
+                
+                // TODO: move this to ForceDirectedEdgeBundler and add a TaskCompletionListener 
+                for (int cycle = 0; cycle < numCycles; cycle++) {
+                    pt.startTask("Bundling cycle " + (cycle + 1) + " of " + numCycles, .95 / numCycles);
+                    bundlingCycle(cycle < numCycles - 1);
+                    pt.taskCompleted();
+                    if (pt.isCancelled()) {
+                        return null;
+                    }
+                }
+    
+                pt.processFinished();
+                repaint();
+            } catch (Throwable th) {
+                logger.error("Bundling error", th);
+                JOptionPane.showMessageDialog(jFlowMap,
+                        "Bundling error: [" + th.getClass().getSimpleName()+ "] " + th.getMessage()
+                );
+            }
+            return null;
+        }
+
+    }
+
 }
+    
