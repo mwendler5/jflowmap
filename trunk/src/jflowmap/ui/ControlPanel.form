@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="jflowmap.ui.ControlPanel">
   <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="789" height="400"/>
+      <xy x="20" y="20" width="866" height="400"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -71,7 +71,9 @@
                   <grid row="0" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <enabled value="false"/>
+                </properties>
               </component>
               <component id="22e9a" class="javax.swing.JLabel">
                 <constraints>
@@ -79,6 +81,7 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <text value="Node X coord field:"/>
                 </properties>
               </component>
@@ -88,6 +91,7 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <text value="Node Y coord field:"/>
                 </properties>
               </component>
@@ -96,7 +100,9 @@
                   <grid row="2" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <enabled value="false"/>
+                </properties>
               </component>
               <component id="5077c" class="javax.swing.JLabel">
                 <constraints>
@@ -104,6 +110,7 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <text value="Edge value field:"/>
                 </properties>
               </component>
@@ -112,7 +119,9 @@
                   <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <enabled value="false"/>
+                </properties>
               </component>
               <component id="83960" class="javax.swing.JLabel">
                 <constraints>
@@ -120,6 +129,7 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <text value="Node label field:"/>
                 </properties>
               </component>
@@ -128,7 +138,9 @@
                   <grid row="2" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <enabled value="false"/>
+                </properties>
               </component>
             </children>
           </grid>
@@ -231,6 +243,7 @@
                   <forms/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <text value="Auto adjust color scale"/>
                 </properties>
               </component>
@@ -298,12 +311,6 @@
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:p:noGrow"/>
             <colspec value="left:15dlu:noGrow"/>
-            <colspec value="fill:max(p;4px):noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:162px:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:53px:noGrow"/>
-            <colspec value="left:5dlu:noGrow"/>
             <colspec value="fill:max(d;4px):grow"/>
             <constraints>
               <tabbedpane title="Scales"/>
@@ -313,33 +320,6 @@
               <size top="10" left="10" bottom="10" right="10"/>
             </border>
             <children>
-              <component id="1442e" class="javax.swing.JSlider" binding="maxEdgeWidthSlider">
-                <constraints>
-                  <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <paintLabels value="false"/>
-                  <paintTicks value="false"/>
-                  <paintTrack value="true"/>
-                </properties>
-              </component>
-              <component id="335be" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Max edge width:"/>
-                </properties>
-              </component>
-              <component id="edf8f" class="javax.swing.JSpinner" binding="maxEdgeWidthSpinner">
-                <constraints>
-                  <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
               <component id="cf993" class="javax.swing.JSeparator">
                 <constraints>
                   <grid row="0" column="2" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
@@ -355,6 +335,7 @@
                   <forms/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <text value="Use log width scale"/>
                 </properties>
               </component>
@@ -364,6 +345,7 @@
                   <forms/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <text value="Use log color scale"/>
                 </properties>
               </component>
@@ -373,6 +355,7 @@
                   <forms/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <text value="Map edge value to color"/>
                 </properties>
               </component>
@@ -382,6 +365,7 @@
                   <forms/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <text value="Map edge value to width"/>
                 </properties>
               </component>
@@ -398,6 +382,8 @@
           </grid>
           <grid id="31f8b" layout-manager="FormLayout">
             <rowspec value="center:d:noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:d:noGrow"/>
@@ -427,6 +413,7 @@
                   <forms/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <text value="Color scheme:"/>
                 </properties>
               </component>
@@ -435,7 +422,9 @@
                   <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <enabled value="false"/>
+                </properties>
               </component>
               <component id="f5650" class="javax.swing.JLabel">
                 <constraints>
@@ -485,11 +474,240 @@
               </component>
               <component id="66cd7" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="4" row-span="3" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="4" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
                   <orientation value="1"/>
+                </properties>
+              </component>
+              <component id="59b8d" class="javax.swing.JSpinner" binding="maxEdgeWidthSpinner">
+                <constraints>
+                  <grid row="4" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="22885" class="javax.swing.JSlider" binding="maxEdgeWidthSlider">
+                <constraints>
+                  <grid row="4" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <paintLabels value="false"/>
+                  <paintTicks value="false"/>
+                  <paintTrack value="true"/>
+                </properties>
+              </component>
+              <component id="9ab73" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <text value="Max edge width:"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="e8f37" layout-manager="FormLayout">
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:5dlu:noGrow"/>
+            <rowspec value="center:d:grow"/>
+            <colspec value="fill:p:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:p:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:45px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:p:noGrow"/>
+            <colspec value="left:25dlu:noGrow"/>
+            <colspec value="fill:93px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:85px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <constraints>
+              <tabbedpane title="Force-Directed Edge Bundling"/>
+            </constraints>
+            <properties/>
+            <border type="empty">
+              <size top="10" left="10" bottom="10" right="10"/>
+            </border>
+            <children>
+              <component id="a154b" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <horizontalAlignment value="4"/>
+                  <text value="Edge compatibility threshold:"/>
+                </properties>
+              </component>
+              <component id="d84a9" class="javax.swing.JSpinner" binding="edgeCompatibilityThresholdSpinner">
+                <constraints>
+                  <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="b27ba" class="javax.swing.JSeparator">
+                <constraints>
+                  <grid row="0" column="4" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <orientation value="1"/>
+                </properties>
+              </component>
+              <component id="79536" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <horizontalAlignment value="4"/>
+                  <text value="Step damping factor:"/>
+                </properties>
+              </component>
+              <component id="4ef94" class="javax.swing.JSpinner" binding="stepDampingFactorSpinner">
+                <constraints>
+                  <grid row="2" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="12d67" class="javax.swing.JSpinner" binding="stepsInCycleSpinner">
+                <constraints>
+                  <grid row="4" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="1402c" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <horizontalAlignment value="4"/>
+                  <text value="Steps in the first cycle (I):"/>
+                </properties>
+              </component>
+              <component id="62350" class="javax.swing.JSpinner" binding="stepSizeSpinner">
+                <constraints>
+                  <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="a4927" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <horizontalAlignment value="4"/>
+                  <text value="Step size (S):"/>
+                </properties>
+              </component>
+              <component id="ecfc9" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <horizontalAlignment value="4"/>
+                  <text value="Edge stiffness (K):"/>
+                </properties>
+              </component>
+              <component id="35787" class="javax.swing.JSpinner" binding="edgeStiffnessSpinner">
+                <constraints>
+                  <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="314" height="22"/>
+                  </grid>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="f1dcc" class="javax.swing.JButton" binding="bundleButton" default-binding="true">
+                <constraints>
+                  <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Bundle"/>
+                </properties>
+              </component>
+              <component id="bdf4c" class="javax.swing.JSeparator">
+                <constraints>
+                  <grid row="0" column="9" row-span="8" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <orientation value="1"/>
+                </properties>
+              </component>
+              <component id="f7bd3" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <horizontalAlignment value="4"/>
+                  <text value="Number of cycles:"/>
+                </properties>
+              </component>
+              <component id="7b604" class="javax.swing.JSpinner" binding="numberOfCyclesSpinner">
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="f61d0" class="javax.swing.JButton" binding="defaultValuesButton" default-binding="true">
+                <constraints>
+                  <grid row="0" column="14" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Default Values"/>
+                </properties>
+              </component>
+              <component id="9fc31" class="javax.swing.JButton" binding="resetButton" default-binding="true">
+                <constraints>
+                  <grid row="0" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Reset"/>
+                </properties>
+              </component>
+              <component id="500e9" class="javax.swing.JCheckBox" binding="directionAffectsCompatibilityCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="6" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Direction affects compatibility"/>
+                </properties>
+              </component>
+              <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="6" column="6" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Binary compatibility"/>
                 </properties>
               </component>
             </children>

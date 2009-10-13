@@ -30,41 +30,46 @@ public class ForceDirectedEdgeBundler {
     private final String xNodeAttr;
     private final String yNodeAttr;
     private final Graph graph;
-    private double K;
-
-    private int numEdges;
-    private int P;      // number of subdivision points
-    private double S;   // step size
-    private int I;      // number of iteration steps performed during a cycle
-    
-    private int cycle;
 
     private Point2D.Double[] edgeStarts;
     private Point2D.Double[] edgeEnds;
     private double[][] edgeCompatibilityMeasures;
+    private int numEdges;
+    private int cycle;
 
+    private double K = 0.1; // global spring constant (used to control the amount of edge bundling by
+                            // determining the stiffness of the edges)
+    private int P = 1;      // initial number of subdivision points (will double with every cycle)
+    private double S = 0.4;   // step size - shouldn't be higher than 1.0
+    private int I = 50;      // number of iteration steps performed during a cycle
+    private double edgeCompatibilityThreshold = 0.60;
+    private boolean directionAffectsCompatibility;
+    private boolean binaryCompatibility;
+
+
+    private double stepDampingFactor = 0.5;
     private ProgressTracker progressTracker;
 
-    private double edgeCompatibilityThreshold;
 
-    private double stepDampingFactor;
-    
-    public ForceDirectedEdgeBundler(Graph graph, String xNodeAttr, String yNodeAttr) {
+    public ForceDirectedEdgeBundler(Graph graph, String xNodeAttr, String yNodeAttr,
+                                    int I, double K, double edgeCompatibilityThreshold,
+                                    double S, double stepDampingFactor,
+                                    boolean directionAffectsCompatibility, boolean binaryCompatibility) {
         this.graph = graph;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
+        this.I = I;
+        this.K = K;
+        this.edgeCompatibilityThreshold = edgeCompatibilityThreshold;
+        this.S = S;
+        this.stepDampingFactor = stepDampingFactor;
+        this.directionAffectsCompatibility = directionAffectsCompatibility;
+        this.binaryCompatibility = binaryCompatibility;
     }
-    
+
     public ProgressTracker getProgressTracker() {
         return progressTracker;
     }
-    
-    /**
-     * Global spring constant (to control the amount of edge bundling)
-     */
-//    public void setK(double k) {
-//        K = k;
-//    }
     
     public Point2D[][] getEdgePoints() {
         Point2D[][] points = new Point2D[numEdges][P + 2];
@@ -111,15 +116,6 @@ public class ForceDirectedEdgeBundler {
             edgeLengths[i] = edgeStarts[i].distance(edgeEnds[i]);
         }
         
-
-        K = 0.1;          // global spring constant (used to control the amount of edge bundling by
-                        // determining the stiffness of the edges)
-        P = 1;          // initial number of subdivision points (will double with every cycle)
-        S = 0.4;         // step size - shouldn't be higher than 1.0
-        I = 50;         // number of iteration steps performed during a cycle
-        edgeCompatibilityThreshold = 0.60;
-        stepDampingFactor = 0.5;
-
         calcEdgeCompatibilityMeasures();
         
         cycle = 0;
@@ -148,7 +144,12 @@ public class ForceDirectedEdgeBundler {
                 // angle compatibility
 //                double Ca = ((p.dot(q) / (p.length() * q.length())) + 1.0)/2.0;
 //              double Cdir = (p.dot(q) / (p.length() * q.length()) > 0 ? 1.0 : 0.0)
-                double Ca = Math.abs(p.dot(q) / (p.length() * q.length()));
+                double Ca;
+                if (directionAffectsCompatibility) {
+                    Ca = (p.dot(q) / (p.length() * q.length()) + 1.0) / 2.0;
+                } else {
+                    Ca = Math.abs(p.dot(q) / (p.length() * q.length()));
+                }
 //                double Ca = 1.0;
                 
                 
@@ -179,11 +180,13 @@ public class ForceDirectedEdgeBundler {
                 }
                 
                 double C = Ca * Cs * Cp * Cv;
-//                if (C > edgeCompatibilityThreshold) {
-//                    C = 1.0;
-//                } else {
-//                    C = 0.0;
-//                }
+                if (binaryCompatibility) {
+                    if (C > edgeCompatibilityThreshold) {
+                        C = 1.0;
+                    } else {
+                        C = 0.0;
+                    }
+                }
                 edgeCompatibilityMeasures[i][j] = C;
                 
             }

@@ -46,6 +46,17 @@ public class ControlPanel {
     private JCheckBox mapEdgeValueToCheckBox1;
     private JSlider edgeMarkerOpacitySlider;
     private JSpinner edgeMarkerOpacitySpinner;
+    private JSpinner edgeStiffnessSpinner;
+    private JSpinner stepSizeSpinner;
+    private JSpinner edgeCompatibilityThresholdSpinner;
+    private JSpinner stepDampingFactorSpinner;
+    private JSpinner stepsInCycleSpinner;
+    private JButton bundleButton;
+    private JButton resetButton;
+    private JSpinner numberOfCyclesSpinner;
+    private JButton defaultValuesButton;
+    private JCheckBox directionAffectsCompatibilityCheckBox;
+    private JCheckBox binaryCompatibilityCheckBox;
     private FlowMapParamsModel flowMapModel;
     private JFlowMap jFlowMap;
     private boolean initializing;
@@ -55,6 +66,30 @@ public class ControlPanel {
         initModelsOnce();
         setFlowMapParamsModel(model);
         initChangeListeners();
+        bundleButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jFlowMap.bundleEdges(
+                        (Integer)numberOfCyclesSpinner.getValue(),
+                        (Integer)stepsInCycleSpinner.getValue(),
+                        (Double)edgeStiffnessSpinner.getValue(),
+                        (Double)edgeCompatibilityThresholdSpinner.getValue(),
+                        (Double)stepSizeSpinner.getValue(),
+                        (Double)stepDampingFactorSpinner.getValue(),
+                        directionAffectsCompatibilityCheckBox.isSelected(),
+                        binaryCompatibilityCheckBox.isSelected()
+                        );
+            }
+        });
+        resetButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jFlowMap.resetBundling();
+            }
+        });
+        defaultValuesButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                initForceDirectedEdgeBundlerParamsModels();
+            }
+        });
     }
 
     public void setFlowMapParamsModel(FlowMapParamsModel model) {
@@ -65,6 +100,18 @@ public class ControlPanel {
 
     private void initModelsOnce() {
         datasetCombo.setModel(new DefaultComboBoxModel(JFlowMap.datasetSpecs));
+        initForceDirectedEdgeBundlerParamsModels();
+    }
+
+    public void initForceDirectedEdgeBundlerParamsModels() {
+        numberOfCyclesSpinner.setModel(new SpinnerNumberModel(6, 1, 10, 1));
+        stepsInCycleSpinner.setModel(new SpinnerNumberModel(50, 1, 1000, 1));
+        edgeStiffnessSpinner.setModel(new SpinnerNumberModel(0.1, 0.0, 1000.0, 1.0));
+        edgeCompatibilityThresholdSpinner.setModel(new SpinnerNumberModel(0.6, 0.0, 1.0, 0.1));
+        stepSizeSpinner.setModel(new SpinnerNumberModel(0.4, 0.0, 100.0, 0.1));
+        stepDampingFactorSpinner.setModel(new SpinnerNumberModel(0.5, 0.0, 1.0, 0.1));
+        directionAffectsCompatibilityCheckBox.setSelected(true);
+        binaryCompatibilityCheckBox.setSelected(false);
     }
 
     private void initModels() {
@@ -105,7 +152,6 @@ public class ControlPanel {
 
     private void initChangeListeners() {
         datasetCombo.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
                 if (initializing) return;
                 loadFlowMap((JFlowMap.DatasetSpec) datasetCombo.getSelectedItem());
@@ -467,5 +513,9 @@ public class ControlPanel {
      */
     public JComponent $$$getRootComponent$$$() {
         return panel1;
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 }

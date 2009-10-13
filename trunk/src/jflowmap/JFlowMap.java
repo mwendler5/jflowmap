@@ -64,50 +64,19 @@ public class JFlowMap extends JComponent {
         VisualFlowMap visFlowMap = loadFlowMap(datasetSpecs[0]);
         controlPanel = new ControlPanel(this, visFlowMap.getModel());
         add(controlPanel.getPanel(), BorderLayout.SOUTH);
-
-        JPanel bundleButs = new JPanel();
-        add(bundleButs, BorderLayout.NORTH);
-        
-        JButton resetButton = new JButton("Reset");
-        bundleButs.add(resetButton);
-        resetButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                visualFlowMap.resetBundling();
-            }
-        });
-        JButton bundleButton = new JButton("Bundle");
-        bundleButs.add(bundleButton);
-        bundleButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    visualFlowMap.bundleEdges(6);
-                } catch (Exception ex) {
-                    logger.error("Bundling error", ex);
-                    JOptionPane.showMessageDialog(JFlowMap.this,
-                            "Error: [" + ex.getClass().getSimpleName()+ "] " + ex.getMessage()
-                    );
-                }
-            }
-        });
-//        JButton bundlingStepButton = new JButton("Bundling cycle");
-//        bundleButs.add(bundlingStepButton);
-//        bundlingStepButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                try {
-//                    visualFlowMap.bundlingCycle(true);
-//                } catch (Exception ex) {
-//                    logger.error("Bundling error", ex);
-//                    JOptionPane.showMessageDialog(JFlowMap.this,
-//                            "Bundling couldn't be performed: [" + ex.getClass().getSimpleName()+ "] " + ex.getMessage()
-//                    );
-//                }
-//            }
-//        });
         
         setVisualFlowMap(visFlowMap);
+    }
+
+    public void resetBundling() {
+        visualFlowMap.resetBundling();
+    }
+
+    public void bundleEdges(int numCycles, int I, double K, double edgeCompatibilityThreshold,
+                                    double S, double stepDampingFactor,
+                                    boolean directionAffectsCompatibility, boolean binaryCompatibility) {
+        visualFlowMap.bundleEdges(numCycles, I, K, edgeCompatibilityThreshold, S, stepDampingFactor,
+                directionAffectsCompatibility, binaryCompatibility);
     }
 
     public Frame getApp() {

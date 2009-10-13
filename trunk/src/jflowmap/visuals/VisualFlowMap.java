@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import jflowmap.JFlowMap;
 import jflowmap.bundling.ForceDirectedEdgeBundler;
@@ -22,6 +22,7 @@ import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import at.fhj.utils.misc.ProgressTracker;
+import at.fhj.utils.misc.TaskCompletionListener;
 import at.fhj.utils.swing.ProgressDialog;
 import at.fhj.utils.swing.ProgressWorker;
 import edu.umd.cs.piccolo.PCamera;
@@ -356,35 +357,23 @@ public class VisualFlowMap extends PNode {
         return canvas.getCamera();
     }
     
-    private ForceDirectedEdgeBundler bundler = null;
-
     public void resetBundling() {
         createEdges();
-        bundler = null;
         repaint();
     }
 
-    public void bundlingCycle(boolean showPoints) {
-        if (bundler == null) {
-            initBundler(new ProgressTracker());
-        }
-        bundler.nextCycle();
-        if (!bundler.getProgressTracker().isCancelled()) {
-            createEdges(bundler.getEdgePoints(), showPoints);
-            repaint();
-        }
-    }
-
-    private void initBundler(ProgressTracker progressTracker) {
-        bundler = new ForceDirectedEdgeBundler(graph, model.getXNodeAttr(), model.getYNodeAttr());
-        bundler.init(progressTracker);
-    }
-    
-    public void bundleEdges(int numCycles) {
-        ProgressTracker progress = new ProgressTracker();
-        EdgeBundlerWorker worker = new EdgeBundlerWorker(progress, numCycles);
+    public void bundleEdges(int numCycles, int I, double K, double edgeCompatibilityThreshold,
+                            double S, double stepDampingFactor, boolean directionAffectsCompatibility,
+                            boolean binaryCompatibility) {
+        ProgressTracker pt = new ProgressTracker();
+        final ForceDirectedEdgeBundler bundler =
+                new ForceDirectedEdgeBundler(
+                        graph, model.getXNodeAttr(), model.getYNodeAttr(),
+                        I, K, edgeCompatibilityThreshold, S, stepDampingFactor,
+                        directionAffectsCompatibility, binaryCompatibility);
+        EdgeBundlerWorker worker = new EdgeBundlerWorker(pt, bundler, numCycles);
         ProgressDialog dialog = new ProgressDialog(jFlowMap.getApp(), "Edge bundling", worker, true);
-        progress.addProgressListener(dialog);
+        pt.addProgressListener(dialog);
         worker.start();
         dialog.setVisible(true);
     }
@@ -392,9 +381,11 @@ public class VisualFlowMap extends PNode {
     private class EdgeBundlerWorker extends ProgressWorker {
 
         private final int numCycles;
+        private ForceDirectedEdgeBundler bundler;
 
-        public EdgeBundlerWorker(ProgressTracker progress, int numCycles) {
+        public EdgeBundlerWorker(ProgressTracker progress, ForceDirectedEdgeBundler bundler, int numCycles) {
             super(progress);
+            this.bundler = bundler;
             this.numCycles = numCycles;
         }
 
@@ -402,9 +393,8 @@ public class VisualFlowMap extends PNode {
         public Object construct() {
             try {
                 ProgressTracker pt = getProgressTracker();
-                bundler = null;
                 pt.startTask("Initializing", .05);
-                initBundler(pt);
+                bundler.init(pt);
                 if (pt.isCancelled()) {
                     return null;
                 }
@@ -413,15 +403,21 @@ public class VisualFlowMap extends PNode {
                 // TODO: move this to ForceDirectedEdgeBundler and add a TaskCompletionListener 
                 for (int cycle = 0; cycle < numCycles; cycle++) {
                     pt.startTask("Bundling cycle " + (cycle + 1) + " of " + numCycles, .95 / numCycles);
-                    bundlingCycle(cycle < numCycles - 1);
+                    bundler.nextCycle();
                     pt.taskCompleted();
                     if (pt.isCancelled()) {
                         return null;
                     }
+                    final boolean showPoints = (cycle < numCycles - 1);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            createEdges(bundler.getEdgePoints(), showPoints);
+                            repaint();
+                        }
+                    });
                 }
     
                 pt.processFinished();
-                repaint();
             } catch (Throwable th) {
                 logger.error("Bundling error", th);
                 JOptionPane.showMessageDialog(jFlowMap,
