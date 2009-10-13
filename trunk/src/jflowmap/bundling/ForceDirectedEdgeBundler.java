@@ -45,7 +45,9 @@ public class ForceDirectedEdgeBundler {
 
     private ProgressTracker progressTracker;
 
-    private double minEdgeCompatibility;
+    private double edgeCompatibilityThreshold;
+
+    private double stepDampingFactor;
     
     public ForceDirectedEdgeBundler(Graph graph, String xNodeAttr, String yNodeAttr) {
         this.graph = graph;
@@ -115,7 +117,8 @@ public class ForceDirectedEdgeBundler {
         P = 1;          // initial number of subdivision points (will double with every cycle)
         S = 0.4;         // step size - shouldn't be higher than 1.0
         I = 50;         // number of iteration steps performed during a cycle
-        minEdgeCompatibility = 0.60;
+        edgeCompatibilityThreshold = 0.60;
+        stepDampingFactor = 0.5;
 
         calcEdgeCompatibilityMeasures();
         
@@ -176,7 +179,7 @@ public class ForceDirectedEdgeBundler {
                 }
                 
                 double C = Ca * Cs * Cp * Cv;
-//                if (C > minEdgeCompatibility) {
+//                if (C > edgeCompatibilityThreshold) {
 //                    C = 1.0;
 //                } else {
 //                    C = 0.0;
@@ -223,7 +226,7 @@ public class ForceDirectedEdgeBundler {
         // Set parameters for the next cycle
         if (cycle > 0) {
             P *= 2;
-            S /= 2;
+            S *= stepDampingFactor;
 //            S /= 1.2;
             I = (I * 2) / 3;
         }
@@ -280,7 +283,7 @@ public class ForceDirectedEdgeBundler {
                     for (int qe = 0; qe < numEdges; qe++) {
                         if (qe != pe  &&  !isSelfLoop(qe)) {
                             double ec = getEdgeCompatibility(pe, qe);
-                            if (ec > minEdgeCompatibility) {
+                            if (ec > edgeCompatibilityThreshold) {
                                 Vector2D q_i = Vector2D.valueOf(edgePoints[qe][i]);
                                 Vector2D v = q_i.minus(p_i);
                                 if (!v.isZero()) {  // zero vector has no direction
