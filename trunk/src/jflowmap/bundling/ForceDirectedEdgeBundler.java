@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import jflowmap.util.GeomUtils;
 import jflowmap.util.Vector2D;
 
 import org.apache.log4j.Logger;
@@ -108,7 +109,6 @@ public class ForceDirectedEdgeBundler {
             edgeLengths[i] = edgeStarts[i].distance(edgeEnds[i]);
         }
         
-        calcEdgeCompatibilityMeasures();
 
         K = 0.1;          // global spring constant (used to control the amount of edge bundling by
                         // determining the stiffness of the edges)
@@ -116,6 +116,8 @@ public class ForceDirectedEdgeBundler {
         S = 0.4;         // step size - shouldn't be higher than 1.0
         I = 50;         // number of iteration steps performed during a cycle
         minEdgeCompatibility = 0.60;
+
+        calcEdgeCompatibilityMeasures();
         
         cycle = 0;
     }
@@ -133,15 +135,16 @@ public class ForceDirectedEdgeBundler {
                 return;
             }
             Vector2D p = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
-            Point2D pm = middle(edgeStarts[i], edgeEnds[i]);
+            Point2D pm = GeomUtils.midpoint(edgeStarts[i], edgeEnds[i]);
             edgeCompatibilityMeasures[i] = new double[i];
             for (int j = 0; j < i; j++) {
                 Vector2D q = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
-                Point2D qm = middle(edgeStarts[j], edgeEnds[j]);
+                Point2D qm = GeomUtils.midpoint(edgeStarts[j], edgeEnds[j]);
                 double l_avg = (edgeLengths[i] + edgeLengths[j])/2;
                 
                 // angle compatibility
 //                double Ca = ((p.dot(q) / (p.length() * q.length())) + 1.0)/2.0;
+//              double Cdir = (p.dot(q) / (p.length() * q.length()) > 0 ? 1.0 : 0.0)
                 double Ca = Math.abs(p.dot(q) / (p.length() * q.length()));
 //                double Ca = 1.0;
                 
@@ -149,7 +152,10 @@ public class ForceDirectedEdgeBundler {
                 // scale compatibility
 //                double Cs = 2 / (l_avg * Math.min(edgeLengths[i], edgeLengths[j])  + (Math.max(edgeLengths[i], edgeLengths[j]) / l_avg));
 //                double Cs = Math.min(edgeLengths[i], edgeLengths[j])  / Math.max(edgeLengths[i], edgeLengths[j]);
-                double Cs = 2 / ((l_avg / Math.min(edgeLengths[i], edgeLengths[j]))  + (Math.max(edgeLengths[i], edgeLengths[j]) / l_avg));
+                double Cs = 2 / (
+                        (l_avg / Math.min(edgeLengths[i], edgeLengths[j]))  + 
+                        (Math.max(edgeLengths[i], edgeLengths[j]) / l_avg)
+                );
 //                double Cs = 1.0;
                 
                 // position compatibility
@@ -157,17 +163,40 @@ public class ForceDirectedEdgeBundler {
 //                double Cp = 1.0;
                 
                 // visibility compatibility
-                double Cv = Math.min(visibility(p, q, pm, qm), visibility(q, p, pm, qm));
-//                double Cv = 1.0;
-
+                double Cv;
+                if (Ca * Cs * Cp > .9) {
+                    // this compatibility measure is only applied if the edges are 
+                    // (almost) parallel, equal in length and close together
+                    Cv = Math.min(
+                            visibilityCompatibility(edgeStarts[i], edgeEnds[i], edgeStarts[j], edgeEnds[j]), 
+                            visibilityCompatibility(edgeStarts[j], edgeEnds[j], edgeStarts[i], edgeEnds[i]) 
+                            );
+                } else {
+                    Cv = 1.0;
+                }
                 
-//                double Cdir = (p.dot(q) / (p.length() * q.length()) > 0 ? 1.0 : 0.0)
-                
-                edgeCompatibilityMeasures[i][j] = Ca * Cs * Cp * Cv;
+                double C = Ca * Cs * Cp * Cv;
+//                if (C > minEdgeCompatibility) {
+//                    C = 1.0;
+//                } else {
+//                    C = 0.0;
+//                }
+                edgeCompatibilityMeasures[i][j] = C;
                 
             }
             progressTracker.incSubtaskProgress();
         }
+    }
+    
+    private static double visibilityCompatibility(Point2D p0, Point2D p1, Point2D q0, Point2D q1) {
+        Point2D i0 = GeomUtils.projectPointToLine(p0, p1, q0);
+        Point2D i1 = GeomUtils.projectPointToLine(p0, p1, q1);
+        Point2D im = GeomUtils.midpoint(i0, i1);
+        Point2D pm = GeomUtils.midpoint(p0, p1);
+        return Math.max(
+                0,
+                1 - 2 * pm.distance(im) / i0.distance(i1)
+        );
     }
     
     private double getEdgeCompatibility(int edgeI, int edgeJ) {
@@ -176,14 +205,6 @@ public class ForceDirectedEdgeBundler {
             return edgeCompatibilityMeasures[edgeI][edgeJ];
         else
             return edgeCompatibilityMeasures[edgeJ][edgeI];
-    }
-    
-    private double visibility(Vector2D p, Vector2D q, Point2D pm, Point2D qm) {
-        
-        return Math.max(
-                0,
-                1 //- 2 * middle(edgeStarts[i], edgeEnds[i]) / middle()
-        );
     }
     
     private boolean isSelfLoop(int edgeIdx) {
@@ -333,7 +354,7 @@ public class ForceDirectedEdgeBundler {
             Point2D[] newPoints = newEdgePoints[i];
             if (cycle == 0) {
                 assert(P == 1);
-                newPoints[0] = middle(edgeStarts[i], edgeEnds[i]);
+                newPoints[0] = GeomUtils.midpoint(edgeStarts[i], edgeEnds[i]);
             } else {
                 List<Point2D> points = new ArrayList<Point2D>(Arrays.asList(edgePoints[i]));
                 points.add(0, edgeStarts[i]);
@@ -362,7 +383,7 @@ public class ForceDirectedEdgeBundler {
                         nextP = points.get(curSegment + 1);
                     }
                     double d = L * (j + 1) - prevSegmentsLen;
-                    newPoints[j] = between(p, nextP, d / segmentLen[curSegment]);
+                    newPoints[j] = GeomUtils.between(p, nextP, d / segmentLen[curSegment]);
                 }
                 
             }
@@ -379,21 +400,6 @@ public class ForceDirectedEdgeBundler {
         }
     }
 
-    private Point2D middle(Point2D a, Point2D b) {
-        return between(a, b, 0.5);
-    }
-    
-    /**
-     * Returns a point on a segment between the two points
-     * @param alpha Between 0 and 1
-     */
-    private Point2D between(Point2D a, Point2D b, double alpha) {
-        return new Point2D.Double(
-                a.getX() + (b.getX() - a.getX()) * alpha,
-                a.getY() + (b.getY() - a.getY()) * alpha
-        );
-    }
-    
     private double getStartX(Edge edge) {
         return edge.getSourceNode().getDouble(xNodeAttr);
     }
