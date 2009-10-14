@@ -45,6 +45,7 @@ public class ForceDirectedEdgeBundler {
     private double edgeCompatibilityThreshold = 0.60;
     private boolean directionAffectsCompatibility;
     private boolean binaryCompatibility;
+    private boolean useInverseQuadraticModel;
 
 
     private double stepDampingFactor = 0.5;
@@ -54,7 +55,8 @@ public class ForceDirectedEdgeBundler {
     public ForceDirectedEdgeBundler(Graph graph, String xNodeAttr, String yNodeAttr,
                                     int I, double K, double edgeCompatibilityThreshold,
                                     double S, double stepDampingFactor,
-                                    boolean directionAffectsCompatibility, boolean binaryCompatibility) {
+                                    boolean directionAffectsCompatibility, boolean binaryCompatibility,
+                                    boolean useInverseQuadraticModel) {
         this.graph = graph;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
@@ -65,6 +67,7 @@ public class ForceDirectedEdgeBundler {
         this.stepDampingFactor = stepDampingFactor;
         this.directionAffectsCompatibility = directionAffectsCompatibility;
         this.binaryCompatibility = binaryCompatibility;
+        this.useInverseQuadraticModel = useInverseQuadraticModel;
     }
 
     public ProgressTracker getProgressTracker() {
@@ -291,7 +294,12 @@ public class ForceDirectedEdgeBundler {
                                 Vector2D v = q_i.minus(p_i);
                                 if (!v.isZero()) {  // zero vector has no direction
                                     double d = v.length();  // shouldn't be zero
-                                    double m = ec / (d * d);
+                                    double m;
+                                    if (useInverseQuadraticModel) {
+                                        m = ec / (d * d * d);
+                                    } else {
+                                        m = ec / (d * d);
+                                    }
                                     if (Math.abs(m) < 1.0) {
                                         v = v.times(m);
                                     }

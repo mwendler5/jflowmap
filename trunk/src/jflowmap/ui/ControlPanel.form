@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="jflowmap.ui.ControlPanel">
   <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="866" height="400"/>
+      <xy x="20" y="20" width="918" height="400"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -517,8 +517,6 @@
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:max(d;4px):noGrow"/>
-            <rowspec value="top:5dlu:noGrow"/>
             <rowspec value="center:d:grow"/>
             <colspec value="fill:p:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
@@ -530,10 +528,10 @@
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:p:noGrow"/>
             <colspec value="left:25dlu:noGrow"/>
-            <colspec value="fill:93px:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:85px:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:p:noGrow"/>
+            <colspec value="fill:p:noGrow"/>
+            <colspec value="left:146dlu:noGrow"/>
+            <colspec value="fill:p:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <constraints>
               <tabbedpane title="Force-Directed Edge Bundling"/>
@@ -543,26 +541,9 @@
               <size top="10" left="10" bottom="10" right="10"/>
             </border>
             <children>
-              <component id="a154b" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <horizontalAlignment value="4"/>
-                  <text value="Edge compatibility threshold:"/>
-                </properties>
-              </component>
-              <component id="d84a9" class="javax.swing.JSpinner" binding="edgeCompatibilityThresholdSpinner">
-                <constraints>
-                  <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
               <component id="b27ba" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="4" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="4" row-span="6" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -585,23 +566,6 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
-              </component>
-              <component id="12d67" class="javax.swing.JSpinner" binding="stepsInCycleSpinner">
-                <constraints>
-                  <grid row="4" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="1402c" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <horizontalAlignment value="4"/>
-                  <text value="Steps in the first cycle (I):"/>
-                </properties>
               </component>
               <component id="62350" class="javax.swing.JSpinner" binding="stepSizeSpinner">
                 <constraints>
@@ -639,18 +603,9 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="f1dcc" class="javax.swing.JButton" binding="bundleButton" default-binding="true">
-                <constraints>
-                  <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Bundle"/>
-                </properties>
-              </component>
               <component id="bdf4c" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="9" row-span="8" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="9" row-span="6" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -674,9 +629,79 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="f61d0" class="javax.swing.JButton" binding="defaultValuesButton" default-binding="true">
+              <component id="f1dcc" class="javax.swing.JButton" binding="bundleButton" default-binding="true">
                 <constraints>
                   <grid row="0" column="14" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Bundle"/>
+                </properties>
+              </component>
+              <component id="a154b" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <horizontalAlignment value="4"/>
+                  <text value="Edge compatibility threshold:"/>
+                </properties>
+              </component>
+              <component id="d84a9" class="javax.swing.JSpinner" binding="edgeCompatibilityThresholdSpinner">
+                <constraints>
+                  <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="500e9" class="javax.swing.JCheckBox" binding="directionAffectsCompatibilityCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="2" column="10" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Direction affects compatibility"/>
+                </properties>
+              </component>
+              <component id="1402c" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <horizontalAlignment value="4"/>
+                  <text value="Steps in the first cycle (I):"/>
+                </properties>
+              </component>
+              <component id="12d67" class="javax.swing.JSpinner" binding="stepsInCycleSpinner">
+                <constraints>
+                  <grid row="4" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="7954a" class="javax.swing.JCheckBox" binding="inverseQuadraticModelCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="0" column="10" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Inverse-quadratic model"/>
+                </properties>
+              </component>
+              <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="4" column="10" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Binary compatibility"/>
+                </properties>
+              </component>
+              <component id="f61d0" class="javax.swing.JButton" binding="defaultValuesButton" default-binding="true">
+                <constraints>
+                  <grid row="4" column="14" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -685,29 +710,11 @@
               </component>
               <component id="9fc31" class="javax.swing.JButton" binding="resetButton" default-binding="true">
                 <constraints>
-                  <grid row="0" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="14" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
                   <text value="Reset"/>
-                </properties>
-              </component>
-              <component id="500e9" class="javax.swing.JCheckBox" binding="directionAffectsCompatibilityCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="6" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Direction affects compatibility"/>
-                </properties>
-              </component>
-              <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="6" column="6" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Binary compatibility"/>
                 </properties>
               </component>
             </children>

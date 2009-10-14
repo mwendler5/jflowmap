@@ -57,6 +57,7 @@ public class ControlPanel {
     private JButton defaultValuesButton;
     private JCheckBox directionAffectsCompatibilityCheckBox;
     private JCheckBox binaryCompatibilityCheckBox;
+    private JCheckBox inverseQuadraticModelCheckBox;
     private FlowMapParamsModel flowMapModel;
     private JFlowMap jFlowMap;
     private boolean initializing;
@@ -76,7 +77,8 @@ public class ControlPanel {
                         (Double) stepSizeSpinner.getValue(),
                         (Double) stepDampingFactorSpinner.getValue(),
                         directionAffectsCompatibilityCheckBox.isSelected(),
-                        binaryCompatibilityCheckBox.isSelected()
+                        binaryCompatibilityCheckBox.isSelected(),
+                        inverseQuadraticModelCheckBox.isSelected()
                 );
             }
         });
@@ -112,6 +114,7 @@ public class ControlPanel {
         stepDampingFactorSpinner.setModel(new SpinnerNumberModel(0.5, 0.0, 1.0, 0.1));
         directionAffectsCompatibilityCheckBox.setSelected(true);
         binaryCompatibilityCheckBox.setSelected(false);
+        inverseQuadraticModelCheckBox.setSelected(false);
     }
 
     private void initModels() {
@@ -526,66 +529,69 @@ public class ControlPanel {
         label13.setText("Max edge width:");
         panel6.add(label13, cc.xy(7, 5, CellConstraints.RIGHT, CellConstraints.CENTER));
         final JPanel panel7 = new JPanel();
-        panel7.setLayout(new FormLayout("fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:45px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:25dlu:noGrow,fill:93px:noGrow,left:4dlu:noGrow,fill:85px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:d:grow"));
+        panel7.setLayout(new FormLayout("fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:45px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:25dlu:noGrow,fill:p:noGrow,fill:p:noGrow,left:146dlu:noGrow,fill:p:noGrow,fill:max(d;4px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:grow"));
         tabbedPane1.addTab("Force-Directed Edge Bundling", panel7);
         panel7.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        final JLabel label14 = new JLabel();
-        label14.setHorizontalAlignment(4);
-        label14.setText("Edge compatibility threshold:");
-        panel7.add(label14, cc.xy(1, 5));
-        edgeCompatibilityThresholdSpinner = new JSpinner();
-        panel7.add(edgeCompatibilityThresholdSpinner, cc.xy(3, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JSeparator separator6 = new JSeparator();
         separator6.setOrientation(1);
-        panel7.add(separator6, cc.xywh(5, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
-        final JLabel label15 = new JLabel();
-        label15.setHorizontalAlignment(4);
-        label15.setText("Step damping factor:");
-        panel7.add(label15, cc.xy(7, 3));
+        panel7.add(separator6, cc.xywh(5, 1, 1, 6, CellConstraints.CENTER, CellConstraints.FILL));
+        final JLabel label14 = new JLabel();
+        label14.setHorizontalAlignment(4);
+        label14.setText("Step damping factor:");
+        panel7.add(label14, cc.xy(7, 3));
         stepDampingFactorSpinner = new JSpinner();
         panel7.add(stepDampingFactorSpinner, cc.xy(9, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        stepsInCycleSpinner = new JSpinner();
-        panel7.add(stepsInCycleSpinner, cc.xy(9, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label16 = new JLabel();
-        label16.setHorizontalAlignment(4);
-        label16.setText("Steps in the first cycle (I):");
-        panel7.add(label16, cc.xy(7, 5));
         stepSizeSpinner = new JSpinner();
         panel7.add(stepSizeSpinner, cc.xy(9, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label17 = new JLabel();
-        label17.setHorizontalAlignment(4);
-        label17.setText("Step size (S):");
-        panel7.add(label17, cc.xy(7, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        final JLabel label18 = new JLabel();
-        label18.setHorizontalAlignment(4);
-        label18.setText("Edge stiffness (K):");
-        panel7.add(label18, cc.xy(1, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        final JLabel label15 = new JLabel();
+        label15.setHorizontalAlignment(4);
+        label15.setText("Step size (S):");
+        panel7.add(label15, cc.xy(7, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        final JLabel label16 = new JLabel();
+        label16.setHorizontalAlignment(4);
+        label16.setText("Edge stiffness (K):");
+        panel7.add(label16, cc.xy(1, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         edgeStiffnessSpinner = new JSpinner();
         panel7.add(edgeStiffnessSpinner, cc.xy(3, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        bundleButton = new JButton();
-        bundleButton.setText("Bundle");
-        panel7.add(bundleButton, cc.xy(11, 1));
         final JSeparator separator7 = new JSeparator();
         separator7.setOrientation(1);
-        panel7.add(separator7, cc.xywh(10, 1, 1, 8, CellConstraints.CENTER, CellConstraints.FILL));
-        final JLabel label19 = new JLabel();
-        label19.setHorizontalAlignment(4);
-        label19.setText("Number of cycles:");
-        panel7.add(label19, cc.xy(1, 1));
+        panel7.add(separator7, cc.xywh(10, 1, 1, 6, CellConstraints.CENTER, CellConstraints.FILL));
+        final JLabel label17 = new JLabel();
+        label17.setHorizontalAlignment(4);
+        label17.setText("Number of cycles:");
+        panel7.add(label17, cc.xy(1, 1));
         numberOfCyclesSpinner = new JSpinner();
         panel7.add(numberOfCyclesSpinner, cc.xy(3, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
-        defaultValuesButton = new JButton();
-        defaultValuesButton.setText("Default Values");
-        panel7.add(defaultValuesButton, cc.xy(15, 1));
-        resetButton = new JButton();
-        resetButton.setText("Reset");
-        panel7.add(resetButton, cc.xy(13, 1));
+        bundleButton = new JButton();
+        bundleButton.setText("Bundle");
+        panel7.add(bundleButton, cc.xy(15, 1));
+        final JLabel label18 = new JLabel();
+        label18.setHorizontalAlignment(4);
+        label18.setText("Edge compatibility threshold:");
+        panel7.add(label18, cc.xy(1, 5));
+        edgeCompatibilityThresholdSpinner = new JSpinner();
+        panel7.add(edgeCompatibilityThresholdSpinner, cc.xy(3, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         directionAffectsCompatibilityCheckBox = new JCheckBox();
         directionAffectsCompatibilityCheckBox.setText("Direction affects compatibility");
-        panel7.add(directionAffectsCompatibilityCheckBox, cc.xyw(1, 7, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        panel7.add(directionAffectsCompatibilityCheckBox, cc.xyw(11, 3, 4, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        final JLabel label19 = new JLabel();
+        label19.setHorizontalAlignment(4);
+        label19.setText("Steps in the first cycle (I):");
+        panel7.add(label19, cc.xy(7, 5));
+        stepsInCycleSpinner = new JSpinner();
+        panel7.add(stepsInCycleSpinner, cc.xy(9, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
+        inverseQuadraticModelCheckBox = new JCheckBox();
+        inverseQuadraticModelCheckBox.setText("Inverse-quadratic model");
+        panel7.add(inverseQuadraticModelCheckBox, cc.xyw(11, 1, 4));
         binaryCompatibilityCheckBox = new JCheckBox();
         binaryCompatibilityCheckBox.setText("Binary compatibility");
-        panel7.add(binaryCompatibilityCheckBox, cc.xyw(7, 7, 3));
+        panel7.add(binaryCompatibilityCheckBox, cc.xyw(11, 5, 3));
+        defaultValuesButton = new JButton();
+        defaultValuesButton.setText("Default Values");
+        panel7.add(defaultValuesButton, cc.xy(15, 5));
+        resetButton = new JButton();
+        resetButton.setText("Reset");
+        panel7.add(resetButton, cc.xy(15, 3));
     }
 
     /**

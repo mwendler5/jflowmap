@@ -74,9 +74,10 @@ public class JFlowMap extends JComponent {
 
     public void bundleEdges(int numCycles, int I, double K, double edgeCompatibilityThreshold,
                                     double S, double stepDampingFactor,
-                                    boolean directionAffectsCompatibility, boolean binaryCompatibility) {
+                                    boolean directionAffectsCompatibility, boolean binaryCompatibility,
+                                    boolean useInverseQuadraticModel) {
         visualFlowMap.bundleEdges(numCycles, I, K, edgeCompatibilityThreshold, S, stepDampingFactor,
-                directionAffectsCompatibility, binaryCompatibility);
+                directionAffectsCompatibility, binaryCompatibility, useInverseQuadraticModel);
     }
 
     public Frame getApp() {
