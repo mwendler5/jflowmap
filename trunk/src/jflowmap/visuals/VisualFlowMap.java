@@ -364,13 +364,15 @@ public class VisualFlowMap extends PNode {
 
     public void bundleEdges(int numCycles, int I, double K, double edgeCompatibilityThreshold,
                             double S, double stepDampingFactor, boolean directionAffectsCompatibility,
-                            boolean binaryCompatibility, boolean useInverseQuadraticModel) {
+                            boolean binaryCompatibility, boolean useInverseQuadraticModel,
+                            boolean useRepulsionForOppositeEdges) {
         ProgressTracker pt = new ProgressTracker();
         final ForceDirectedEdgeBundler bundler =
                 new ForceDirectedEdgeBundler(
                         graph, model.getXNodeAttr(), model.getYNodeAttr(),
                         I, K, edgeCompatibilityThreshold, S, stepDampingFactor,
-                        directionAffectsCompatibility, binaryCompatibility, useInverseQuadraticModel);
+                        directionAffectsCompatibility, binaryCompatibility, useInverseQuadraticModel,
+                        useRepulsionForOppositeEdges);
         EdgeBundlerWorker worker = new EdgeBundlerWorker(pt, bundler, numCycles);
         ProgressDialog dialog = new ProgressDialog(jFlowMap.getApp(), "Edge bundling", worker, true);
         pt.addProgressListener(dialog);

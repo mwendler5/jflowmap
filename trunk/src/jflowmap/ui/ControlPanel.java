@@ -79,7 +79,8 @@ public class ControlPanel {
                         (Double) stepDampingFactorSpinner.getValue(),
                         directionAffectsCompatibilityCheckBox.isSelected(),
                         binaryCompatibilityCheckBox.isSelected(),
-                        inverseQuadraticModelCheckBox.isSelected()
+                        inverseQuadraticModelCheckBox.isSelected(),
+                        repulsiveEdgesCheckBox.isSelected()
                 );
             }
         });
@@ -111,11 +112,12 @@ public class ControlPanel {
         stepsInCycleSpinner.setModel(new SpinnerNumberModel(50, 1, 1000, 1));
         edgeStiffnessSpinner.setModel(new SpinnerNumberModel(0.1, 0.0, 1000.0, 1.0));
         edgeCompatibilityThresholdSpinner.setModel(new SpinnerNumberModel(0.6, 0.0, 1.0, 0.1));
-        stepSizeSpinner.setModel(new SpinnerNumberModel(0.4, 0.0, 100.0, 0.1));
+        stepSizeSpinner.setModel(new SpinnerNumberModel(0.4, 0.0, 1.0, 0.1));
         stepDampingFactorSpinner.setModel(new SpinnerNumberModel(0.5, 0.0, 1.0, 0.1));
         directionAffectsCompatibilityCheckBox.setSelected(true);
         binaryCompatibilityCheckBox.setSelected(false);
         inverseQuadraticModelCheckBox.setSelected(false);
+        repulsiveEdgesCheckBox.setSelected(false);
     }
 
     private void initModels() {

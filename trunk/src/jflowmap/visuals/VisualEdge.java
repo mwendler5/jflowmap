@@ -1,6 +1,8 @@
 package jflowmap.visuals;
 
 import java.awt.Color;
+import java.awt.LinearGradientPaint;
+import java.awt.Paint;
 
 import jflowmap.models.FlowMapParamsModel;
 import jflowmap.util.Stats;
@@ -58,6 +60,22 @@ public abstract class VisualEdge extends PNode {
         addInputEventListener(visualEdgeListener);
     }
 
+    
+    public double getSourceX() {
+        return sourceNode.getValueX();
+    }
+    
+    public double getSourceY() {
+        return sourceNode.getValueY();
+    }
+    
+    public double getTargetX() {
+        return targetNode.getValueX();
+    }
+    
+    public double getTargetY() {
+        return targetNode.getValueY();
+    }
     
     protected void setEdgePPath(PPath ppath) {
         this.edgePPath = ppath;
@@ -188,12 +206,31 @@ public abstract class VisualEdge extends PNode {
         }
         return new Color(r, g, b, alpha);
     }
+    
+    protected Paint getEdgeGradientPaint() {
+        FlowMapParamsModel model = getVisualFlowMap().getModel();
+        final double normalizedValue = getNormalizedLogValue();
+        int intensity = (int)Math.round(255 * normalizedValue);
+        int alpha = model.getEdgeAlpha();
+        if (isSelfLoop()) {
+            return new Color(intensity, intensity, 0, alpha);
+        } else {
+            return new LinearGradientPaint(
+                    (float)getSourceX(), (float)getSourceY(),
+                    (float)getTargetX(), (float)getTargetY(),
+                    new float[] {0.0f, 1.0f}, new Color[] {
+                    new Color(intensity, 0, 0, alpha), // red
+                    new Color(0, intensity, 0, alpha)  // green
+            });
+        }
+    }
 
     public void updateEdgeColors() {
         PPath ppath = getEdgePPath();
         if (ppath != null) {
-            Color color = getValueColor(STROKE_PAINT, false);
-            ppath.setStrokePaint(color);
+//            Paint paint = getValueColor(STROKE_PAINT, false);
+            Paint paint = getEdgeGradientPaint();
+            ppath.setStrokePaint(paint);
         }
     }
 

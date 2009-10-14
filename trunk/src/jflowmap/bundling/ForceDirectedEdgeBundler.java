@@ -46,6 +46,7 @@ public class ForceDirectedEdgeBundler {
     private boolean directionAffectsCompatibility;
     private boolean binaryCompatibility;
     private boolean useInverseQuadraticModel;
+    private boolean useRepulsionForOppositeEdges; // useRepulsionForCompatibleEdgesOfOppositeDirections
 
 
     private double stepDampingFactor = 0.5;
@@ -56,7 +57,7 @@ public class ForceDirectedEdgeBundler {
                                     int I, double K, double edgeCompatibilityThreshold,
                                     double S, double stepDampingFactor,
                                     boolean directionAffectsCompatibility, boolean binaryCompatibility,
-                                    boolean useInverseQuadraticModel) {
+                                    boolean useInverseQuadraticModel, boolean useRepulsionForOppositeEdges) {
         this.graph = graph;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
@@ -65,9 +66,13 @@ public class ForceDirectedEdgeBundler {
         this.edgeCompatibilityThreshold = edgeCompatibilityThreshold;
         this.S = S;
         this.stepDampingFactor = stepDampingFactor;
-        this.directionAffectsCompatibility = directionAffectsCompatibility;
         this.binaryCompatibility = binaryCompatibility;
         this.useInverseQuadraticModel = useInverseQuadraticModel;
+        this.useRepulsionForOppositeEdges = useRepulsionForOppositeEdges;
+        if (useRepulsionForOppositeEdges) {
+            directionAffectsCompatibility = false;
+        }
+        this.directionAffectsCompatibility = directionAffectsCompatibility;
     }
 
     public ProgressTracker getProgressTracker() {
@@ -140,7 +145,7 @@ public class ForceDirectedEdgeBundler {
             Point2D pm = GeomUtils.midpoint(edgeStarts[i], edgeEnds[i]);
             edgeCompatibilityMeasures[i] = new double[i];
             for (int j = 0; j < i; j++) {
-                Vector2D q = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
+                Vector2D q = Vector2D.valueOf(edgeStarts[j], edgeEnds[j]);
                 Point2D qm = GeomUtils.midpoint(edgeStarts[j], edgeEnds[j]);
                 double l_avg = (edgeLengths[i] + edgeLengths[j])/2;
                 
@@ -151,7 +156,11 @@ public class ForceDirectedEdgeBundler {
                 if (directionAffectsCompatibility) {
                     Ca = (p.dot(q) / (p.length() * q.length()) + 1.0) / 2.0;
                 } else {
-                    Ca = Math.abs(p.dot(q) / (p.length() * q.length()));
+                    Ca = p.dot(q) / (p.length() * q.length());
+                    if (!useRepulsionForOppositeEdges) {
+                        Ca = Math.abs(Ca);
+                    } // otherwise the compatibility measure will be negative and the 
+                      // force will become repulsive
                 }
 //                double Ca = 1.0;
                 
@@ -171,7 +180,7 @@ public class ForceDirectedEdgeBundler {
                 
                 // visibility compatibility
                 double Cv;
-                if (Ca * Cs * Cp > .9) {
+                if (Math.abs(Ca * Cs * Cp) > .9) {
                     // this compatibility measure is only applied if the edges are 
                     // (almost) parallel, equal in length and close together
                     Cv = Math.min(
@@ -184,14 +193,13 @@ public class ForceDirectedEdgeBundler {
                 
                 double C = Ca * Cs * Cp * Cv;
                 if (binaryCompatibility) {
-                    if (C > edgeCompatibilityThreshold) {
-                        C = 1.0;
+                    if (Math.abs(C) >= edgeCompatibilityThreshold) {
+                        C = Math.signum(C);
                     } else {
                         C = 0.0;
                     }
                 }
                 edgeCompatibilityMeasures[i][j] = C;
-                
             }
             progressTracker.incSubtaskProgress();
         }
@@ -232,7 +240,7 @@ public class ForceDirectedEdgeBundler {
         // Set parameters for the next cycle
         if (cycle > 0) {
             P *= 2;
-            S *= stepDampingFactor;
+            S *= (1.0 - stepDampingFactor);
 //            S /= 1.2;
             I = (I * 2) / 3;
         }
@@ -289,7 +297,7 @@ public class ForceDirectedEdgeBundler {
                     for (int qe = 0; qe < numEdges; qe++) {
                         if (qe != pe  &&  !isSelfLoop(qe)) {
                             double ec = getEdgeCompatibility(pe, qe);
-                            if (ec > edgeCompatibilityThreshold) {
+                            if (Math.abs(ec) > edgeCompatibilityThreshold) {
                                 Vector2D q_i = Vector2D.valueOf(edgePoints[qe][i]);
                                 Vector2D v = q_i.minus(p_i);
                                 if (!v.isZero()) {  // zero vector has no direction

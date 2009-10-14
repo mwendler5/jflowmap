@@ -75,9 +75,10 @@ public class JFlowMap extends JComponent {
     public void bundleEdges(int numCycles, int I, double K, double edgeCompatibilityThreshold,
                                     double S, double stepDampingFactor,
                                     boolean directionAffectsCompatibility, boolean binaryCompatibility,
-                                    boolean useInverseQuadraticModel) {
+                                    boolean useInverseQuadraticModel, boolean useRepulsionForOppositeEdges) {
         visualFlowMap.bundleEdges(numCycles, I, K, edgeCompatibilityThreshold, S, stepDampingFactor,
-                directionAffectsCompatibility, binaryCompatibility, useInverseQuadraticModel);
+                directionAffectsCompatibility, binaryCompatibility, useInverseQuadraticModel,
+                useRepulsionForOppositeEdges);
     }
 
     public Frame getApp() {
@@ -161,6 +162,7 @@ public class JFlowMap extends JComponent {
             new DatasetSpec("data/bundling-test.xml", "data", "name", null),
             new DatasetSpec("data/bundling-test2.xml", "data", "name", null),
             new DatasetSpec("data/bundling-test3.xml", "data", "name", null),
+            new DatasetSpec("data/bundling-test4.xml", "data", "name", null),
             new DatasetSpec("data/migrations-unique.xml", "value", "tooltip", null),
             new DatasetSpec("data/refugee-flows-2008.xml", "refugees", "name", "data/countries-areas.xml"),
             new DatasetSpec("data/refugee-flows-2007.xml", "refugees", "name", "data/countries-areas.xml"),
