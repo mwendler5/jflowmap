@@ -1,21 +1,32 @@
 package jflowmap.ui;
 
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import jflowmap.JFlowMap;
 import jflowmap.models.FlowMapParamsModel;
 import jflowmap.util.Stats;
 import jflowmap.visuals.VisualFlowMap;
+
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class ControlPanel {
 
@@ -59,6 +70,8 @@ public class ControlPanel {
     private JCheckBox binaryCompatibilityCheckBox;
     private JCheckBox inverseQuadraticModelCheckBox;
     private JCheckBox repulsiveEdgesCheckBox;
+    private JCheckBox simpleCompatibilityMeasureCheckBox;
+    private JCheckBox showNodesCheckBox;
     private FlowMapParamsModel flowMapModel;
     private JFlowMap jFlowMap;
     private boolean initializing;
@@ -80,7 +93,8 @@ public class ControlPanel {
                         directionAffectsCompatibilityCheckBox.isSelected(),
                         binaryCompatibilityCheckBox.isSelected(),
                         inverseQuadraticModelCheckBox.isSelected(),
-                        repulsiveEdgesCheckBox.isSelected()
+                        repulsiveEdgesCheckBox.isSelected(),
+                        simpleCompatibilityMeasureCheckBox.isSelected()
                 );
             }
         });
@@ -118,6 +132,7 @@ public class ControlPanel {
         binaryCompatibilityCheckBox.setSelected(false);
         inverseQuadraticModelCheckBox.setSelected(false);
         repulsiveEdgesCheckBox.setSelected(false);
+        simpleCompatibilityMeasureCheckBox.setSelected(false);
     }
 
     private void initModels() {
@@ -385,7 +400,7 @@ public class ControlPanel {
         tabbedPane1 = new JTabbedPane();
         panel1.add(tabbedPane1, BorderLayout.CENTER);
         final JPanel panel2 = new JPanel();
-        panel2.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:185px:noGrow,left:4dlu:noGrow,fill:38px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:119px:noGrow,left:23dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:119px:noGrow,left:5dlu:noGrow,fill:max(d;4px):grow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        panel2.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:187px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:119px:noGrow,left:20dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:119px:noGrow,left:5dlu:noGrow,fill:max(d;4px):grow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Dataset", panel2);
         panel2.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         datasetCombo = new JComboBox();
@@ -425,15 +440,18 @@ public class ControlPanel {
         comboBox6 = new JComboBox();
         comboBox6.setEnabled(false);
         panel2.add(comboBox6, cc.xy(9, 3));
+        final JSeparator separator2 = new JSeparator();
+        separator2.setOrientation(1);
+        panel2.add(separator2, cc.xywh(10, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         final JPanel panel3 = new JPanel();
-        panel3.setLayout(new FormLayout("right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow(2.0),left:4dlu:noGrow,fill:92px:noGrow,left:4dlu:noGrow,fill:23px:noGrow,left:4dlu:noGrow,right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:50px:noGrow", "center:26px:noGrow,top:4dlu:noGrow,center:24px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:d:noGrow"));
+        panel3.setLayout(new FormLayout("right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow(2.0),left:4dlu:noGrow,fill:92px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:50px:noGrow", "center:26px:noGrow,top:4dlu:noGrow,center:24px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:d:noGrow"));
         tabbedPane1.addTab("Filter", panel3);
         panel3.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         minValueFilterSpinner = new JSpinner();
         panel3.add(minValueFilterSpinner, cc.xy(5, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JSeparator separator2 = new JSeparator();
-        separator2.setOrientation(1);
-        panel3.add(separator2, cc.xywh(7, 1, 1, 8, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator3 = new JSeparator();
+        separator3.setOrientation(1);
+        panel3.add(separator3, cc.xywh(7, 1, 1, 8, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label6 = new JLabel();
         label6.setText("Min length:");
         panel3.add(label6, cc.xy(9, 1));
@@ -468,12 +486,12 @@ public class ControlPanel {
         minValueFilterSlider = new JSlider();
         panel3.add(minValueFilterSlider, cc.xy(3, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JPanel panel5 = new JPanel();
-        panel5.setLayout(new FormLayout("fill:d:noGrow,left:p:noGrow,fill:21px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:15dlu:noGrow,fill:max(d;4px):grow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:24px:noGrow,top:6dlu:noGrow,top:4dlu:noGrow"));
+        panel5.setLayout(new FormLayout("fill:d:noGrow,left:p:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:20dlu:noGrow,fill:max(d;4px):grow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:24px:noGrow,top:6dlu:noGrow,top:4dlu:noGrow"));
         tabbedPane1.addTab("Scales", panel5);
         panel5.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        final JSeparator separator3 = new JSeparator();
-        separator3.setOrientation(1);
-        panel5.add(separator3, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator4 = new JSeparator();
+        separator4.setOrientation(1);
+        panel5.add(separator4, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         useLogWidthScaleCheckbox = new JCheckBox();
         useLogWidthScaleCheckbox.setEnabled(false);
         useLogWidthScaleCheckbox.setText("Use log width scale");
@@ -490,11 +508,11 @@ public class ControlPanel {
         mapEdgeValueToCheckBox1.setEnabled(false);
         mapEdgeValueToCheckBox1.setText("Map edge value to width");
         panel5.add(mapEdgeValueToCheckBox1, cc.xy(5, 3));
-        final JSeparator separator4 = new JSeparator();
-        separator4.setOrientation(1);
-        panel5.add(separator4, cc.xywh(6, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator5 = new JSeparator();
+        separator5.setOrientation(1);
+        panel5.add(separator5, cc.xywh(6, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         final JPanel panel6 = new JPanel();
-        panel6.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:110px:noGrow,left:4dlu:noGrow,fill:44px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:39px:noGrow,left:6dlu:noGrow,fill:max(d;4px):grow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        panel6.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:110px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:39px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:6dlu:noGrow,fill:max(d;4px):grow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Aesthetics", panel6);
         panel6.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         final JLabel label10 = new JLabel();
@@ -518,9 +536,9 @@ public class ControlPanel {
         panel6.add(edgeOpacitySpinner, cc.xy(11, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
         edgeMarkerOpacitySpinner = new JSpinner();
         panel6.add(edgeMarkerOpacitySpinner, cc.xy(11, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JSeparator separator5 = new JSeparator();
-        separator5.setOrientation(1);
-        panel6.add(separator5, cc.xywh(5, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator6 = new JSeparator();
+        separator6.setOrientation(1);
+        panel6.add(separator6, cc.xywh(5, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         maxEdgeWidthSpinner = new JSpinner();
         panel6.add(maxEdgeWidthSpinner, cc.xy(11, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         maxEdgeWidthSlider = new JSlider();
@@ -531,13 +549,19 @@ public class ControlPanel {
         final JLabel label13 = new JLabel();
         label13.setText("Max edge width:");
         panel6.add(label13, cc.xy(7, 5, CellConstraints.RIGHT, CellConstraints.CENTER));
+        final JSeparator separator7 = new JSeparator();
+        separator7.setOrientation(1);
+        panel6.add(separator7, cc.xywh(13, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        showNodesCheckBox = new JCheckBox();
+        showNodesCheckBox.setText("Show nodes");
+        panel6.add(showNodesCheckBox, cc.xy(15, 1));
         final JPanel panel7 = new JPanel();
-        panel7.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:45px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:25dlu:noGrow,fill:p:noGrow,fill:p:noGrow,left:146dlu:noGrow,fill:p:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:grow"));
+        panel7.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:12dlu:noGrow,fill:p:noGrow,fill:d:noGrow,left:max(p;100px):noGrow,left:4dlu:noGrow,fill:182px:noGrow,left:4dlu:noGrow,fill:d:noGrow,left:d:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow"));
         tabbedPane1.addTab("Force-Directed Edge Bundling", panel7);
         panel7.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        final JSeparator separator6 = new JSeparator();
-        separator6.setOrientation(1);
-        panel7.add(separator6, cc.xywh(9, 1, 1, 8, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator8 = new JSeparator();
+        separator8.setOrientation(1);
+        panel7.add(separator8, cc.xywh(9, 1, 1, 6, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label14 = new JLabel();
         label14.setHorizontalAlignment(4);
         label14.setText("Step damping factor:");
@@ -556,9 +580,9 @@ public class ControlPanel {
         panel7.add(label16, cc.xy(5, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         edgeStiffnessSpinner = new JSpinner();
         panel7.add(edgeStiffnessSpinner, cc.xy(7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JSeparator separator7 = new JSeparator();
-        separator7.setOrientation(1);
-        panel7.add(separator7, cc.xywh(14, 1, 1, 8, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator9 = new JSeparator();
+        separator9.setOrientation(1);
+        panel7.add(separator9, cc.xywh(14, 1, 1, 6, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label17 = new JLabel();
         label17.setHorizontalAlignment(4);
         label17.setText("Number of cycles:");
@@ -567,22 +591,16 @@ public class ControlPanel {
         panel7.add(numberOfCyclesSpinner, cc.xy(7, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label18 = new JLabel();
         label18.setHorizontalAlignment(4);
-        label18.setText("Edge compatibility threshold:");
+        label18.setText("Compatibility threshold:");
         panel7.add(label18, cc.xy(5, 5));
         edgeCompatibilityThresholdSpinner = new JSpinner();
         panel7.add(edgeCompatibilityThresholdSpinner, cc.xy(7, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
-        directionAffectsCompatibilityCheckBox = new JCheckBox();
-        directionAffectsCompatibilityCheckBox.setText("Direction affects compatibility");
-        panel7.add(directionAffectsCompatibilityCheckBox, cc.xyw(15, 3, 4, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JLabel label19 = new JLabel();
         label19.setHorizontalAlignment(4);
-        label19.setText("Steps in the first cycle (I):");
+        label19.setText("Steps in 1st cycle (I):");
         panel7.add(label19, cc.xy(11, 5));
         stepsInCycleSpinner = new JSpinner();
         panel7.add(stepsInCycleSpinner, cc.xy(13, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
-        inverseQuadraticModelCheckBox = new JCheckBox();
-        inverseQuadraticModelCheckBox.setText("Inverse-quadratic model");
-        panel7.add(inverseQuadraticModelCheckBox, cc.xyw(15, 1, 4));
         bundleButton = new JButton();
         bundleButton.setText("Bundle");
         panel7.add(bundleButton, cc.xy(1, 1));
@@ -592,15 +610,24 @@ public class ControlPanel {
         defaultValuesButton = new JButton();
         defaultValuesButton.setText("Default Values");
         panel7.add(defaultValuesButton, cc.xy(1, 5));
-        final JSeparator separator8 = new JSeparator();
-        separator8.setOrientation(1);
-        panel7.add(separator8, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator10 = new JSeparator();
+        separator10.setOrientation(1);
+        panel7.add(separator10, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         binaryCompatibilityCheckBox = new JCheckBox();
         binaryCompatibilityCheckBox.setText("Binary compatibility");
-        panel7.add(binaryCompatibilityCheckBox, cc.xyw(17, 5, 2));
+        panel7.add(binaryCompatibilityCheckBox, cc.xyw(17, 5, 6, CellConstraints.LEFT, CellConstraints.DEFAULT));
         repulsiveEdgesCheckBox = new JCheckBox();
         repulsiveEdgesCheckBox.setText("Repulsive edges");
-        panel7.add(repulsiveEdgesCheckBox, cc.xy(17, 7));
+        panel7.add(repulsiveEdgesCheckBox, cc.xy(17, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        simpleCompatibilityMeasureCheckBox = new JCheckBox();
+        simpleCompatibilityMeasureCheckBox.setText("Simple compatibility measure");
+        panel7.add(simpleCompatibilityMeasureCheckBox, cc.xy(17, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        inverseQuadraticModelCheckBox = new JCheckBox();
+        inverseQuadraticModelCheckBox.setText("Inverse-quadratic model");
+        panel7.add(inverseQuadraticModelCheckBox, cc.xyw(19, 1, 2, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        directionAffectsCompatibilityCheckBox = new JCheckBox();
+        directionAffectsCompatibilityCheckBox.setText("Direction affects compatibility");
+        panel7.add(directionAffectsCompatibilityCheckBox, cc.xyw(19, 3, 2, CellConstraints.LEFT, CellConstraints.DEFAULT));
     }
 
     /**

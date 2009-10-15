@@ -20,14 +20,14 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:185px:noGrow"/>
+            <colspec value="fill:187px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:38px:noGrow"/>
+            <colspec value="fill:20px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:p:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:119px:noGrow"/>
-            <colspec value="left:23dlu:noGrow"/>
+            <colspec value="left:20dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:119px:noGrow"/>
@@ -142,6 +142,15 @@
                   <enabled value="false"/>
                 </properties>
               </component>
+              <component id="78c2e" class="javax.swing.JSeparator">
+                <constraints>
+                  <grid row="0" column="9" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <orientation value="1"/>
+                </properties>
+              </component>
             </children>
           </grid>
           <grid id="5b542" default-binding="true" layout-manager="FormLayout">
@@ -160,7 +169,7 @@
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:92px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:23px:noGrow"/>
+            <colspec value="fill:20px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="right:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
@@ -307,10 +316,10 @@
             <rowspec value="top:4dlu:noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:p:noGrow"/>
-            <colspec value="fill:21px:noGrow"/>
+            <colspec value="fill:20px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:p:noGrow"/>
-            <colspec value="left:15dlu:noGrow"/>
+            <colspec value="left:20dlu:noGrow"/>
             <colspec value="fill:max(d;4px):grow"/>
             <constraints>
               <tabbedpane title="Scales"/>
@@ -390,13 +399,17 @@
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:110px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:44px:noGrow"/>
+            <colspec value="fill:20px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:39px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:20px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:6dlu:noGrow"/>
             <colspec value="fill:max(d;4px):grow"/>
             <constraints>
@@ -508,6 +521,24 @@
                   <text value="Max edge width:"/>
                 </properties>
               </component>
+              <component id="70cc1" class="javax.swing.JSeparator">
+                <constraints>
+                  <grid row="0" column="12" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <orientation value="1"/>
+                </properties>
+              </component>
+              <component id="e0783" class="javax.swing.JCheckBox" binding="showNodesCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="0" column="14" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Show nodes"/>
+                </properties>
+              </component>
             </children>
           </grid>
           <grid id="e8f37" layout-manager="FormLayout">
@@ -517,9 +548,6 @@
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:max(d;4px):noGrow"/>
-            <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:d:grow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:12px:noGrow"/>
@@ -528,16 +556,20 @@
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:p:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:45px:noGrow"/>
+            <colspec value="fill:12px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:p:noGrow"/>
-            <colspec value="left:25dlu:noGrow"/>
+            <colspec value="left:12dlu:noGrow"/>
             <colspec value="fill:p:noGrow"/>
-            <colspec value="fill:p:noGrow"/>
-            <colspec value="left:146dlu:noGrow"/>
-            <colspec value="fill:p:noGrow"/>
+            <colspec value="fill:d:noGrow"/>
+            <colspec value="left:max(p;100px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:182px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:d:noGrow"/>
+            <colspec value="left:d:noGrow"/>
             <constraints>
               <tabbedpane title="Force-Directed Edge Bundling"/>
             </constraints>
@@ -548,7 +580,7 @@
             <children>
               <component id="b27ba" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="8" row-span="8" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="8" row-span="6" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -610,7 +642,7 @@
               </component>
               <component id="bdf4c" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="13" row-span="8" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="13" row-span="6" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -641,7 +673,7 @@
                 </constraints>
                 <properties>
                   <horizontalAlignment value="4"/>
-                  <text value="Edge compatibility threshold:"/>
+                  <text value="Compatibility threshold:"/>
                 </properties>
               </component>
               <component id="d84a9" class="javax.swing.JSpinner" binding="edgeCompatibilityThresholdSpinner">
@@ -651,15 +683,6 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="500e9" class="javax.swing.JCheckBox" binding="directionAffectsCompatibilityCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="2" column="14" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Direction affects compatibility"/>
-                </properties>
-              </component>
               <component id="1402c" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="4" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -667,7 +690,7 @@
                 </constraints>
                 <properties>
                   <horizontalAlignment value="4"/>
-                  <text value="Steps in the first cycle (I):"/>
+                  <text value="Steps in 1st cycle (I):"/>
                 </properties>
               </component>
               <component id="12d67" class="javax.swing.JSpinner" binding="stepsInCycleSpinner">
@@ -676,15 +699,6 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
-              </component>
-              <component id="7954a" class="javax.swing.JCheckBox" binding="inverseQuadraticModelCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="0" column="14" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Inverse-quadratic model"/>
-                </properties>
               </component>
               <component id="f1dcc" class="javax.swing.JButton" binding="bundleButton" default-binding="true">
                 <constraints>
@@ -724,8 +738,8 @@
               </component>
               <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="4" column="16" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="4" column="16" row-span="1" col-span="6" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="Binary compatibility"/>
@@ -733,11 +747,38 @@
               </component>
               <component id="a30d2" class="javax.swing.JCheckBox" binding="repulsiveEdgesCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="6" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="0" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="Repulsive edges"/>
+                </properties>
+              </component>
+              <component id="83fa4" class="javax.swing.JCheckBox" binding="simpleCompatibilityMeasureCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="2" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Simple compatibility measure"/>
+                </properties>
+              </component>
+              <component id="7954a" class="javax.swing.JCheckBox" binding="inverseQuadraticModelCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="0" column="18" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Inverse-quadratic model"/>
+                </properties>
+              </component>
+              <component id="500e9" class="javax.swing.JCheckBox" binding="directionAffectsCompatibilityCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="2" column="18" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Direction affects compatibility"/>
                 </properties>
               </component>
             </children>

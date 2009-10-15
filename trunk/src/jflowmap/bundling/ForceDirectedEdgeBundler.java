@@ -23,6 +23,8 @@ import at.fhj.utils.misc.ProgressTracker;
  */
 public class ForceDirectedEdgeBundler {
 
+    private static final double EPS = 1e-7;
+
     private static Logger logger = Logger.getLogger(ForceDirectedEdgeBundler.class);
     
     private Point2D.Double[][] edgePoints;
@@ -47,17 +49,22 @@ public class ForceDirectedEdgeBundler {
     private boolean binaryCompatibility;
     private boolean useInverseQuadraticModel;
     private boolean useRepulsionForOppositeEdges; // useRepulsionForCompatibleEdgesOfOppositeDirections
-
-
+    private boolean useSimpleCompatibilityMeasure;
     private double stepDampingFactor = 0.5;
+    
     private ProgressTracker progressTracker;
 
 
+//    public static class Parameters {
+//        
+//    }
+    
     public ForceDirectedEdgeBundler(Graph graph, String xNodeAttr, String yNodeAttr,
                                     int I, double K, double edgeCompatibilityThreshold,
                                     double S, double stepDampingFactor,
                                     boolean directionAffectsCompatibility, boolean binaryCompatibility,
-                                    boolean useInverseQuadraticModel, boolean useRepulsionForOppositeEdges) {
+                                    boolean useInverseQuadraticModel, boolean useRepulsionForOppositeEdges,
+                                    boolean useSimpleCompatibilityMeasure) {
         this.graph = graph;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
@@ -73,6 +80,7 @@ public class ForceDirectedEdgeBundler {
             directionAffectsCompatibility = false;
         }
         this.directionAffectsCompatibility = directionAffectsCompatibility;
+        this.useSimpleCompatibilityMeasure = useSimpleCompatibilityMeasure;
     }
 
     public ProgressTracker getProgressTracker() {
@@ -128,81 +136,120 @@ public class ForceDirectedEdgeBundler {
         
         cycle = 0;
     }
-
+    
     private void calcEdgeCompatibilityMeasures() {
         progressTracker.startSubtask("Allocating memory", .05);
         edgeCompatibilityMeasures = new double[numEdges][];
         progressTracker.subtaskCompleted();
         
+        logger.info("Calculating compatibility measures");
+        logger.info("Using " + (useSimpleCompatibilityMeasure ? "simple" : "standard") + " compatibility measure");
         progressTracker.startSubtask("Precalculating edge compatibility measures", .95);
         progressTracker.setSubtaskIncUnit(100.0 / numEdges);
+        int Ccnt = 0;
+        int numCompatible = 0;
+        double Csum = 0;
         for (int i = 0; i < numEdges; i++) {
             if (progressTracker.isCancelled()) {
                 edgeCompatibilityMeasures = null;
                 return;
             }
-            Vector2D p = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
-            Point2D pm = GeomUtils.midpoint(edgeStarts[i], edgeEnds[i]);
             edgeCompatibilityMeasures[i] = new double[i];
             for (int j = 0; j < i; j++) {
-                Vector2D q = Vector2D.valueOf(edgeStarts[j], edgeEnds[j]);
-                Point2D qm = GeomUtils.midpoint(edgeStarts[j], edgeEnds[j]);
-                double l_avg = (edgeLengths[i] + edgeLengths[j])/2;
-                
-                // angle compatibility
-//                double Ca = ((p.dot(q) / (p.length() * q.length())) + 1.0)/2.0;
-//              double Cdir = (p.dot(q) / (p.length() * q.length()) > 0 ? 1.0 : 0.0)
-                double Ca;
-                if (directionAffectsCompatibility) {
-                    Ca = (p.dot(q) / (p.length() * q.length()) + 1.0) / 2.0;
-                } else {
-                    Ca = p.dot(q) / (p.length() * q.length());
-                    if (!useRepulsionForOppositeEdges) {
-                        Ca = Math.abs(Ca);
-                    } // otherwise the compatibility measure will be negative and the 
-                      // force will become repulsive
+                if (progressTracker.isCancelled()) {
+                    edgeCompatibilityMeasures = null;
+                    return;
                 }
-//                double Ca = 1.0;
-                
-                
-                // scale compatibility
-//                double Cs = 2 / (l_avg * Math.min(edgeLengths[i], edgeLengths[j])  + (Math.max(edgeLengths[i], edgeLengths[j]) / l_avg));
-//                double Cs = Math.min(edgeLengths[i], edgeLengths[j])  / Math.max(edgeLengths[i], edgeLengths[j]);
-                double Cs = 2 / (
-                        (l_avg / Math.min(edgeLengths[i], edgeLengths[j]))  + 
-                        (Math.max(edgeLengths[i], edgeLengths[j]) / l_avg)
-                );
-//                double Cs = 1.0;
-                
-                // position compatibility
-                double Cp = l_avg / (l_avg + pm.distance(qm));
-//                double Cp = 1.0;
-                
-                // visibility compatibility
-                double Cv;
-                if (Math.abs(Ca * Cs * Cp) > .9) {
-                    // this compatibility measure is only applied if the edges are 
-                    // (almost) parallel, equal in length and close together
-                    Cv = Math.min(
-                            visibilityCompatibility(edgeStarts[i], edgeEnds[i], edgeStarts[j], edgeEnds[j]), 
-                            visibilityCompatibility(edgeStarts[j], edgeEnds[j], edgeStarts[i], edgeEnds[i]) 
-                            );
+                double C;
+                if (useSimpleCompatibilityMeasure) {
+                    C = calcSimpleEdgeCompatibility(i, j);
                 } else {
-                    Cv = 1.0;
+                    C = calcEdgeCompatibility(i, j);
                 }
-                
-                double C = Ca * Cs * Cp * Cv;
+                assert(C >= 0  &&  C <= 1.0);
+                if (C >= edgeCompatibilityThreshold) {
+                    numCompatible++;
+                }
                 if (binaryCompatibility) {
-                    if (Math.abs(C) >= edgeCompatibilityThreshold) {
-                        C = Math.signum(C);
+                    if (C >= edgeCompatibilityThreshold) {
+                        C = 1.0;
                     } else {
                         C = 0.0;
+                    }
+                }
+                Csum += C;
+                Ccnt++;
+                if (useRepulsionForOppositeEdges) {
+                    Vector2D p = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
+                    Vector2D q = Vector2D.valueOf(edgeStarts[j], edgeEnds[j]);
+                    double cos = p.dot(q) / (p.length() * q.length());
+                    if (cos < 0) {
+                        C = -C;
                     }
                 }
                 edgeCompatibilityMeasures[i][j] = C;
             }
             progressTracker.incSubtaskProgress();
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Average edge compatibility = " + (Csum / Ccnt));
+            logger.debug("Compatibility ratio = " + Math.round((numCompatible * 100.0 / Ccnt) * 100)/100.0 + "%");
+        }
+    }
+
+    private double calcSimpleEdgeCompatibility(int i, int j) {
+        double l_avg = (edgeLengths[i] + edgeLengths[j])/2;
+        return l_avg / (l_avg + 
+                edgeStarts[i].distance(edgeStarts[j]) + 
+                edgeEnds[i].distance(edgeEnds[j]));
+    }
+
+    private double calcEdgeCompatibility(int i, int j) {
+        Vector2D p = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
+        Vector2D q = Vector2D.valueOf(edgeStarts[j], edgeEnds[j]);
+        Point2D pm = GeomUtils.midpoint(edgeStarts[i], edgeEnds[i]);
+        Point2D qm = GeomUtils.midpoint(edgeStarts[j], edgeEnds[j]);
+        double l_avg = (edgeLengths[i] + edgeLengths[j])/2;
+        
+        // angle compatibility
+        double Ca;
+        if (directionAffectsCompatibility) {
+            Ca = (p.dot(q) / (p.length() * q.length()) + 1.0) / 2.0;
+        } else {
+            Ca = Math.abs(p.dot(q) / (p.length() * q.length()));
+        }
+        if (Math.abs(Ca) < EPS) {
+            Ca = 0.0;
+        }
+        
+        // scale compatibility
+        double Cs = 2 / (
+                (l_avg / Math.min(edgeLengths[i], edgeLengths[j]))  + 
+                (Math.max(edgeLengths[i], edgeLengths[j]) / l_avg)
+        );
+        
+        // position compatibility
+        double Cp = l_avg / (l_avg + pm.distance(qm));
+        
+        // visibility compatibility
+        double Cv;
+        if (Ca * Cs * Cp > .9) {
+            // this compatibility measure is only applied if the edges are 
+            // (almost) parallel, equal in length and close together
+            Cv = Math.min(
+                    visibilityCompatibility(edgeStarts[i], edgeEnds[i], edgeStarts[j], edgeEnds[j]), 
+                    visibilityCompatibility(edgeStarts[j], edgeEnds[j], edgeStarts[i], edgeEnds[i]) 
+            );
+        } else {
+            Cv = 1.0;
+        }
+        
+        assert(Ca >= 0  &&  Ca <= 1);
+        assert(Cs >= 0  &&  Cs <= 1);
+        assert(Cp >= 0  &&  Cp <= 1);
+        assert(Cv >= 0  &&  Cv <= 1);
+
+        return Ca * Cs * Cp * Cv;
     }
     
     private static double visibilityCompatibility(Point2D p0, Point2D p1, Point2D q0, Point2D q1) {
@@ -322,7 +369,7 @@ public class ForceDirectedEdgeBundler {
                         }
                     }
 
-                    if (Math.abs(F_s_i.length()) < 1e-5  &&  Math.abs(F_e_i.length()) < 1e-5) {
+                    if (Math.abs(F_s_i.length()) < EPS  &&  Math.abs(F_e_i.length()) < EPS) {
                         newP[i] = p[i];
                         continue;
                     }
