@@ -39,48 +39,19 @@ public class ForceDirectedEdgeBundler {
     private int numEdges;
     private int cycle;
 
-    private double K = 0.1; // global spring constant (used to control the amount of edge bundling by
-                            // determining the stiffness of the edges)
-    private int P = 1;      // initial number of subdivision points (will double with every cycle)
-    private double S = 0.4;   // step size - shouldn't be higher than 1.0
-    private int I = 50;      // number of iteration steps performed during a cycle
-    private double edgeCompatibilityThreshold = 0.60;
-    private boolean directionAffectsCompatibility;
-    private boolean binaryCompatibility;
-    private boolean useInverseQuadraticModel;
-    private boolean useRepulsionForOppositeEdges; // useRepulsionForCompatibleEdgesOfOppositeDirections
-    private boolean useSimpleCompatibilityMeasure;
-    private double stepDampingFactor = 0.5;
+    private int P;      // number of subdivision points (will double with every cycle)
+    private double S;   // step size
+    private int I;      // number of iteration steps performed during a cycle
+    
+    private ForceDirectedBundlerParameters params;
     
     private ProgressTracker progressTracker;
-
-
-//    public static class Parameters {
-//        
-//    }
     
-    public ForceDirectedEdgeBundler(Graph graph, String xNodeAttr, String yNodeAttr,
-                                    int I, double K, double edgeCompatibilityThreshold,
-                                    double S, double stepDampingFactor,
-                                    boolean directionAffectsCompatibility, boolean binaryCompatibility,
-                                    boolean useInverseQuadraticModel, boolean useRepulsionForOppositeEdges,
-                                    boolean useSimpleCompatibilityMeasure) {
+    public ForceDirectedEdgeBundler(Graph graph, String xNodeAttr, String yNodeAttr, ForceDirectedBundlerParameters params) {
         this.graph = graph;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
-        this.I = I;
-        this.K = K;
-        this.edgeCompatibilityThreshold = edgeCompatibilityThreshold;
-        this.S = S;
-        this.stepDampingFactor = stepDampingFactor;
-        this.binaryCompatibility = binaryCompatibility;
-        this.useInverseQuadraticModel = useInverseQuadraticModel;
-        this.useRepulsionForOppositeEdges = useRepulsionForOppositeEdges;
-        if (useRepulsionForOppositeEdges) {
-            directionAffectsCompatibility = false;
-        }
-        this.directionAffectsCompatibility = directionAffectsCompatibility;
-        this.useSimpleCompatibilityMeasure = useSimpleCompatibilityMeasure;
+        this.params = params;
     }
 
     public ProgressTracker getProgressTracker() {
@@ -95,13 +66,6 @@ public class ForceDirectedEdgeBundler {
             points[i][P + 1] = edgeEnds[i];
         }
         return points;
-    }
-    
-    /**
-     * Number of subdivision points
-     */
-    public int getP() {
-        return P;
     }
     
     public void bundle(ProgressTracker progressTracker, int numCycles) {
@@ -131,6 +95,10 @@ public class ForceDirectedEdgeBundler {
             edgeEnds[i] = new Point2D.Double(getEndX(edge), getEndY(edge));
             edgeLengths[i] = edgeStarts[i].distance(edgeEnds[i]);
         }
+
+        this.I = params.getI();
+        this.P = params.getP();
+        this.S = params.getS();
         
         calcEdgeCompatibilityMeasures();
         
@@ -143,7 +111,7 @@ public class ForceDirectedEdgeBundler {
         progressTracker.subtaskCompleted();
         
         logger.info("Calculating compatibility measures");
-        logger.info("Using " + (useSimpleCompatibilityMeasure ? "simple" : "standard") + " compatibility measure");
+        logger.info("Using " + (params.getUseSimpleCompatibilityMeasure() ? "simple" : "standard") + " compatibility measure");
         progressTracker.startSubtask("Precalculating edge compatibility measures", .95);
         progressTracker.setSubtaskIncUnit(100.0 / numEdges);
         int Ccnt = 0;
@@ -161,17 +129,17 @@ public class ForceDirectedEdgeBundler {
                     return;
                 }
                 double C;
-                if (useSimpleCompatibilityMeasure) {
+                if (params.getUseSimpleCompatibilityMeasure()) {
                     C = calcSimpleEdgeCompatibility(i, j);
                 } else {
                     C = calcEdgeCompatibility(i, j);
                 }
                 assert(C >= 0  &&  C <= 1.0);
-                if (C >= edgeCompatibilityThreshold) {
+                if (C >= params.getEdgeCompatibilityThreshold()) {
                     numCompatible++;
                 }
-                if (binaryCompatibility) {
-                    if (C >= edgeCompatibilityThreshold) {
+                if (params.getBinaryCompatibility()) {
+                    if (C >= params.getEdgeCompatibilityThreshold()) {
                         C = 1.0;
                     } else {
                         C = 0.0;
@@ -179,7 +147,7 @@ public class ForceDirectedEdgeBundler {
                 }
                 Csum += C;
                 Ccnt++;
-                if (useRepulsionForOppositeEdges) {
+                if (params.getUseRepulsionForOppositeEdges()) {
                     Vector2D p = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
                     Vector2D q = Vector2D.valueOf(edgeStarts[j], edgeEnds[j]);
                     double cos = p.dot(q) / (p.length() * q.length());
@@ -213,14 +181,13 @@ public class ForceDirectedEdgeBundler {
         
         // angle compatibility
         double Ca;
-        if (directionAffectsCompatibility) {
+        if (params.getDirectionAffectsCompatibility()) {
             Ca = (p.dot(q) / (p.length() * q.length()) + 1.0) / 2.0;
         } else {
             Ca = Math.abs(p.dot(q) / (p.length() * q.length()));
         }
-        if (Math.abs(Ca) < EPS) {
-            Ca = 0.0;
-        }
+        if (Math.abs(Ca) < EPS) { Ca = 0.0; }       // this led to errors (when Ca == -1e-12)
+        if (Math.abs(Math.abs(Ca) - 1.0) < EPS) { Ca = 1.0; }
         
         // scale compatibility
         double Cs = 2 / (
@@ -287,7 +254,7 @@ public class ForceDirectedEdgeBundler {
         // Set parameters for the next cycle
         if (cycle > 0) {
             P *= 2;
-            S *= (1.0 - stepDampingFactor);
+            S *= (1.0 - params.getStepDampingFactor());
 //            S /= 1.2;
             I = (I * 2) / 3;
         }
@@ -322,7 +289,7 @@ public class ForceDirectedEdgeBundler {
                 }
 
                 final int numOfSegments = P + 1;
-                double k_p = K / (edgeLengths[pe] * numOfSegments);
+                double k_p = params.getK() / (edgeLengths[pe] * numOfSegments);
                 
                 for (int i = 0; i < P; i++) {
                     // spring forces
@@ -344,13 +311,13 @@ public class ForceDirectedEdgeBundler {
                     for (int qe = 0; qe < numEdges; qe++) {
                         if (qe != pe  &&  !isSelfLoop(qe)) {
                             double ec = getEdgeCompatibility(pe, qe);
-                            if (Math.abs(ec) > edgeCompatibilityThreshold) {
+                            if (Math.abs(ec) > params.getEdgeCompatibilityThreshold()) {
                                 Vector2D q_i = Vector2D.valueOf(edgePoints[qe][i]);
                                 Vector2D v = q_i.minus(p_i);
                                 if (!v.isZero()) {  // zero vector has no direction
                                     double d = v.length();  // shouldn't be zero
                                     double m;
-                                    if (useInverseQuadraticModel) {
+                                    if (params.getUseInverseQuadraticModel()) {
                                         m = ec / (d * d * d);
                                     } else {
                                         m = ec / (d * d);
@@ -484,5 +451,4 @@ public class ForceDirectedEdgeBundler {
     private double getEndY(Edge edge) {
         return edge.getTargetNode().getDouble(yNodeAttr);
     }
-    
 }

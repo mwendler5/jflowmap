@@ -3,18 +3,15 @@ package jflowmap;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.IOException;
 
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.models.FlowMapParamsModel;
 import jflowmap.models.map.AreaMap;
 import jflowmap.ui.ControlPanel;
@@ -72,14 +69,8 @@ public class JFlowMap extends JComponent {
         visualFlowMap.resetBundling();
     }
 
-    public void bundleEdges(int numCycles, int I, double K, double edgeCompatibilityThreshold,
-                                    double S, double stepDampingFactor,
-                                    boolean directionAffectsCompatibility, boolean binaryCompatibility,
-                                    boolean useInverseQuadraticModel, boolean useRepulsionForOppositeEdges,
-                                    boolean useSimpleCompatibilityMeasures) {
-        visualFlowMap.bundleEdges(numCycles, I, K, edgeCompatibilityThreshold, S, stepDampingFactor,
-                directionAffectsCompatibility, binaryCompatibility, useInverseQuadraticModel,
-                useRepulsionForOppositeEdges, useSimpleCompatibilityMeasures);
+    public void bundleEdges(int numCycles, ForceDirectedBundlerParameters params) {
+        visualFlowMap.bundleEdges(numCycles, params);
     }
 
     public Frame getApp() {

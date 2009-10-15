@@ -21,6 +21,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import jflowmap.JFlowMap;
+import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.models.FlowMapParamsModel;
 import jflowmap.util.Stats;
 import jflowmap.visuals.VisualFlowMap;
@@ -83,19 +84,18 @@ public class ControlPanel {
         initChangeListeners();
         bundleButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                jFlowMap.bundleEdges(
-                        (Integer) numberOfCyclesSpinner.getValue(),
-                        (Integer) stepsInCycleSpinner.getValue(),
-                        (Double) edgeStiffnessSpinner.getValue(),
-                        (Double) edgeCompatibilityThresholdSpinner.getValue(),
-                        (Double) stepSizeSpinner.getValue(),
-                        (Double) stepDampingFactorSpinner.getValue(),
-                        directionAffectsCompatibilityCheckBox.isSelected(),
-                        binaryCompatibilityCheckBox.isSelected(),
-                        inverseQuadraticModelCheckBox.isSelected(),
-                        repulsiveEdgesCheckBox.isSelected(),
-                        simpleCompatibilityMeasureCheckBox.isSelected()
-                );
+                ForceDirectedBundlerParameters params = new ForceDirectedBundlerParameters();
+                params.setI((Integer) stepsInCycleSpinner.getValue());
+                params.setK((Double) edgeStiffnessSpinner.getValue());
+                params.setEdgeCompatibilityThreshold((Double) edgeCompatibilityThresholdSpinner.getValue());
+                params.setS((Double) stepSizeSpinner.getValue());
+                params.setStepDampingFactor((Double) stepDampingFactorSpinner.getValue());
+                params.setDirectionAffectsCompatibility(directionAffectsCompatibilityCheckBox.isSelected());
+                params.setBinaryCompatibility(binaryCompatibilityCheckBox.isSelected());
+                params.setUseInverseQuadraticModel(inverseQuadraticModelCheckBox.isSelected());
+                params.setUseRepulsionForOppositeEdges(repulsiveEdgesCheckBox.isSelected());
+                params.setUseSimpleCompatibilityMeasure(simpleCompatibilityMeasureCheckBox.isSelected());
+                jFlowMap.bundleEdges((Integer) numberOfCyclesSpinner.getValue(), params);
             }
         });
         resetButton.addActionListener(new ActionListener() {
@@ -115,12 +115,12 @@ public class ControlPanel {
             }
         };
         simpleCompatibilityMeasureCheckBox.addChangeListener(li);
-        binaryCompatibilityCheckBox.addChangeListener(li);
+        repulsiveEdgesCheckBox.addChangeListener(li);
         updateDirectionAffectsCompatibilityCheckBox();
     }
     
     private void updateDirectionAffectsCompatibilityCheckBox() {
-        if (simpleCompatibilityMeasureCheckBox.isSelected()  ||  binaryCompatibilityCheckBox.isSelected()) {
+        if (simpleCompatibilityMeasureCheckBox.isSelected()  ||  repulsiveEdgesCheckBox.isSelected()) {
             directionAffectsCompatibilityCheckBox.setSelected(true);
             directionAffectsCompatibilityCheckBox.setEnabled(false);
         } else {

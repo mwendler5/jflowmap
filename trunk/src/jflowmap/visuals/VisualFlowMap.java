@@ -10,9 +10,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import jflowmap.JFlowMap;
+import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.bundling.ForceDirectedEdgeBundler;
 import jflowmap.models.FlowMapParamsModel;
 
@@ -22,7 +24,6 @@ import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import at.fhj.utils.misc.ProgressTracker;
-import at.fhj.utils.misc.TaskCompletionListener;
 import at.fhj.utils.swing.ProgressDialog;
 import at.fhj.utils.swing.ProgressWorker;
 import edu.umd.cs.piccolo.PCamera;
@@ -362,17 +363,10 @@ public class VisualFlowMap extends PNode {
         repaint();
     }
 
-    public void bundleEdges(int numCycles, int I, double K, double edgeCompatibilityThreshold,
-                            double S, double stepDampingFactor, boolean directionAffectsCompatibility,
-                            boolean binaryCompatibility, boolean useInverseQuadraticModel,
-                            boolean useRepulsionForOppositeEdges, boolean useSimpleCompatibilityMeasure) {
+    public void bundleEdges(int numCycles, ForceDirectedBundlerParameters params) {
         ProgressTracker pt = new ProgressTracker();
         final ForceDirectedEdgeBundler bundler =
-                new ForceDirectedEdgeBundler(
-                        graph, model.getXNodeAttr(), model.getYNodeAttr(),
-                        I, K, edgeCompatibilityThreshold, S, stepDampingFactor,
-                        directionAffectsCompatibility, binaryCompatibility, useInverseQuadraticModel,
-                        useRepulsionForOppositeEdges, useSimpleCompatibilityMeasure);
+                new ForceDirectedEdgeBundler(graph, model.getXNodeAttr(), model.getYNodeAttr(), params);
         EdgeBundlerWorker worker = new EdgeBundlerWorker(pt, bundler, numCycles);
         ProgressDialog dialog = new ProgressDialog(jFlowMap.getApp(), "Edge bundling", worker, true);
         pt.addProgressListener(dialog);
