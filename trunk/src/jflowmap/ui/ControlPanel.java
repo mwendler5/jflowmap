@@ -108,6 +108,24 @@ public class ControlPanel {
                 initForceDirectedEdgeBundlerParamsModels();
             }
         });
+        ChangeListener li = new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                updateDirectionAffectsCompatibilityCheckBox();
+            }
+        };
+        simpleCompatibilityMeasureCheckBox.addChangeListener(li);
+        binaryCompatibilityCheckBox.addChangeListener(li);
+        updateDirectionAffectsCompatibilityCheckBox();
+    }
+    
+    private void updateDirectionAffectsCompatibilityCheckBox() {
+        if (simpleCompatibilityMeasureCheckBox.isSelected()  ||  binaryCompatibilityCheckBox.isSelected()) {
+            directionAffectsCompatibilityCheckBox.setSelected(true);
+            directionAffectsCompatibilityCheckBox.setEnabled(false);
+        } else {
+            directionAffectsCompatibilityCheckBox.setEnabled(true);
+        }
     }
 
     public void setFlowMapParamsModel(FlowMapParamsModel model) {
