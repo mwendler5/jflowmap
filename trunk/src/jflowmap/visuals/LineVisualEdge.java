@@ -1,11 +1,11 @@
 package jflowmap.visuals;
 
 import java.awt.Color;
+import java.awt.Stroke;
 import java.awt.geom.Line2D;
 
 import prefuse.data.Edge;
 import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * @author Ilya Boyandin
@@ -75,7 +75,7 @@ public class LineVisualEdge extends VisualEdge {
     }
 
     public void updateEdgeWidth() {
-        PFixedWidthStroke stroke = getStroke();
+        Stroke stroke = createStroke();
         startMarker.setStroke(stroke);
         endMarker.setStroke(stroke);
         getEdgePPath().setStroke(stroke);

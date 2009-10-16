@@ -24,7 +24,7 @@ public class FlowMapParamsModel {
     private String yNodeAttr = "y";
     private String labelAttr = "tooltip";
 
-    private int edgeAlpha = 40;
+    private int edgeAlpha = 100;
     private int edgeMarkerAlpha = 200;
 
     private double valueFilterMin = Double.MIN_VALUE;
@@ -157,7 +157,8 @@ public class FlowMapParamsModel {
 
     public void setValueFilterMin(double valueFilterMin) {
         Stats stats = graphStats.getValueEdgeAttrStats();
-        if (stats.min < valueFilterMin  &&  valueFilterMin < stats.max) {
+        if (stats.min <= valueFilterMin  &&  valueFilterMin <= stats.max  &&
+            this.valueFilterMin != valueFilterMin) {
             double old = this.valueFilterMin;
             this.valueFilterMin = valueFilterMin;
             changes.firePropertyChange(PROPERTY_VALUE_FILTER_MIN, old, valueFilterMin);
@@ -166,7 +167,8 @@ public class FlowMapParamsModel {
 
     public void setValueFilterMax(double valueFilterMax) {
         Stats stats = graphStats.getValueEdgeAttrStats();
-        if (stats.min < valueFilterMax  &&  valueFilterMax < stats.max) {
+        if (stats.min <= valueFilterMin  &&  valueFilterMin <= stats.max  &&
+            this.valueFilterMax != valueFilterMax) {
             double old = this.valueFilterMax;
             this.valueFilterMax = valueFilterMax;
             changes.firePropertyChange(PROPERTY_VALUE_FILTER_MAX, old, valueFilterMax);

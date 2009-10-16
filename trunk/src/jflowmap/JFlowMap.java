@@ -97,7 +97,9 @@ public class JFlowMap extends JComponent {
         try {
             Graph graph = loadGraph(dataset.filename);
             model = new FlowMapParamsModel(graph, dataset.valueAttrName, dataset.labelAttrName);
-            model.setValueFilterMin(1000);
+            if (!Double.isNaN(dataset.valueFilterMin)) {
+                model.setValueFilterMin(dataset.valueFilterMin);
+            }
             VisualFlowMap visualFlowMap = new VisualFlowMap(this, canvas, graph, model);
             if (dataset.areaMapFilename != null) {
                 VisualAreaMap map = loadAreaMap(dataset.areaMapFilename);
@@ -115,7 +117,9 @@ public class JFlowMap extends JComponent {
     private Graph loadGraph(String filename) throws DataIOException {
         logger.info("Loading graph \"" + filename + "\"");
         GraphMLReader reader = new GraphMLReader();
-        return reader.readGraph(filename);
+        Graph graph = reader.readGraph(filename);
+        logger.info("Loaded graph \"" + filename + "\": " + graph.getNodeCount() + " nodes, " + graph.getEdgeCount() + " edges");
+        return graph;
     }
 
     private VisualAreaMap loadAreaMap(String areaMapFilename) {
@@ -132,15 +136,21 @@ public class JFlowMap extends JComponent {
 
     public static class DatasetSpec {
         public DatasetSpec(String filename, String valueAttrName, String labelAttrName, String areaMapFilename) {
+            this(filename, valueAttrName, labelAttrName, areaMapFilename, Double.NaN);
+        }
+        
+        public DatasetSpec(String filename, String valueAttrName, String labelAttrName, String areaMapFilename, double valueFilterMin) {
             this.filename = filename;
             this.valueAttrName = valueAttrName;
             this.labelAttrName = labelAttrName;
             this.areaMapFilename = areaMapFilename;
+            this.valueFilterMin = valueFilterMin;
         }
         public final String filename;
         public final String areaMapFilename;
         public final String valueAttrName;
         public final String labelAttrName;
+        public final double valueFilterMin;
 
         @Override
         public String toString() {
@@ -155,16 +165,19 @@ public class JFlowMap extends JComponent {
             new DatasetSpec("data/bundling-test2.xml", "data", "name", null),
             new DatasetSpec("data/bundling-test3.xml", "data", "name", null),
             new DatasetSpec("data/bundling-test4.xml", "data", "name", null),
+            new DatasetSpec("data/bundling-test5.xml", "data", "name", null),
+            new DatasetSpec("data/bundling-test6.xml", "data", "name", null),
             new DatasetSpec("data/migrations-unique.xml", "value", "tooltip", null),
-            new DatasetSpec("data/refugee-flows-2008.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugee-flows-2007.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugee-flows-2006.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugee-flows-2005.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugee-flows-2004.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugee-flows-2003.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugee-flows-2002.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugee-flows-2001.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugee-flows-2000.xml", "refugees", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/migrations.xml", "value", "tooltip", null),
+            new DatasetSpec("data/refugee-flows-2008.xml", "refugees", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugee-flows-2007.xml", "refugees", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugee-flows-2006.xml", "refugees", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugee-flows-2005.xml", "refugees", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugee-flows-2004.xml", "refugees", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugee-flows-2003.xml", "refugees", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugee-flows-2002.xml", "refugees", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugee-flows-2001.xml", "refugees", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugee-flows-2000.xml", "refugees", "name", "data/countries-areas.xml", 1000),
             new DatasetSpec("data/refugee-flows-1999.xml", "refugees", "name", "data/countries-areas.xml"),
             new DatasetSpec("data/refugee-flows-1998.xml", "refugees", "name", "data/countries-areas.xml"),
             new DatasetSpec("data/refugee-flows-1997.xml", "refugees", "name", "data/countries-areas.xml"),

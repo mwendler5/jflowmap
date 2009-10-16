@@ -2,9 +2,14 @@
 <project relativePaths="false" version="4">
   <component name="ChangeListManager">
     <list default="true" readonly="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/JFlowMap.java" afterPath="$PROJECT_DIR$/src/jflowmap/JFlowMap.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.form" afterPath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.form" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedBundlerParameters.java" afterPath="$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedBundlerParameters.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/FlowMapMain.java" afterPath="$PROJECT_DIR$/src/jflowmap/FlowMapMain.java" />
+      <change type="DELETED" beforePath="C:\Workspace\JFlowMap\src\ch" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/JFlowMap.iws" afterPath="$PROJECT_DIR$/JFlowMap.iws" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java" afterPath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java" afterPath="$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/JFlowMap.ipr" afterPath="$PROJECT_DIR$/JFlowMap.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedEdgeBundler.java" afterPath="$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedEdgeBundler.java" />
     </list>
     <ignored path="JFlowMap.iws" />
@@ -67,7 +72,30 @@
       <file leaf-file-name="FlowMapMain.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/jflowmap/FlowMapMain.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="13" selection-start="242" selection-end="242" vertical-scroll-proportion="0.0">
+            <state line="20" column="13" selection-start="416" selection-end="416" vertical-scroll-proportion="0.0">
+              <folding>
+                <marker date="1255696973746" expanded="false" signature="26:35" placeholder="..." />
+                <marker date="1255696973746" expanded="true" signature="2060:2068" placeholder="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ForceDirectedEdgeBundler.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedEdgeBundler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="30" column="13" selection-start="766" selection-end="766" vertical-scroll-proportion="0.0">
+              <folding>
+                <marker date="1255693587363" expanded="true" signature="18982:18988" placeholder="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ForceDirectedBundlerParameters.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedBundlerParameters.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="38" column="4" selection-start="1508" selection-end="1508" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -76,7 +104,7 @@
       <file leaf-file-name="VisualFlowMap.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="370" column="17" selection-start="13155" selection-end="13155" vertical-scroll-proportion="0.0">
+            <state line="367" column="17" selection-start="12847" selection-end="12847" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -173,6 +201,38 @@
       <option name="HOST" value="localhost" />
       <option name="PORT" value="5005" />
     </configuration>
+    <configuration default="true" type="SpecsRunConfiguration" factoryName="Specs">
+      <module name="" />
+      <setting name="path" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="ADDITIONAL_CLASS_PATH" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+    </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
       <module name="" />
       <option name="MAIN_CLASS_NAME" />
@@ -216,6 +276,13 @@
         <value defaultName="moduleWithDependencies" />
       </option>
       <envs />
+    </configuration>
+    <configuration default="true" type="ScalaTestRunConfiguration" factoryName="ScalaTest">
+      <module name="" />
+      <setting name="path" value="" />
+      <setting name="package" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
     </configuration>
     <list size="1">
       <item index="0" class="java.lang.String" itemvalue="Application.FlowMapMain" />
@@ -265,12 +332,12 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="-4" width="1288" height="1002" extended-state="0" />
+    <frame x="-4" y="-4" width="1288" height="1002" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18446602" sideWeight="0.66239816" order="-1" side_tool="false" />
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32945284" sideWeight="0.5" order="-1" side_tool="false" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.11326861" sideWeight="0.66239816" order="-1" side_tool="false" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" />
@@ -327,13 +394,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/jflowmap/FlowMapMain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="13" selection-start="242" selection-end="242" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/JFlowMap.iws">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
@@ -357,7 +417,33 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="370" column="17" selection-start="13155" selection-end="13155" vertical-scroll-proportion="0.0">
+        <state line="367" column="17" selection-start="12847" selection-end="12847" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jflowmap/FlowMapMain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="13" selection-start="416" selection-end="416" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1255696973746" expanded="false" signature="26:35" placeholder="..." />
+            <marker date="1255696973746" expanded="true" signature="2060:2068" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedEdgeBundler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="13" selection-start="766" selection-end="766" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1255693587363" expanded="true" signature="18982:18988" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedBundlerParameters.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="4" selection-start="1508" selection-end="1508" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>

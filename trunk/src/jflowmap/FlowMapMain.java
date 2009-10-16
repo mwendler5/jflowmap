@@ -1,13 +1,19 @@
 package jflowmap;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
+
+import at.fhj.utils.swing.JMemoryIndicator;
 
 /**
  * @author Ilya Boyandin
@@ -34,6 +40,13 @@ public class FlowMapMain extends JFrame {
         flowMap = new JFlowMap(this);
         add(flowMap);
 
+        JPanel statusPanel = new JPanel(new BorderLayout());
+        add(statusPanel, BorderLayout.SOUTH);
+
+        JMemoryIndicator mi = new JMemoryIndicator(3000);
+        statusPanel.add(mi, BorderLayout.EAST);
+        mi.startUpdater();
+
         setExtendedState(MAXIMIZED_BOTH);
         setMinimumSize(new Dimension(800, 600));
 //        setPreferredSize(new Dimension(800, 600));
@@ -45,7 +58,18 @@ public class FlowMapMain extends JFrame {
         final int locY = (screen.height - size.height) / 2;
         setLocation(locX, locY);
 
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                dispose();
+                shutdown();
+            }
+        });
+    }
+
+    public void shutdown() {
+        logger.info("Exiting application");
+        System.exit(0);
     }
 
     public static void main(String[] args) throws IOException {

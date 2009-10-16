@@ -37,8 +37,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 public class VisualFlowMap extends PNode {
 
     private static Logger logger = Logger.getLogger(VisualFlowMap.class);
-    private static final int DEFAULT_NODE_SIZE = 4;
-    private static final int SHORT_ANIMATION_DURATION = 500;
+    private static final int DEFAULT_NODE_SIZE = 2;
     private final Tooltip tooltipBox;
     private PBounds nodeBounds;
 
@@ -366,7 +365,10 @@ public class VisualFlowMap extends PNode {
     public void bundleEdges(int numCycles, ForceDirectedBundlerParameters params) {
         ProgressTracker pt = new ProgressTracker();
         final ForceDirectedEdgeBundler bundler =
-                new ForceDirectedEdgeBundler(graph, model.getXNodeAttr(), model.getYNodeAttr(), params);
+                new ForceDirectedEdgeBundler(graph, 
+                        model.getXNodeAttr(), model.getYNodeAttr(), 
+                        model.getValueEdgeAttr(), 
+                        params);
         EdgeBundlerWorker worker = new EdgeBundlerWorker(pt, bundler, numCycles);
         ProgressDialog dialog = new ProgressDialog(jFlowMap.getApp(), "Edge bundling", worker, true);
         pt.addProgressListener(dialog);

@@ -566,10 +566,8 @@
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:max(p;100px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:182px:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:d:noGrow"/>
-            <colspec value="left:d:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
             <constraints>
               <tabbedpane title="Force-Directed Edge Bundling"/>
             </constraints>
@@ -736,15 +734,6 @@
                   <orientation value="1"/>
                 </properties>
               </component>
-              <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="4" column="16" row-span="1" col-span="6" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Binary compatibility"/>
-                </properties>
-              </component>
               <component id="a30d2" class="javax.swing.JCheckBox" binding="repulsiveEdgesCheckBox" default-binding="true">
                 <constraints>
                   <grid row="0" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -779,6 +768,24 @@
                 </constraints>
                 <properties>
                   <text value="Direction affects compatibility"/>
+                </properties>
+              </component>
+              <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="4" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Binary compatibility"/>
+                </properties>
+              </component>
+              <component id="d8a4" class="javax.swing.JCheckBox" binding="precalculateEdgeCompatibilityCheckBox">
+                <constraints>
+                  <grid row="4" column="18" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Precompute compatibility (requires memory)"/>
                 </properties>
               </component>
             </children>

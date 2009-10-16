@@ -3,6 +3,7 @@ package jflowmap.visuals;
 import java.awt.Color;
 import java.awt.LinearGradientPaint;
 import java.awt.Paint;
+import java.awt.Stroke;
 
 import jflowmap.models.FlowMapParamsModel;
 import jflowmap.util.Stats;
@@ -92,7 +93,7 @@ public abstract class VisualEdge extends PNode {
     public void updateEdgeWidth() {
         PPath ppath = getEdgePPath();
         if (ppath != null) {
-            ppath.setStroke(getStroke());
+            ppath.setStroke(createStroke());
         }
     }
 
@@ -111,6 +112,7 @@ public abstract class VisualEdge extends PNode {
                 valueFilterMin <= value && value <= valueFilterMax    &&
                 edgeLengthFilterMin <= length && length <= edgeLengthFilterMax
         ;
+//        System.out.println(this + "  " + visible  + "  filter:[" + valueFilterMin + "-" + valueFilterMax + "] value = " + value);
         setVisible(visible);
         setPickable(visible);
         setChildrenPickable(visible);
@@ -254,11 +256,11 @@ public abstract class VisualEdge extends PNode {
         }
     }
 
-    protected PFixedWidthStroke getStroke() {
+    protected Stroke createStroke() {
         double nv = getNormalizedValue();
         float width = (float)(1 + nv * getVisualFlowMap().getMaxEdgeWidth());
-        PFixedWidthStroke stroke = new PFixedWidthStroke(width);
-        return stroke;
+        return new PFixedWidthStroke(width);
+//        return new BasicStroke(width);
     }
 
     public void update() {

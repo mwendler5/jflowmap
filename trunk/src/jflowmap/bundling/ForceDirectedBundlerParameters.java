@@ -4,20 +4,39 @@ package jflowmap.bundling;
  * @author Ilya Boyandin
  */
 public class ForceDirectedBundlerParameters {
-    private int P = 1;        // initial number of subdivision points
-    private double S = 0.4;   // step size - shouldn't be higher than 1.0
-    private int I = 50;       // number of iteration steps performed during a cycle
-    private double K = 0.1; // global spring constant (used to control the amount of edge bundling by
+    private int P;        // initial number of subdivision points
+    private double S;   // step size - shouldn't be higher than 1.0
+    private int I;       // number of iteration steps performed during a cycle
+    private double K; // global spring constant (used to control the amount of edge bundling by
                             // determining the stiffness of the edges)
-    private double stepDampingFactor = 0.5;
-    private double edgeCompatibilityThreshold = 0.60;
-    private boolean directionAffectsCompatibility = true;
-    private boolean binaryCompatibility = false;
-    private boolean useInverseQuadraticModel = false;
-    private boolean useRepulsionForOppositeEdges = false; // for compatible edges going into opposite directions
-    private boolean useSimpleCompatibilityMeasure = false;
+    private double stepDampingFactor;
+    private double edgeCompatibilityThreshold;
+    private boolean directionAffectsCompatibility;
+    private boolean binaryCompatibility;
+    private boolean useInverseQuadraticModel;
+    private boolean useRepulsionForOppositeEdges; // for compatible edges going into opposite directions
+    private boolean useSimpleCompatibilityMeasure;
+    private boolean precalculateCompatibilityMeasures ;
+    private boolean edgeValueAffectsAttraction;
     
     public ForceDirectedBundlerParameters() {
+        resetToDefaults();
+    }
+    
+    public void resetToDefaults() {
+        P = 1;
+        S = 0.4;
+        I = 50;
+        K = 0.1;
+        stepDampingFactor = 0.5;
+        edgeCompatibilityThreshold = 0.60;
+        directionAffectsCompatibility = true;
+        binaryCompatibility = false;
+        useInverseQuadraticModel = false;
+        useRepulsionForOppositeEdges = false;
+        useSimpleCompatibilityMeasure = false;
+        precalculateCompatibilityMeasures = true;
+        edgeValueAffectsAttraction = true;
     }
     
     private void ensureDirectionAffectsCompatibilityValueIsValid() {
@@ -25,7 +44,7 @@ public class ForceDirectedBundlerParameters {
             directionAffectsCompatibility = false;
         }
     }
-
+    
     public int getP() {
         return P;
     }
@@ -116,4 +135,23 @@ public class ForceDirectedBundlerParameters {
     public void setStepDampingFactor(double stepDampingFactor) {
         this.stepDampingFactor = stepDampingFactor;
     }
+
+    public boolean getPrecalculateCompatibilityMeasures() {
+        return precalculateCompatibilityMeasures;
+    }
+
+    public void setPrecalculateCompatibilityMeasures(
+            boolean precalculateCompatibilityMeasures) {
+        this.precalculateCompatibilityMeasures = precalculateCompatibilityMeasures;
+    }
+
+    public boolean getEdgeValueAffectsAttraction() {
+        return edgeValueAffectsAttraction;
+    }
+
+    public void setEdgeValueAffectsAttraction(boolean edgeValueAffectsAttraction) {
+        this.edgeValueAffectsAttraction = edgeValueAffectsAttraction;
+    }
+
+    
 }
