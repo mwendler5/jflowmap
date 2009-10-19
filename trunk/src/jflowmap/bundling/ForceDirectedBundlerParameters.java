@@ -4,6 +4,7 @@ package jflowmap.bundling;
  * @author Ilya Boyandin
  */
 public class ForceDirectedBundlerParameters {
+    private int numCycles;
     private int P;        // initial number of subdivision points
     private double S;   // step size - shouldn't be higher than 1.0
     private int I;       // number of iteration steps performed during a cycle
@@ -16,7 +17,6 @@ public class ForceDirectedBundlerParameters {
     private boolean useInverseQuadraticModel;
     private boolean useRepulsionForOppositeEdges; // for compatible edges going into opposite directions
     private boolean useSimpleCompatibilityMeasure;
-    private boolean precalculateCompatibilityMeasures ;
     private boolean edgeValueAffectsAttraction;
     
     public ForceDirectedBundlerParameters() {
@@ -24,6 +24,7 @@ public class ForceDirectedBundlerParameters {
     }
     
     public void resetToDefaults() {
+        numCycles = 6;
         P = 1;
         S = 0.4;
         I = 50;
@@ -35,7 +36,6 @@ public class ForceDirectedBundlerParameters {
         useInverseQuadraticModel = false;
         useRepulsionForOppositeEdges = false;
         useSimpleCompatibilityMeasure = false;
-        precalculateCompatibilityMeasures = true;
         edgeValueAffectsAttraction = true;
     }
     
@@ -43,6 +43,14 @@ public class ForceDirectedBundlerParameters {
         if (useSimpleCompatibilityMeasure  ||  useRepulsionForOppositeEdges) {
             directionAffectsCompatibility = false;
         }
+    }
+    
+    public int getNumCycles() {
+        return numCycles;
+    }
+    
+    public void setNumCycles(int numCycles) {
+        this.numCycles = numCycles;
     }
     
     public int getP() {
@@ -134,15 +142,6 @@ public class ForceDirectedBundlerParameters {
 
     public void setStepDampingFactor(double stepDampingFactor) {
         this.stepDampingFactor = stepDampingFactor;
-    }
-
-    public boolean getPrecalculateCompatibilityMeasures() {
-        return precalculateCompatibilityMeasures;
-    }
-
-    public void setPrecalculateCompatibilityMeasures(
-            boolean precalculateCompatibilityMeasures) {
-        this.precalculateCompatibilityMeasures = precalculateCompatibilityMeasures;
     }
 
     public boolean getEdgeValueAffectsAttraction() {

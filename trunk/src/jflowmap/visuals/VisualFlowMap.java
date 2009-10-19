@@ -24,6 +24,7 @@ import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import at.fhj.utils.misc.ProgressTracker;
+import at.fhj.utils.misc.TaskCompletionListener;
 import at.fhj.utils.swing.ProgressDialog;
 import at.fhj.utils.swing.ProgressWorker;
 import edu.umd.cs.piccolo.PCamera;
@@ -362,60 +363,44 @@ public class VisualFlowMap extends PNode {
         repaint();
     }
 
-    public void bundleEdges(int numCycles, ForceDirectedBundlerParameters params) {
+    public void bundleEdges(ForceDirectedBundlerParameters params) {
         ProgressTracker pt = new ProgressTracker();
         final ForceDirectedEdgeBundler bundler =
                 new ForceDirectedEdgeBundler(graph, 
                         model.getXNodeAttr(), model.getYNodeAttr(), 
                         model.getValueEdgeAttr(), 
                         params);
-        EdgeBundlerWorker worker = new EdgeBundlerWorker(pt, bundler, numCycles);
-        ProgressDialog dialog = new ProgressDialog(jFlowMap.getApp(), "Edge bundling", worker, true);
+        EdgeBundlerWorker worker = new EdgeBundlerWorker(pt, bundler);
+        ProgressDialog dialog = new ProgressDialog(jFlowMap.getApp(), "Edge Bundling", worker, true);
         pt.addProgressListener(dialog);
+        pt.addTaskCompletionListener(new TaskCompletionListener() {
+            @Override
+            public void taskCompleted(int taskId) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        createEdges(bundler.getEdgePoints(), false);
+                        repaint();
+                    }
+                });
+            }
+        });
         worker.start();
         dialog.setVisible(true);
     }
     
     private class EdgeBundlerWorker extends ProgressWorker {
 
-        private final int numCycles;
-        private ForceDirectedEdgeBundler bundler;
+        private final ForceDirectedEdgeBundler bundler;
 
-        public EdgeBundlerWorker(ProgressTracker progress, ForceDirectedEdgeBundler bundler, int numCycles) {
+        public EdgeBundlerWorker(ProgressTracker progress, ForceDirectedEdgeBundler bundler) {
             super(progress);
             this.bundler = bundler;
-            this.numCycles = numCycles;
         }
 
         @Override
         public Object construct() {
             try {
-                ProgressTracker pt = getProgressTracker();
-                pt.startTask("Initializing", .05);
-                bundler.init(pt);
-                if (pt.isCancelled()) {
-                    return null;
-                }
-                pt.taskCompleted();
-                
-                // TODO: move this to ForceDirectedEdgeBundler and add a TaskCompletionListener 
-                for (int cycle = 0; cycle < numCycles; cycle++) {
-                    pt.startTask("Bundling cycle " + (cycle + 1) + " of " + numCycles, .95 / numCycles);
-                    bundler.nextCycle();
-                    pt.taskCompleted();
-                    if (pt.isCancelled()) {
-                        return null;
-                    }
-                    final boolean showPoints = (cycle < numCycles - 1);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            createEdges(bundler.getEdgePoints(), showPoints);
-                            repaint();
-                        }
-                    });
-                }
-    
-                pt.processFinished();
+                bundler.bundle(getProgressTracker());
             } catch (Throwable th) {
                 logger.error("Bundling error", th);
                 JOptionPane.showMessageDialog(jFlowMap,

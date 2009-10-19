@@ -75,9 +75,9 @@ public class ControlPanel {
     private JCheckBox showNodesCheckBox;
     private JCheckBox precalculateEdgeCompatibilityCheckBox;
     private FlowMapParamsModel flowMapModel;
-    private JFlowMap jFlowMap;
+    private final JFlowMap jFlowMap;
     private boolean initializing;
-    private ForceDirectedBundlerParameters fdBundlingParams = new ForceDirectedBundlerParameters();
+    private final ForceDirectedBundlerParameters fdBundlingParams = new ForceDirectedBundlerParameters();
 
     public ControlPanel(JFlowMap flowMap, FlowMapParamsModel model) {
         this.jFlowMap = flowMap;
@@ -86,6 +86,7 @@ public class ControlPanel {
         initChangeListeners();
         bundleButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                fdBundlingParams.setNumCycles((Integer) numberOfCyclesSpinner.getValue());
                 fdBundlingParams.setI((Integer) stepsInCycleSpinner.getValue());
                 fdBundlingParams.setK((Double) edgeStiffnessSpinner.getValue());
                 fdBundlingParams.setEdgeCompatibilityThreshold((Double) edgeCompatibilityThresholdSpinner.getValue());
@@ -96,8 +97,7 @@ public class ControlPanel {
                 fdBundlingParams.setUseInverseQuadraticModel(inverseQuadraticModelCheckBox.isSelected());
                 fdBundlingParams.setUseRepulsionForOppositeEdges(repulsiveEdgesCheckBox.isSelected());
                 fdBundlingParams.setUseSimpleCompatibilityMeasure(simpleCompatibilityMeasureCheckBox.isSelected());
-                fdBundlingParams.setPrecalculateCompatibilityMeasures(precalculateEdgeCompatibilityCheckBox.isSelected());
-                jFlowMap.bundleEdges((Integer) numberOfCyclesSpinner.getValue(), fdBundlingParams);
+                jFlowMap.bundleEdges(fdBundlingParams);
             }
         });
         resetButton.addActionListener(new ActionListener() {
@@ -111,15 +111,29 @@ public class ControlPanel {
                 initForceDirectedEdgeBundlerParamsModels();
             }
         });
-        ChangeListener li = new ChangeListener() {
+        simpleCompatibilityMeasureCheckBox.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 updateDirectionAffectsCompatibilityCheckBox();
             }
-        };
-        simpleCompatibilityMeasureCheckBox.addChangeListener(li);
-        repulsiveEdgesCheckBox.addChangeListener(li);
+        });
+        repulsiveEdgesCheckBox.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                updateSimpleCompatibilityMeasureCheckBox();
+                updateDirectionAffectsCompatibilityCheckBox();
+            }
+        });
         updateDirectionAffectsCompatibilityCheckBox();
+    }
+    
+    private void updateSimpleCompatibilityMeasureCheckBox() {
+        if (repulsiveEdgesCheckBox.isSelected()) {
+            simpleCompatibilityMeasureCheckBox.setSelected(false);
+            simpleCompatibilityMeasureCheckBox.setEnabled(false);
+        } else {
+            simpleCompatibilityMeasureCheckBox.setEnabled(true);
+        }
     }
 
     private void updateDirectionAffectsCompatibilityCheckBox() {
@@ -143,7 +157,7 @@ public class ControlPanel {
     }
 
     public void initForceDirectedEdgeBundlerParamsModels() {
-        numberOfCyclesSpinner.setModel(new SpinnerNumberModel(6, 1, 10, 1));
+        numberOfCyclesSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getNumCycles(), 1, 10, 1));
         stepsInCycleSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getI(), 1, 1000, 1));
         edgeStiffnessSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getK(), 0.0, 1000.0, 1.0));
         edgeCompatibilityThresholdSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getEdgeCompatibilityThreshold(), 0.0, 1.0, 0.1));
@@ -154,7 +168,7 @@ public class ControlPanel {
         inverseQuadraticModelCheckBox.setSelected(fdBundlingParams.getUseInverseQuadraticModel());
         repulsiveEdgesCheckBox.setSelected(fdBundlingParams.getUseRepulsionForOppositeEdges());
         simpleCompatibilityMeasureCheckBox.setSelected(fdBundlingParams.getUseSimpleCompatibilityMeasure());
-        precalculateEdgeCompatibilityCheckBox.setSelected(fdBundlingParams.getPrecalculateCompatibilityMeasures());
+        precalculateEdgeCompatibilityCheckBox.setEnabled(false);
     }
 
     private void initModels() {

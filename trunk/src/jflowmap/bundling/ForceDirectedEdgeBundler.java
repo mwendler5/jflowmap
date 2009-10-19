@@ -31,13 +31,13 @@ public class ForceDirectedEdgeBundler {
     private double[] edgeLengths;
     private final String xNodeAttr;
     private final String yNodeAttr;
-    private String valueEdgeAttr;
+    private final String valueEdgeAttr;
     private final Graph graph;
 
+    private List<CompatibleEdge>[] compatibleEdgeLists;
     private Point2D.Double[] edgeStarts;
     private Point2D.Double[] edgeEnds;
     private double[] edgeValues;
-    private byte[][] edgeCompatibilityMeasures; // use byte to save memory
     private int numEdges;
     private int cycle;
 
@@ -45,7 +45,7 @@ public class ForceDirectedEdgeBundler {
     private double S;   // step size
     private int I;      // number of iteration steps performed during a cycle
     
-    private ForceDirectedBundlerParameters params;
+    private final ForceDirectedBundlerParameters params;
     
     private ProgressTracker progressTracker;
 
@@ -75,22 +75,34 @@ public class ForceDirectedEdgeBundler {
         return points;
     }
     
-    public void bundle(ProgressTracker progressTracker, int numCycles) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("ForceDirectedEdgeBundler.bundle()");
+    public void bundle(ProgressTracker pt) {
+        logger.info("FDE bundling started");
+        pt.startTask("Initializing", .05);
+        init(pt);
+        if (!pt.isCancelled()) {
+            pt.taskCompleted();
+            
+            // iterative refinement scheme
+            int numCycles = params.getNumCycles();
+            for (int cycle = 0; cycle < numCycles; cycle++) {
+                pt.startTask("Bundling cycle " + (cycle + 1) + " of " + numCycles, cycle, .95 / numCycles);
+                nextCycle();
+                pt.taskCompleted();
+                if (pt.isCancelled()) {
+                    break;
+                }
+            }
         }
-        init(progressTracker);
-        // iterative refinement scheme
-        for (int i = 0; i < numCycles; i++) {
-            logger.debug("Cycle " + i + " of " + numCycles);
-            nextCycle();
+
+        if (pt.isCancelled()) {
+            logger.info("FDE bundling cancelled");
+        } else {
+            pt.processFinished();
+            logger.info("FDE bundling finished");
         }
     }
 
-    public void init(ProgressTracker progressTracker) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("ForceDirectedEdgeBundler.init()");
-        }
+    private void init(ProgressTracker progressTracker) {
         this.progressTracker = progressTracker;
         numEdges = graph.getEdgeCount();
         edgeLengths = new double[numEdges];
@@ -103,7 +115,9 @@ public class ForceDirectedEdgeBundler {
             Edge edge = graph.getEdge(i);
             edgeStarts[i] = new Point2D.Double(getStartX(edge), getStartY(edge));
             edgeEnds[i] = new Point2D.Double(getEndX(edge), getEndY(edge));
-            edgeLengths[i] = edgeStarts[i].distance(edgeEnds[i]);
+            double length = edgeStarts[i].distance(edgeEnds[i]);
+            if (Math.abs(length) < EPS) length = 0.0;
+            edgeLengths[i] = length;
             if (params.getEdgeValueAffectsAttraction()) {
                 edgeValues[i] = getValue(edge);
             }
@@ -113,54 +127,61 @@ public class ForceDirectedEdgeBundler {
         this.P = params.getP();
         this.S = params.getS();
         
-        if (params.getPrecalculateCompatibilityMeasures()) {
-            calcEdgeCompatibilityMeasures();
-        }
+        calcEdgeCompatibilityMeasures();
         
         cycle = 0;
     }
     
     private void calcEdgeCompatibilityMeasures() {
         progressTracker.startSubtask("Allocating memory", .05);
-        edgeCompatibilityMeasures = new byte[numEdges][];
         progressTracker.subtaskCompleted();
         
         logger.info("Calculating compatibility measures");
         logger.info("Using " + (params.getUseSimpleCompatibilityMeasure() ? "simple" : "standard") + " compatibility measure");
         progressTracker.startSubtask("Precalculating edge compatibility measures", .95);
         progressTracker.setSubtaskIncUnit(100.0 / numEdges);
-        int Ccnt = 0;
+        
+        compatibleEdgeLists = new List[numEdges];
+        for (int i = 0; i < numEdges; i++) {
+            compatibleEdgeLists[i] = new ArrayList<CompatibleEdge>();
+        }
+        int numTotal = 0;
         int numCompatible = 0;
         double Csum = 0;
         for (int i = 0; i < numEdges; i++) {
-            if (progressTracker.isCancelled()) {
-                edgeCompatibilityMeasures = null;
-                return;
-            }
-            edgeCompatibilityMeasures[i] = new byte[i];
             for (int j = 0; j < i; j++) {
                 if (progressTracker.isCancelled()) {
-                    edgeCompatibilityMeasures = null;
+                    compatibleEdgeLists = null;
                     return;
                 }
                 
                 double C = calcEdgeCompatibility(i, j);
                 if (Math.abs(C) >= params.getEdgeCompatibilityThreshold()) {
+                    compatibleEdgeLists[i].add(new CompatibleEdge(j, C));
+                    compatibleEdgeLists[j].add(new CompatibleEdge(i, C));
                     numCompatible++;
                 }
                 Csum += Math.abs(C);
-                Ccnt++;
-                
-                // C is between -1.0 and 1.0, so we can multiply it by 100 and store in byte
-                // to save memory. This way we lose precision, but is not that important.
-                edgeCompatibilityMeasures[i][j] = (byte)Math.round(C * 100);
+                numTotal++;
             }
             progressTracker.incSubtaskProgress();
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("Average edge compatibility = " + (Csum / Ccnt));
-            logger.debug("Compatibility ratio = " + Math.round((numCompatible * 100.0 / Ccnt) * 100)/100.0 + "%");
+            logger.debug("Average edge compatibility = " + (Csum / numTotal));
+            logger.debug("Compatibility ratio = " + Math.round((numCompatible * 100.0 / numTotal) * 100)/100.0 + "%");
         }
+        if (progressTracker.isCancelled()) {
+            compatibleEdgeLists = null;
+        }
+    }
+    
+    private static class CompatibleEdge {
+        public CompatibleEdge(int edgeIdx, double c) {
+            this.edgeIdx = edgeIdx;
+            C = c;
+        }
+        final int edgeIdx;
+        final double C;
     }
 
     private double calcEdgeCompatibility(int i, int j) {
@@ -262,29 +283,12 @@ public class ForceDirectedEdgeBundler {
         );
     }
     
-    private double getEdgeCompatibility(int i, int j) {
-        if (i == j) return 0;
-        if (params.getPrecalculateCompatibilityMeasures()) {
-            byte C;
-            if (i > j)
-                C = edgeCompatibilityMeasures[i][j];
-            else
-                C = edgeCompatibilityMeasures[j][i];
-            return (double)C / 100.0;
-        } else {
-            return calcEdgeCompatibility(i, j);
-        }
-    }
-    
     private boolean isSelfLoop(int edgeIdx) {
-        return Math.abs(edgeLengths[edgeIdx]) == 0.0;
+        return edgeLengths[edgeIdx] == 0.0;
     }
 
     public void nextCycle() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("ForceDirectedEdgeBundler.nextCycle()");
-        }
-        
+        logger.info("FDE bundling cycle " + (cycle + 1));
         int P = this.P;
         double S = this.S;
         int I = this.I;
@@ -293,7 +297,6 @@ public class ForceDirectedEdgeBundler {
         if (cycle > 0) {
             P *= 2;
             S *= (1.0 - params.getStepDampingFactor());
-//            S /= 1.2;
             I = (I * 2) / 3;
         }
         
@@ -305,6 +308,7 @@ public class ForceDirectedEdgeBundler {
         progressTracker.subtaskCompleted();
         
         // Perform simulation steps
+        
         Point2D.Double[][] tmpEdgePoints = new Point2D.Double[numEdges][P];
         
         for (int step = 0; step < I; step++) {
@@ -313,9 +317,6 @@ public class ForceDirectedEdgeBundler {
             }
             progressTracker.startSubtask("Step " + (step + 1) + " of " + I, (1.0 - .1) / I);
             progressTracker.setSubtaskIncUnit(100.0 / numEdges);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Cycle " + (cycle + 1) + "; Step " + (step + 1) + " of " + I);
-            }
             for (int pe = 0; pe < numEdges; pe++) {
                 if (progressTracker.isCancelled()) {
                     return;
@@ -329,81 +330,62 @@ public class ForceDirectedEdgeBundler {
                 final int numOfSegments = P + 1;
                 double k_p = params.getK() / (edgeLengths[pe] * numOfSegments);
                 
+                List<CompatibleEdge> compatible = compatibleEdgeLists[pe];
+                                
                 for (int i = 0; i < P; i++) {
                     // spring forces
-                    Vector2D p_i = Vector2D.valueOf(p[i]);
-                    Vector2D p_prev = Vector2D.valueOf(i == 0 ? edgeStarts[pe] : p[i - 1]);
-                    Vector2D p_next = Vector2D.valueOf(i == P - 1 ? edgeEnds[pe] : p[i + 1]);
-                    Vector2D F_s_i = (
-                        p_prev.minus(p_i) //.times(k_p)  * p_i.distanceTo(p_prev))
-                    ).plus(
-                        p_next.minus(p_i) //.times(k_p)  * p_i.distanceTo(p_next))
-                    );
+                    Point2D p_i = p[i];
+                    Point2D p_prev = (i == 0 ? edgeStarts[pe] : p[i - 1]);
+                    Point2D p_next = (i == P - 1 ? edgeEnds[pe] : p[i + 1]);
+                    double Fsi_x = p_prev.getX() - p_i.getX() + p_next.getX() - p_i.getX();
+                    double Fsi_y = p_prev.getY() - p_i.getY() + p_next.getY() - p_i.getY();
                     
                     if (Math.abs(k_p) < 1.0) {
-                        F_s_i = F_s_i.times(k_p);
+                        Fsi_x *= k_p;
+                        Fsi_y *= k_p;
                     }
 
                     // attracting electrostatic forces (for each other edge)
-                    Vector2D F_e_i = Vector2D.ZERO;
-                    for (int qe = 0; qe < numEdges; qe++) {
-                        if (qe != pe  &&  !isSelfLoop(qe)) {
-                            double C = getEdgeCompatibility(pe, qe);
-                            if (Math.abs(C) > params.getEdgeCompatibilityThreshold()) {
-                                Vector2D q_i = Vector2D.valueOf(edgePoints[qe][i]);
-                                Vector2D v = q_i.minus(p_i);
-                                if (!v.isZero()) {  // zero vector has no direction
-                                    double d = v.length();  // shouldn't be zero
-                                    double m;
-                                    if (params.getUseInverseQuadraticModel()) {
-                                        m = (C / d) / (d * d);
-                                    } else {
-                                        m = (C / d) / d;
-                                    }
-                                    if (params.getEdgeValueAffectsAttraction()) {
-                                        m *= 1.0 + (edgeValues[qe] - edgeValues[pe])/(edgeValues[qe] + edgeValues[pe]);
-                                    }
-                                    if (Math.abs(m) < 1.0) {
-                                        v = v.times(m);
-                                    } else {
-                                        v = v.times(Math.signum(m));
-                                    }
-//                                    if (v.isNaN()) {
-//                                        // can happen if d is Infinity and ec is zero
-//                                        logger.warn("v is NaN");
-//                                    }
-                                    F_e_i = F_e_i.plus(v);
-                                }
-//                              F_e_i_v += 1 / (p[i].distance(q[i]));      // using inverse-linear model (not square)
+                    double Fei_x = 0;
+                    double Fei_y = 0;
+                    for (int ci = 0, size = compatible.size(); ci < size; ci++) {
+                        CompatibleEdge ce = compatible.get(ci);
+                        final int qe = ce.edgeIdx;
+                        final double C = ce.C;
+                        Point2D q_i = edgePoints[qe][i];
+                        
+                        double v_x = q_i.getX() - p_i.getX();
+                        double v_y = q_i.getY() - p_i.getY();
+                        if (Math.abs(v_x) > EPS  ||  Math.abs(v_y) > EPS) {  // zero vector has no direction
+                            double d = Math.sqrt(v_x * v_x + v_y * v_y);  // shouldn't be zero
+                            double m;
+                            if (params.getUseInverseQuadraticModel()) {
+                                m = (C / d) / (d * d);
+                            } else {
+                                m = (C / d) / d;
                             }
+//                            if (C < 0) m *= 0.1;
+                            if (params.getEdgeValueAffectsAttraction()) {
+//                                m *= 1.0 + (edgeValues[qe] - edgeValues[pe])/(edgeValues[qe] + edgeValues[pe]);
+                            }
+                            if (Math.abs(m * S) > 1.0) {
+                                m = Math.signum(m) / S;
+                            }
+                            v_x *= m;
+                            v_y *= m;
+                            Fei_x += v_x;
+                            Fei_y += v_y;
                         }
                     }
 
-                    if (Math.abs(F_s_i.length()) < EPS  &&  Math.abs(F_e_i.length()) < EPS) {
-                        newP[i] = p[i];
-                        continue;
+                    double Fpi_x = Fsi_x + Fei_x;
+                    double Fpi_y = Fsi_y + Fei_y;
+                    Point2D.Double np = newP[i];
+                    if (np == null) {
+                        np = new Point2D.Double(p[i].getX(), p[i].getY());
                     }
-                    Vector2D F_p_i = F_s_i.plus(F_e_i);
-                    newP[i] = F_p_i.times(S).movePoint(p[i]);
-
-                    if (F_s_i.isNaN()) {
-                        throw new AssertionError("F_s_i is NaN");
-                    }
-                    if (F_e_i.isNaN()) {
-                        throw new AssertionError("F_e_i is NaN");
-                    }
-                    if (Double.isInfinite(newP[i].x)  &&  Double.isInfinite(newP[i].y)) {
-                        throw new AssertionError("Point moved to infinity");
-                    }
-//                    if (Math.abs(F_s_i.length() / F_e_i.length()) > 1e5  ||  Math.abs(F_e_i.length() / F_s_i.length()) > 1e5) {
-//                        logger.warn("F_s_i and F_e_i differ in more than five orders of magnitude: F_s_i = " + F_s_i.length() + ", F_e_i = " + F_e_i.length());
-//                    }
-//                    if (F_s_i.length() > 1e10) {
-//                        logger.warn("Extremely high F_s_i value: F_s_i = " + F_s_i.length());
-//                    }
-//                    if (F_e_i.length() > 1e10) {
-//                        logger.warn("Extremely high F_e_i value: F_e_i = " + F_e_i.length());
-//                    }
+                    np.setLocation(np.getX() + Fpi_x * S, np.getY() + Fpi_y * S);
+                    newP[i] = np;
                 }
                 progressTracker.incSubtaskProgress();
             }
@@ -475,7 +457,16 @@ public class ForceDirectedEdgeBundler {
             throw new RuntimeException("Src and dest array sizes mismatch");
         }
         for (int i = 0; i < src.length; i++) {
-            System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
+//            System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
+            for (int j = 0, len = src[i].length; j < len; j++) {
+                Point2D.Double ps = src[i][j];
+                if (ps == null)
+                    dest[i][j] = null;
+                else
+                    dest[i][j] = new Point2D.Double(ps.getX(), ps.getY());
+//                Point2D.Double pd = dest[i][j];
+//                pd.setLocation(ps.getX(), ps.getY());
+            }
         }
     }
     

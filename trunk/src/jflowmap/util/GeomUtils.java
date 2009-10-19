@@ -39,5 +39,5 @@ public final class GeomUtils {
                 a.getY() + (b.getY() - a.getY()) * alpha
         );
     }
-
+    
 }

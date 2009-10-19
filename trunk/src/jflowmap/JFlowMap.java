@@ -69,8 +69,8 @@ public class JFlowMap extends JComponent {
         visualFlowMap.resetBundling();
     }
 
-    public void bundleEdges(int numCycles, ForceDirectedBundlerParameters params) {
-        visualFlowMap.bundleEdges(numCycles, params);
+    public void bundleEdges(ForceDirectedBundlerParameters params) {
+        visualFlowMap.bundleEdges(params);
     }
 
     public Frame getApp() {
@@ -160,6 +160,7 @@ public class JFlowMap extends JComponent {
     
     public static final DatasetSpec[] datasetSpecs = new DatasetSpec[] {
             new DatasetSpec("data/airlines.xml", "value", "tooltip", null),
+            new DatasetSpec("data/migrations-unique.xml", "value", "tooltip", null, 1000),
             new DatasetSpec("data/refugee-flows-1985.xml", "refugees", "name", "data/countries-areas.xml"),
             new DatasetSpec("data/bundling-test.xml", "data", "name", null),
             new DatasetSpec("data/bundling-test2.xml", "data", "name", null),
@@ -167,8 +168,6 @@ public class JFlowMap extends JComponent {
             new DatasetSpec("data/bundling-test4.xml", "data", "name", null),
             new DatasetSpec("data/bundling-test5.xml", "data", "name", null),
             new DatasetSpec("data/bundling-test6.xml", "data", "name", null),
-            new DatasetSpec("data/migrations-unique.xml", "value", "tooltip", null),
-            new DatasetSpec("data/migrations.xml", "value", "tooltip", null),
             new DatasetSpec("data/refugee-flows-2008.xml", "refugees", "name", "data/countries-areas.xml", 1000),
             new DatasetSpec("data/refugee-flows-2007.xml", "refugees", "name", "data/countries-areas.xml", 1000),
             new DatasetSpec("data/refugee-flows-2006.xml", "refugees", "name", "data/countries-areas.xml", 1000),

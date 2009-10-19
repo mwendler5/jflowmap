@@ -30,7 +30,11 @@ public class Vector2D {
     }
     
     public boolean isZero() {
-        return Math.abs(x) == 0.0  &&  Math.abs(y) == 0.0;
+        return isZero(0.0);
+    }
+    
+    public boolean isZero(double eps) {
+        return Math.abs(x) < eps  &&  Math.abs(y) < eps;
     }
 
     public double dot(Vector2D b) {
