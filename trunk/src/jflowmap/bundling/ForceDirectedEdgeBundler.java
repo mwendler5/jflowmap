@@ -364,7 +364,7 @@ public class ForceDirectedEdgeBundler {
                             } else {
                                 m = (C / d) / d;
                             }
-//                            if (C < 0) m *= 0.1;
+//                            if (C < 0) m *= 0.05;
                             if (params.getEdgeValueAffectsAttraction()) {
 //                                m *= 1.0 + (edgeValues[qe] - edgeValues[pe])/(edgeValues[qe] + edgeValues[pe]);
                             }

@@ -230,27 +230,36 @@ public abstract class VisualEdge extends PNode {
     public void updateEdgeColors() {
         PPath ppath = getEdgePPath();
         if (ppath != null) {
-//            Paint paint = getValueColor(STROKE_PAINT, false);
-            Paint paint = getEdgeGradientPaint();
-            ppath.setStrokePaint(paint);
+            ppath.setStrokePaint(getEdgePaint());
         }
     }
 
+    private Paint getEdgePaint() {
+//      Paint paint = STROKE_PAINT;
+//      Paint paint = new Color(
+//              STROKE_PAINT.getRed(), STROKE_PAINT.getGreen(), STROKE_PAINT.getBlue(),
+//              getVisualFlowMap().getModel().getEdgeAlpha());
+//      Paint paint = getValueColor(STROKE_PAINT, false);
+        Paint paint = getEdgeGradientPaint();
+        return paint;
+    }
+    
     public void setHighlighted(boolean value, boolean showDirection, boolean outgoing) {
         PPath ppath = getEdgePPath();
         if (ppath != null) {
-            Color paint;
+            Paint paint;
             if (value) {
+                Color color;
                 if (showDirection) {
-                    paint = (outgoing ? STROKE_HIGHLIGHTED_OUTGOING_PAINT : STROKE_HIGHLIGHTED_INCOMING_PAINT);
+                    color = (outgoing ? STROKE_HIGHLIGHTED_OUTGOING_PAINT : STROKE_HIGHLIGHTED_INCOMING_PAINT);
                 } else {
-                    paint = STROKE_HIGHLIGHTED_PAINT;
+                    color = STROKE_HIGHLIGHTED_PAINT;
                 }
+                paint = getValueColor(color, false);
             } else {
-                paint = STROKE_PAINT;
+                paint = getEdgePaint();
             }
-            Color color = getValueColor(paint, false);
-            ppath.setStrokePaint(color);
+            ppath.setStrokePaint(paint);
             getSourceNode().setVisible(value);
             getTargetNode().setVisible(value);
         }

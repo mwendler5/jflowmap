@@ -20,12 +20,15 @@ public class LineVisualEdge extends VisualEdge {
 
     private static final double MARKER_SIZE = 6;
 
-    private final PPath startMarker;
-    private final PPath endMarker;
+    private PPath startMarker;
+    private PPath endMarker;
+
+    private boolean showMarkers;
 
     public LineVisualEdge(VisualFlowMap visualFlowMap, Edge edge,
-            VisualNode sourceNode, VisualNode targetNode) {
+            VisualNode sourceNode, VisualNode targetNode, boolean showMarkers) {
         super(visualFlowMap, edge, sourceNode, targetNode);
+        this.showMarkers = showMarkers;
         targetNode.addIncomingEdge(this);
         sourceNode.addOutgoingEdge(this);
 
@@ -45,39 +48,49 @@ public class LineVisualEdge extends VisualEdge {
             markerSize = MARKER_SIZE;
         }
         
-        final double sin_a = (x1 - x2) / edgeLength;
-        final double cos_a = (y1 - y2) / edgeLength;
-        double sm_x = x1 - markerSize * sin_a;
-        double sm_y = y1 - markerSize * cos_a;
+        double ex1, ex2, ey1, ey2;
+        if (showMarkers) {
+            final double sin_a = (x1 - x2) / edgeLength;
+            final double cos_a = (y1 - y2) / edgeLength;
+            double ms_x = x1 - markerSize * sin_a;
+            double ms_y = y1 - markerSize * cos_a;
+            double me_y = y2 + markerSize * cos_a;
+            double me_x = x2 + markerSize * sin_a;
 
-        double em_x = x2 + markerSize * sin_a;
-        double em_y = y2 + markerSize * cos_a;
+            startMarker = new PPath(new Line2D.Double(x1, y1, ms_x, ms_y));
+            addChild(startMarker);
+            endMarker = new PPath(new Line2D.Double(me_x, me_y, x2, y2));
+            addChild(endMarker);
 
+            ex1 = ms_x;
+            ex2 = me_x;
+            ey1 = ms_y;
+            ey2 = me_y;
+        } else {
+            ex1 = x1;
+            ex2 = x2;
+            ey1 = y1;
+            ey2 = y2;
+        }
         
-        startMarker = new PPath(new Line2D.Double(x1, y1, sm_x, sm_y));
-        addChild(startMarker);
-        
-        endMarker = new PPath(new Line2D.Double(em_x, em_y, x2, y2));
-        addChild(endMarker);
-
-
 //        final double width = getVisualFlowMap().getMaxEdgeWidth();   // TODO: update dynamically
-        PPath line = new PPath(new Line2D.Double(
-                sm_x /*- sin_a * width*/, sm_y /*- cos_a * width*/,
-                em_x /*+ sin_a * width*/, em_y /*+ cos_a * width*/));
+        PPath line = new PPath(new Line2D.Double(ex1, ey1, ex2, ey2));
         setEdgePPath(line);
         addChild(line);
     }
 
     public void updateEdgeMarkerColors() {
+        if (!showMarkers) return;
         startMarker.setStrokePaint(getValueColor(START_MARKER_STROKE_PAINT, true));
         endMarker.setStrokePaint(getValueColor(END_MARKER_STROKE_PAINT, true));
     }
 
     public void updateEdgeWidth() {
         Stroke stroke = createStroke();
-        startMarker.setStroke(stroke);
-        endMarker.setStroke(stroke);
+        if (showMarkers) {
+            startMarker.setStroke(stroke);
+            endMarker.setStroke(stroke);
+        }
         getEdgePPath().setStroke(stroke);
     }
 }

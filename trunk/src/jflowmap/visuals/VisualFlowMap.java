@@ -115,6 +115,7 @@ public class VisualFlowMap extends PNode {
         edgesToVisuals = new LinkedHashMap<Edge, VisualEdge>();
         @SuppressWarnings("unchecked")
         
+//        Iterator<Integer> it = graph.getEdgeTable().rows();
         Iterator<Integer> it = graph.getEdgeTable().rowsSortedBy(model.getValueEdgeAttr(), true);
 
         while (it.hasNext()) {
@@ -143,7 +144,7 @@ public class VisualFlowMap extends PNode {
 
                 VisualEdge ve;
                 if (edgeSplinePoints == null) {
-                    ve = new LineVisualEdge(this, edge, fromNode, toNode);
+                    ve = new LineVisualEdge(this, edge, fromNode, toNode, true);
                 } else {
                     ve = new BSplineVisualEdge(this, edge, fromNode, toNode, edgeSplinePoints[edge.getRow()], showPoints);
                 }
