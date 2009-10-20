@@ -364,7 +364,9 @@ public class ForceDirectedEdgeBundler {
                             } else {
                                 m = (C / d) / d;
                             }
-//                            if (C < 0) m *= 0.05;
+                            if (C < 0) {    // means that repulsion is enabled
+                                m *= params.getRepulsionAmount();
+                            }
                             if (params.getEdgeValueAffectsAttraction()) {
 //                                m *= 1.0 + (edgeValues[qe] - edgeValues[pe])/(edgeValues[qe] + edgeValues[pe]);
                             }

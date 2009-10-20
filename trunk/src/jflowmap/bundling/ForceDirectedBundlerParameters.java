@@ -18,6 +18,7 @@ public class ForceDirectedBundlerParameters {
     private boolean useRepulsionForOppositeEdges; // for compatible edges going into opposite directions
     private boolean useSimpleCompatibilityMeasure;
     private boolean edgeValueAffectsAttraction;
+    private double repulsionAmount;
     
     public ForceDirectedBundlerParameters() {
         resetToDefaults();
@@ -29,6 +30,7 @@ public class ForceDirectedBundlerParameters {
         S = 0.4;
         I = 50;
         K = 0.1;
+        repulsionAmount = 1.0;
         stepDampingFactor = 0.5;
         edgeCompatibilityThreshold = 0.60;
         directionAffectsCompatibility = true;
@@ -152,5 +154,14 @@ public class ForceDirectedBundlerParameters {
         this.edgeValueAffectsAttraction = edgeValueAffectsAttraction;
     }
 
-    
+    public double getRepulsionAmount() {
+        return repulsionAmount;
+    }
+
+    public void setRepulsionAmount(double repulsionAmount) {
+        this.repulsionAmount = repulsionAmount;
+    }
+
+
+
 }

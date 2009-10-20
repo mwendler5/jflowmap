@@ -2,12 +2,11 @@
 <project relativePaths="false" version="4">
   <component name="ChangeListManager">
     <list default="true" readonly="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/visuals/LineVisualEdge.java" afterPath="$PROJECT_DIR$/src/jflowmap/visuals/LineVisualEdge.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/visuals/VisualEdge.java" afterPath="$PROJECT_DIR$/src/jflowmap/visuals/VisualEdge.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.form" afterPath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.form" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedBundlerParameters.java" afterPath="$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedBundlerParameters.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/JFlowMap.iws" afterPath="$PROJECT_DIR$/JFlowMap.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/JFlowMap.java" afterPath="$PROJECT_DIR$/src/jflowmap/JFlowMap.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java" afterPath="$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedEdgeBundler.java" afterPath="$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedEdgeBundler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java" afterPath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/JFlowMap.ipr" afterPath="$PROJECT_DIR$/JFlowMap.ipr" />
     </list>
     <ignored path=".idea/workspace.xml" />
     <ignored path="JFlowMap.iws" />
@@ -87,7 +86,7 @@
       <file leaf-file-name="ForceDirectedBundlerParameters.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedBundlerParameters.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="4" selection-start="1452" selection-end="1452" vertical-scroll-proportion="0.0">
+            <state line="32" column="23" selection-start="1198" selection-end="1213" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -106,6 +105,75 @@
         <entry file="file://$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.form">
           <provider selected="true" editor-type-id="ui-designer">
             <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ControlPanel.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="132" column="69" selection-start="5830" selection-end="5830" vertical-scroll-proportion="0.0">
+              <folding>
+                <marker date="1256048591981" expanded="true" signature="3058:5715" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="3248:4569" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="3305:4559" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="4631:4755" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="4688:4745" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="4825:5019" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="4882:5009" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="5104:5246" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="5158:5236" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="5319:5563" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="5373:5553" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="5759:5840" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="5902:6185" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="6250:6593" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="6659:6747" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="6783:6922" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="6983:8285" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="8317:10225" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="10266:15548" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="10328:10536" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="10385:10526" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="10638:10879" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="10692:10869" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="10950:11282" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="11004:11272" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="11354:11595" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="11408:11585" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="11666:11998" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="11720:11988" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="12103:12347" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="12157:12337" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="12419:12759" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="12473:12749" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="12832:13076" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="12886:13066" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="13148:13488" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="13202:13478" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="13583:13789" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="13637:13779" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="13857:14143" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="13911:14133" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="14250:14468" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="14304:14458" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="14542:14846" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="14596:14836" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="14939:15180" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="14993:15170" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="15249:15540" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="15303:15530" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="15609:15792" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="15842:15878" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="15950:16266" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="16330:16586" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="16648:16705" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="16767:16802" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="16833:16863" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="16914:18218" placeholder="{...}" />
+                <marker date="1256048591981" expanded="true" signature="19087:19153" placeholder="{...}" />
+                <marker date="1256048591981" expanded="false" signature="19159:35630" placeholder="UI Designer generated code" />
+              </folding>
+            </state>
           </provider>
         </entry>
       </file>
@@ -137,18 +205,7 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectPane">
-    <subPane>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="JFlowMap" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="JFlowMap" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-      </PATH>
-    </subPane>
+    <subPane />
   </component>
   <component name="ProjectReloadState">
     <option name="STATE" value="0" />
@@ -169,22 +226,25 @@
   </component>
   <component name="PropertiesComponent">
     <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="project.structure.last.edited" value="Facets" />
+    <property name="project.structure.proportion" value="0.0" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="RunManagerConfig.showSettingsBeforeRunnig" value="true" />
-    <property name="options.lastSelected" value="com.intellij.openapi.vcs.configurable.VcsManagerConfigurable$4" />
+    <property name="RunManagerConfig.showSettingsBeforeRunnig" value="false" />
     <property name="MemberChooser.sorted" value="false" />
+    <property name="options.lastSelected" value="com.maddyhome.idea.copyright.ui.CopyrightProfilesPanel" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="options.searchVisible" value="true" />
-    <property name="options.splitter.details.proportions" value="0.2" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="dynamic.classpath" value="false" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RunManager" selected="Application.FlowMapMain">
     <tempConfiguration default="false" name="FlowMapMain" type="Application" factoryName="Application" enabled="false" merge="false" sample_coverage="true" runner="emma">
       <option name="MAIN_CLASS_NAME" value="jflowmap.FlowMapMain" />
-      <option name="VM_PARAMETERS" value="-ea -Xmx1024m" />
+      <option name="VM_PARAMETERS" value="-ea -Xmx256m" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -338,30 +398,30 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="-4" width="1288" height="1002" extended-state="7" />
+    <frame x="-4" y="-4" width="1288" height="1002" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18446602" sideWeight="0.66239816" order="2" side_tool="false" />
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32945284" sideWeight="0.5" order="7" side_tool="false" />
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.11326861" sideWeight="0.66239816" order="3" side_tool="false" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.11326861" sideWeight="0.66239816" order="6" side_tool="false" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" />
-      <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
-      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32945284" sideWeight="0.5" order="7" side_tool="false" />
+      <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" />
+      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32945284" sideWeight="0.5" order="10" side_tool="false" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.66239816" order="0" side_tool="false" />
-      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
-      <window_info id="Web Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24979724" sideWeight="0.66239816" order="0" side_tool="false" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" />
+      <window_info id="Web Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32945284" sideWeight="0.5" order="2" side_tool="false" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32945284" sideWeight="0.5" order="2" side_tool="false" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" />
@@ -421,9 +481,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/jflowmap/FlowMapMain.java">
+    <entry file="file://$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="13" selection-start="416" selection-end="416" vertical-scroll-proportion="0.0">
+        <state line="368" column="17" selection-start="12888" selection-end="12888" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -435,17 +495,84 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedBundlerParameters.java">
+    <entry file="file://$PROJECT_DIR$/src/jflowmap/FlowMapMain.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="4" selection-start="1452" selection-end="1452" vertical-scroll-proportion="0.0">
+        <state line="20" column="13" selection-start="416" selection-end="416" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java">
+    <entry file="file://$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedBundlerParameters.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="368" column="17" selection-start="12888" selection-end="12888" vertical-scroll-proportion="0.0">
+        <state line="32" column="23" selection-start="1198" selection-end="1213" vertical-scroll-proportion="0.0">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="132" column="69" selection-start="5830" selection-end="5830" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1256048591981" expanded="true" signature="3058:5715" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="3248:4569" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="3305:4559" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="4631:4755" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="4688:4745" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="4825:5019" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="4882:5009" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="5104:5246" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="5158:5236" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="5319:5563" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="5373:5553" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="5759:5840" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="5902:6185" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="6250:6593" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="6659:6747" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="6783:6922" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="6983:8285" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="8317:10225" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="10266:15548" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="10328:10536" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="10385:10526" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="10638:10879" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="10692:10869" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="10950:11282" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="11004:11272" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="11354:11595" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="11408:11585" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="11666:11998" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="11720:11988" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="12103:12347" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="12157:12337" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="12419:12759" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="12473:12749" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="12832:13076" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="12886:13066" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="13148:13488" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="13202:13478" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="13583:13789" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="13637:13779" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="13857:14143" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="13911:14133" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="14250:14468" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="14304:14458" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="14542:14846" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="14596:14836" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="14939:15180" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="14993:15170" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="15249:15540" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="15303:15530" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="15609:15792" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="15842:15878" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="15950:16266" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="16330:16586" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="16648:16705" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="16767:16802" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="16833:16863" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="16914:18218" placeholder="{...}" />
+            <marker date="1256048591981" expanded="true" signature="19087:19153" placeholder="{...}" />
+            <marker date="1256048591981" expanded="false" signature="19159:35630" placeholder="UI Designer generated code" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -462,8 +589,15 @@
           <value>
             <UIState>
               <option name="proportions">
-                <SplitterProportionsDataImpl />
+                <SplitterProportionsDataImpl>
+                  <option name="proportions">
+                    <list>
+                      <option value="0.2" />
+                    </list>
+                  </option>
+                </SplitterProportionsDataImpl>
               </option>
+              <option name="lastEditedConfigurable" value="my" />
             </UIState>
           </value>
         </entry>
@@ -471,8 +605,15 @@
           <value>
             <UIState>
               <option name="proportions">
-                <SplitterProportionsDataImpl />
+                <SplitterProportionsDataImpl>
+                  <option name="proportions">
+                    <list>
+                      <option value="0.2" />
+                    </list>
+                  </option>
+                </SplitterProportionsDataImpl>
               </option>
+              <option name="lastEditedConfigurable" value="Default|IDE Profiles" />
             </UIState>
           </value>
         </entry>
@@ -509,8 +650,15 @@
           <value>
             <UIState>
               <option name="proportions">
-                <SplitterProportionsDataImpl />
+                <SplitterProportionsDataImpl>
+                  <option name="proportions">
+                    <list>
+                      <option value="0.2" />
+                    </list>
+                  </option>
+                </SplitterProportionsDataImpl>
               </option>
+              <option name="lastEditedConfigurable" value="my" />
             </UIState>
           </value>
         </entry>
@@ -518,8 +666,15 @@
           <value>
             <UIState>
               <option name="proportions">
-                <SplitterProportionsDataImpl />
+                <SplitterProportionsDataImpl>
+                  <option name="proportions">
+                    <list>
+                      <option value="0.2" />
+                    </list>
+                  </option>
+                </SplitterProportionsDataImpl>
               </option>
+              <option name="lastEditedConfigurable" value="Default|IDE Profiles" />
             </UIState>
           </value>
         </entry>

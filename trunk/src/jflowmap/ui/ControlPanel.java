@@ -73,7 +73,7 @@ public class ControlPanel {
     private JCheckBox repulsiveEdgesCheckBox;
     private JCheckBox simpleCompatibilityMeasureCheckBox;
     private JCheckBox showNodesCheckBox;
-    private JCheckBox precalculateEdgeCompatibilityCheckBox;
+    private JSpinner repulsionSpinner;
     private FlowMapParamsModel flowMapModel;
     private final JFlowMap jFlowMap;
     private boolean initializing;
@@ -97,6 +97,7 @@ public class ControlPanel {
                 fdBundlingParams.setUseInverseQuadraticModel(inverseQuadraticModelCheckBox.isSelected());
                 fdBundlingParams.setUseRepulsionForOppositeEdges(repulsiveEdgesCheckBox.isSelected());
                 fdBundlingParams.setUseSimpleCompatibilityMeasure(simpleCompatibilityMeasureCheckBox.isSelected());
+                fdBundlingParams.setRepulsionAmount((Double) repulsionSpinner.getValue());
                 jFlowMap.bundleEdges(fdBundlingParams);
             }
         });
@@ -112,21 +113,26 @@ public class ControlPanel {
             }
         });
         simpleCompatibilityMeasureCheckBox.addChangeListener(new ChangeListener() {
-            @Override
             public void stateChanged(ChangeEvent e) {
                 updateDirectionAffectsCompatibilityCheckBox();
             }
         });
         repulsiveEdgesCheckBox.addChangeListener(new ChangeListener() {
-            @Override
             public void stateChanged(ChangeEvent e) {
                 updateSimpleCompatibilityMeasureCheckBox();
                 updateDirectionAffectsCompatibilityCheckBox();
+                updateRepulsionSpinner();
             }
         });
         updateDirectionAffectsCompatibilityCheckBox();
+        updateDirectionAffectsCompatibilityCheckBox();
+        updateRepulsionSpinner();
     }
-    
+
+    private void updateRepulsionSpinner() {
+        repulsionSpinner.setEnabled(repulsiveEdgesCheckBox.isSelected());
+    }
+
     private void updateSimpleCompatibilityMeasureCheckBox() {
         if (repulsiveEdgesCheckBox.isSelected()) {
             simpleCompatibilityMeasureCheckBox.setSelected(false);
@@ -168,7 +174,7 @@ public class ControlPanel {
         inverseQuadraticModelCheckBox.setSelected(fdBundlingParams.getUseInverseQuadraticModel());
         repulsiveEdgesCheckBox.setSelected(fdBundlingParams.getUseRepulsionForOppositeEdges());
         simpleCompatibilityMeasureCheckBox.setSelected(fdBundlingParams.getUseSimpleCompatibilityMeasure());
-        precalculateEdgeCompatibilityCheckBox.setEnabled(false);
+        repulsionSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getRepulsionAmount(), 0.0, 1.0, 0.1));
     }
 
     private void initModels() {
@@ -592,7 +598,7 @@ public class ControlPanel {
         showNodesCheckBox.setText("Show nodes");
         panel6.add(showNodesCheckBox, cc.xy(15, 1));
         final JPanel panel7 = new JPanel();
-        panel7.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:12dlu:noGrow,fill:p:noGrow,fill:d:noGrow,left:max(p;100px):noGrow,left:4dlu:noGrow,fill:d:noGrow,left:4dlu:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow"));
+        panel7.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:12dlu:noGrow,fill:p:noGrow,fill:d:noGrow,left:d:noGrow,left:6dlu:noGrow,fill:m:noGrow,left:4dlu:noGrow,fill:d:noGrow,left:4dlu:noGrow,fill:max(p;55px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow"));
         tabbedPane1.addTab("Force-Directed Edge Bundling", panel7);
         panel7.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         final JSeparator separator8 = new JSeparator();
@@ -649,24 +655,26 @@ public class ControlPanel {
         final JSeparator separator10 = new JSeparator();
         separator10.setOrientation(1);
         panel7.add(separator10, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
-        repulsiveEdgesCheckBox = new JCheckBox();
-        repulsiveEdgesCheckBox.setText("Repulsive edges");
-        panel7.add(repulsiveEdgesCheckBox, cc.xy(17, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        directionAffectsCompatibilityCheckBox = new JCheckBox();
+        directionAffectsCompatibilityCheckBox.setText("Direction affects compatibility");
+        panel7.add(directionAffectsCompatibilityCheckBox, cc.xy(17, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
         simpleCompatibilityMeasureCheckBox = new JCheckBox();
         simpleCompatibilityMeasureCheckBox.setText("Simple compatibility measure");
         panel7.add(simpleCompatibilityMeasureCheckBox, cc.xy(17, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        inverseQuadraticModelCheckBox = new JCheckBox();
-        inverseQuadraticModelCheckBox.setText("Inverse-quadratic model");
-        panel7.add(inverseQuadraticModelCheckBox, cc.xyw(19, 1, 2, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        directionAffectsCompatibilityCheckBox = new JCheckBox();
-        directionAffectsCompatibilityCheckBox.setText("Direction affects compatibility");
-        panel7.add(directionAffectsCompatibilityCheckBox, cc.xyw(19, 3, 2, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        repulsionSpinner = new JSpinner();
+        panel7.add(repulsionSpinner, cc.xy(23, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        repulsiveEdgesCheckBox = new JCheckBox();
+        repulsiveEdgesCheckBox.setText("Repulsion:");
+        panel7.add(repulsiveEdgesCheckBox, cc.xy(21, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         binaryCompatibilityCheckBox = new JCheckBox();
         binaryCompatibilityCheckBox.setText("Binary compatibility");
         panel7.add(binaryCompatibilityCheckBox, cc.xy(17, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        precalculateEdgeCompatibilityCheckBox = new JCheckBox();
-        precalculateEdgeCompatibilityCheckBox.setText("Precompute edge compatibility");
-        panel7.add(precalculateEdgeCompatibilityCheckBox, cc.xy(19, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        inverseQuadraticModelCheckBox = new JCheckBox();
+        inverseQuadraticModelCheckBox.setText("Inverse-quadratic model");
+        panel7.add(inverseQuadraticModelCheckBox, cc.xyw(21, 1, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        final JSeparator separator11 = new JSeparator();
+        separator11.setOrientation(1);
+        panel7.add(separator11, cc.xywh(19, 1, 1, 6, CellConstraints.CENTER, CellConstraints.FILL));
     }
 
     /**

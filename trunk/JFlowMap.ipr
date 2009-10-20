@@ -31,6 +31,12 @@
     </wildcardResourcePatterns>
   </component>
   <component name="CopyrightManager" default="">
+    <copyright>
+      <option name="notice" value="Copyright (c) &amp;#36;today.year. Ilya Boyandin" />
+      <option name="keyword" value="Copyright" />
+      <option name="myName" value="my" />
+      <option name="myLocal" value="true" />
+    </copyright>
     <module2copyright />
   </component>
   <component name="DependencyValidationManager">

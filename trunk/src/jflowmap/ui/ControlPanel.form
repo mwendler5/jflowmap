@@ -564,10 +564,13 @@
             <colspec value="left:12dlu:noGrow"/>
             <colspec value="fill:p:noGrow"/>
             <colspec value="fill:d:noGrow"/>
-            <colspec value="left:max(p;100px):noGrow"/>
+            <colspec value="left:d:noGrow"/>
+            <colspec value="left:6dlu:noGrow"/>
+            <colspec value="fill:m:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(p;55px):noGrow"/>
             <constraints>
               <tabbedpane title="Force-Directed Edge Bundling"/>
             </constraints>
@@ -734,13 +737,13 @@
                   <orientation value="1"/>
                 </properties>
               </component>
-              <component id="a30d2" class="javax.swing.JCheckBox" binding="repulsiveEdgesCheckBox" default-binding="true">
+              <component id="500e9" class="javax.swing.JCheckBox" binding="directionAffectsCompatibilityCheckBox" default-binding="true">
                 <constraints>
                   <grid row="0" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <text value="Repulsive edges"/>
+                  <text value="Direction affects compatibility"/>
                 </properties>
               </component>
               <component id="83fa4" class="javax.swing.JCheckBox" binding="simpleCompatibilityMeasureCheckBox" default-binding="true">
@@ -752,22 +755,20 @@
                   <text value="Simple compatibility measure"/>
                 </properties>
               </component>
-              <component id="7954a" class="javax.swing.JCheckBox" binding="inverseQuadraticModelCheckBox" default-binding="true">
+              <component id="e3e63" class="javax.swing.JSpinner" binding="repulsionSpinner">
                 <constraints>
-                  <grid row="0" column="18" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="22" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
-                <properties>
-                  <text value="Inverse-quadratic model"/>
-                </properties>
+                <properties/>
               </component>
-              <component id="500e9" class="javax.swing.JCheckBox" binding="directionAffectsCompatibilityCheckBox" default-binding="true">
+              <component id="a30d2" class="javax.swing.JCheckBox" binding="repulsiveEdgesCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="2" column="18" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="20" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <text value="Direction affects compatibility"/>
+                  <text value="Repulsion:"/>
                 </properties>
               </component>
               <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
@@ -779,13 +780,22 @@
                   <text value="Binary compatibility"/>
                 </properties>
               </component>
-              <component id="d8a4" class="javax.swing.JCheckBox" binding="precalculateEdgeCompatibilityCheckBox">
+              <component id="7954a" class="javax.swing.JCheckBox" binding="inverseQuadraticModelCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="4" column="18" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="20" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <text value="Precompute compatibility (requires memory)"/>
+                  <text value="Inverse-quadratic model"/>
+                </properties>
+              </component>
+              <component id="8eae9" class="javax.swing.JSeparator">
+                <constraints>
+                  <grid row="0" column="18" row-span="6" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <orientation value="1"/>
                 </properties>
               </component>
             </children>
