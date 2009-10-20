@@ -74,6 +74,7 @@ public class ControlPanel {
     private JCheckBox simpleCompatibilityMeasureCheckBox;
     private JCheckBox showNodesCheckBox;
     private JSpinner repulsionSpinner;
+    private JCheckBox edgeValueAffectsAttractionCheckBox;
     private FlowMapParamsModel flowMapModel;
     private final JFlowMap jFlowMap;
     private boolean initializing;
@@ -98,6 +99,7 @@ public class ControlPanel {
                 fdBundlingParams.setUseRepulsionForOppositeEdges(repulsiveEdgesCheckBox.isSelected());
                 fdBundlingParams.setUseSimpleCompatibilityMeasure(simpleCompatibilityMeasureCheckBox.isSelected());
                 fdBundlingParams.setRepulsionAmount((Double) repulsionSpinner.getValue());
+                fdBundlingParams.setEdgeValueAffectsAttraction(edgeValueAffectsAttractionCheckBox.isSelected());
                 jFlowMap.bundleEdges(fdBundlingParams);
             }
         });
@@ -174,6 +176,7 @@ public class ControlPanel {
         inverseQuadraticModelCheckBox.setSelected(fdBundlingParams.getUseInverseQuadraticModel());
         repulsiveEdgesCheckBox.setSelected(fdBundlingParams.getUseRepulsionForOppositeEdges());
         simpleCompatibilityMeasureCheckBox.setSelected(fdBundlingParams.getUseSimpleCompatibilityMeasure());
+        edgeValueAffectsAttractionCheckBox.setSelected(fdBundlingParams.getEdgeValueAffectsAttraction());
         repulsionSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getRepulsionAmount(), 0.0, 1.0, 0.1));
     }
 
@@ -598,7 +601,7 @@ public class ControlPanel {
         showNodesCheckBox.setText("Show nodes");
         panel6.add(showNodesCheckBox, cc.xy(15, 1));
         final JPanel panel7 = new JPanel();
-        panel7.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:12dlu:noGrow,fill:p:noGrow,fill:d:noGrow,left:d:noGrow,left:6dlu:noGrow,fill:m:noGrow,left:4dlu:noGrow,fill:d:noGrow,left:4dlu:noGrow,fill:max(p;55px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow"));
+        panel7.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:12dlu:noGrow,fill:p:noGrow,fill:d:noGrow,left:d:noGrow,left:6dlu:noGrow,fill:m:noGrow,left:4dlu:noGrow,fill:d:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:69px:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow"));
         tabbedPane1.addTab("Force-Directed Edge Bundling", panel7);
         panel7.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         final JSeparator separator8 = new JSeparator();
@@ -675,6 +678,9 @@ public class ControlPanel {
         final JSeparator separator11 = new JSeparator();
         separator11.setOrientation(1);
         panel7.add(separator11, cc.xywh(19, 1, 1, 6, CellConstraints.CENTER, CellConstraints.FILL));
+        edgeValueAffectsAttractionCheckBox = new JCheckBox();
+        edgeValueAffectsAttractionCheckBox.setText("Edge value affects attraction");
+        panel7.add(edgeValueAffectsAttractionCheckBox, cc.xyw(21, 5, 5));
     }
 
     /**

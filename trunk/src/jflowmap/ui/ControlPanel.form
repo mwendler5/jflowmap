@@ -570,7 +570,9 @@
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:max(p;55px):noGrow"/>
+            <colspec value="fill:p:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:69px:noGrow"/>
             <constraints>
               <tabbedpane title="Force-Directed Edge Bundling"/>
             </constraints>
@@ -757,7 +759,7 @@
               </component>
               <component id="e3e63" class="javax.swing.JSpinner" binding="repulsionSpinner">
                 <constraints>
-                  <grid row="2" column="22" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="22" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
@@ -796,6 +798,15 @@
                 </constraints>
                 <properties>
                   <orientation value="1"/>
+                </properties>
+              </component>
+              <component id="9b4e8" class="javax.swing.JCheckBox" binding="edgeValueAffectsAttractionCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="4" column="20" row-span="1" col-span="5" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Edge value affects attraction"/>
                 </properties>
               </component>
             </children>

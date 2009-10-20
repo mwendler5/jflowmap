@@ -38,6 +38,7 @@ public class ForceDirectedEdgeBundler {
     private Point2D.Double[] edgeStarts;
     private Point2D.Double[] edgeEnds;
     private double[] edgeValues;
+    private double edgeValueMax, edgeValueMin;
     private int numEdges;
     private int cycle;
 
@@ -108,6 +109,7 @@ public class ForceDirectedEdgeBundler {
         edgeLengths = new double[numEdges];
         edgeStarts = new Point2D.Double[numEdges];
         edgeEnds = new Point2D.Double[numEdges];
+        double evMin = Double.POSITIVE_INFINITY, evMax = Double.NEGATIVE_INFINITY;
         if (params.getEdgeValueAffectsAttraction()) {
             edgeValues = new double[numEdges];
         }
@@ -119,8 +121,19 @@ public class ForceDirectedEdgeBundler {
             if (Math.abs(length) < EPS) length = 0.0;
             edgeLengths[i] = length;
             if (params.getEdgeValueAffectsAttraction()) {
-                edgeValues[i] = getValue(edge);
+                double value = getValue(edge);
+                edgeValues[i] = value;
+                if (value > evMax) {
+                    evMax = value;
+                }
+                if (value < evMin) {
+                    evMin = value;
+                }
             }
+        }
+        if (params.getEdgeValueAffectsAttraction()) {
+            edgeValueMax = evMax;
+            edgeValueMin = evMin;
         }
 
         this.I = params.getI();
@@ -368,7 +381,8 @@ public class ForceDirectedEdgeBundler {
                                 m *= params.getRepulsionAmount();
                             }
                             if (params.getEdgeValueAffectsAttraction()) {
-//                                m *= 1.0 + (edgeValues[qe] - edgeValues[pe])/(edgeValues[qe] + edgeValues[pe]);
+                                double coeff = 1.0 + Math.max(-1.0, (edgeValues[qe] - edgeValues[pe])/(edgeValueMax + edgeValueMin));
+                                m *= coeff;
                             }
                             if (Math.abs(m * S) > 1.0) {
                                 m = Math.signum(m) / S;

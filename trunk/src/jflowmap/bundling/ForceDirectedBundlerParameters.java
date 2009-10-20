@@ -38,7 +38,7 @@ public class ForceDirectedBundlerParameters {
         useInverseQuadraticModel = false;
         useRepulsionForOppositeEdges = false;
         useSimpleCompatibilityMeasure = false;
-        edgeValueAffectsAttraction = true;
+        edgeValueAffectsAttraction = false;
     }
     
     private void ensureDirectionAffectsCompatibilityValueIsValid() {
