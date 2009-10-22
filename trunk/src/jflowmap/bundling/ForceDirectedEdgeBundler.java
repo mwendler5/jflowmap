@@ -281,6 +281,14 @@ public class ForceDirectedEdgeBundler {
         assert(Cs >= 0  &&  Cs <= 1);
         assert(Cp >= 0  &&  Cp <= 1);
         assert(Cv >= 0  &&  Cv <= 1);
+        
+        if (params.getBinaryCompatibility()) {
+            double threshold = params.getEdgeCompatibilityThreshold();
+            Ca = Ca >= threshold ? 1.0 : 0.0;
+            Cs = Cs >= threshold ? 1.0 : 0.0;
+            Cp = Cp >= threshold ? 1.0 : 0.0;
+            Cv = Cv >= threshold ? 1.0 : 0.0;
+        }
 
         return Ca * Cs * Cp * Cv;
     }
@@ -355,7 +363,7 @@ public class ForceDirectedEdgeBundler {
                     
                     if (Math.abs(k_p) < 1.0) {
                         Fsi_x *= k_p;
-                        Fsi_y *= k_p;
+                        Fsi_y *= k_p; 
                     }
 
                     // attracting electrostatic forces (for each other edge)
@@ -384,8 +392,14 @@ public class ForceDirectedEdgeBundler {
                                 double coeff = 1.0 + Math.max(-1.0, (edgeValues[qe] - edgeValues[pe])/(edgeValueMax + edgeValueMin));
                                 m *= coeff;
                             }
-                            if (Math.abs(m * S) > 1.0) {
+                            if (Math.abs(m * S) > 1.0) {    // this condition is to reduce the "hairy" effect:
+                                                            // a point shouldn't be moved farther than to the
+                                                            // point which attracts it
                                 m = Math.signum(m) / S;
+                                                            // TODO: this force difference shouldn't be neglected
+                                                            // instead it should make it more difficult to move the 
+                                                            // point from it's current position: this should reduce
+                                                            // the effect even more
                             }
                             v_x *= m;
                             v_y *= m;
