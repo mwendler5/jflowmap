@@ -74,6 +74,10 @@ public class JFlowMap extends JComponent {
         visualFlowMap.bundleEdges(params);
     }
 
+    public void clusterNodes() {
+        visualFlowMap.clusterNodes();
+    }
+
     public Frame getApp() {
         return app;
     }

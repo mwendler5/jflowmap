@@ -9,13 +9,18 @@ public final class GeomUtils {
     
     private GeomUtils() {
     }
+
+    public static double distance(double x1, double y1, double x2, double y2) {
+        double dx = x1 - x2;
+        double dy = y1 - y2;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
     
     public static Point2D projectPointToLine(Point2D line1, Point2D line2, Point2D point) {
         return projectPointToLine(
                 line1.getX(), line1.getY(), line2.getX(), line2.getY(),
                 point.getX(), point.getY());
     }
-
     /**
      * See http://www.exaflop.org/docs/cgafaq/cga1.html
      */

@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import javax.swing.SwingUtilities;
 import jflowmap.JFlowMap;
 import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.bundling.ForceDirectedEdgeBundler;
+import jflowmap.clustering.NodeSimilarityDistanceMeasure;
 import jflowmap.models.FlowMapParamsModel;
 
 import org.apache.log4j.Logger;
@@ -27,6 +29,9 @@ import at.fhj.utils.misc.ProgressTracker;
 import at.fhj.utils.misc.TaskCompletionListener;
 import at.fhj.utils.swing.ProgressDialog;
 import at.fhj.utils.swing.ProgressWorker;
+import ch.unifr.dmlib.cluster.ClusterNode;
+import ch.unifr.dmlib.cluster.HierarchicalClusterer;
+import ch.unifr.dmlib.cluster.Linkage;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
@@ -411,6 +416,22 @@ public class VisualFlowMap extends PNode {
             return null;
         }
 
+    }
+
+    private ClusterNode<VisualNode> rootCluster = null;
+    
+    public void clusterNodes() {
+        logger.info("Clustering nodes");
+        rootCluster = HierarchicalClusterer.cluster(
+                new ArrayList<VisualNode>(nodesToVisuals.values()),
+                new NodeSimilarityDistanceMeasure(), 
+                Linkage.SINGLE, new ProgressTracker());
+//        rootCluster.get
+//        logger.debug(rootCluster.dumpToString());
+    }
+    
+    public void updateClusters() {
+        
     }
 
 }

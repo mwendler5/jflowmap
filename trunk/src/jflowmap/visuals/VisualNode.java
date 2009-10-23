@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -139,9 +140,17 @@ public class VisualNode extends PPath {
     public void addOutgoingEdge(VisualEdge flow) {
         outgoingEdges.add(flow);
     }
+    
+    public List<VisualEdge> getOutgoingEdges() {
+        return Collections.unmodifiableList(outgoingEdges);
+    }
 
     public void addIncomingEdge(VisualEdge flow) {
         incomingEdges.add(flow);
+    }
+    
+    public List<VisualEdge> getIncomingEdges() {
+        return Collections.unmodifiableList(incomingEdges);
     }
 
     public boolean isSelected() {
