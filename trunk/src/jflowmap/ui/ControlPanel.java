@@ -28,6 +28,7 @@ import jflowmap.JFlowMap;
 import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.clustering.NodeSimilarityDistances;
 import jflowmap.models.FlowMapParamsModel;
+import jflowmap.util.GraphStats;
 import jflowmap.util.Stats;
 import jflowmap.visuals.VisualFlowMap;
 import jflowmap.visuals.VisualNode;
@@ -86,68 +87,28 @@ public class ControlPanel {
     private JButton calcDistancesButton;
     private JButton clusterButton;
     private JSlider clusterSizeSlider;
-    private FlowMapParamsModel flowMapModel;
+    private JCheckBox fillEdgesWithGradientCheckBox;
+    private JCheckBox showDirectionMarkersCheckBox;
+    private JSlider edgeMarkerSizeSlider;
+    private JSpinner edgeMarkerSizeSpinner;
+    private JCheckBox proportionalDirectionMarkersCheckBox;
+    private JLabel edgeMarkerSizeLabel;
+    private JLabel edgeMarkerOpacityLabel;
     private final JFlowMap jFlowMap;
     private boolean initializing;
     private final ForceDirectedBundlerParameters fdBundlingParams = new ForceDirectedBundlerParameters();
     private NodeSimilarityDistancesTableModel similarNodesTableModel;
 
-    public ControlPanel(JFlowMap flowMap, FlowMapParamsModel model) {
+    public ControlPanel(JFlowMap flowMap) {
         this.jFlowMap = flowMap;
         $$$setupUI$$$();
         initModelsOnce();
-        setFlowMapParamsModel(model);
+        setFlowMapParamsModel(flowMap.getVisualFlowMap().getModel());
         initChangeListeners();
-        bundleButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                fdBundlingParams.setNumCycles((Integer) numberOfCyclesSpinner.getValue());
-                fdBundlingParams.setI((Integer) stepsInCycleSpinner.getValue());
-                fdBundlingParams.setK((Double) edgeStiffnessSpinner.getValue());
-                fdBundlingParams.setEdgeCompatibilityThreshold((Double) edgeCompatibilityThresholdSpinner.getValue());
-                fdBundlingParams.setS((Double) stepSizeSpinner.getValue());
-                fdBundlingParams.setStepDampingFactor((Double) stepDampingFactorSpinner.getValue());
-                fdBundlingParams.setDirectionAffectsCompatibility(directionAffectsCompatibilityCheckBox.isSelected());
-                fdBundlingParams.setBinaryCompatibility(binaryCompatibilityCheckBox.isSelected());
-                fdBundlingParams.setUseInverseQuadraticModel(inverseQuadraticModelCheckBox.isSelected());
-                fdBundlingParams.setUseRepulsionForOppositeEdges(repulsiveEdgesCheckBox.isSelected());
-                fdBundlingParams.setUseSimpleCompatibilityMeasure(simpleCompatibilityMeasureCheckBox.isSelected());
-                fdBundlingParams.setRepulsionAmount((Double) repulsionSpinner.getValue());
-                fdBundlingParams.setEdgeValueAffectsAttraction(edgeValueAffectsAttractionCheckBox.isSelected());
-                jFlowMap.bundleEdges(fdBundlingParams);
-            }
-        });
-        resetButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                jFlowMap.resetBundling();
-            }
-        });
-        defaultValuesButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                fdBundlingParams.resetToDefaults();
-                initForceDirectedEdgeBundlerParamsModels();
-            }
-        });
-        simpleCompatibilityMeasureCheckBox.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                updateDirectionAffectsCompatibilityCheckBox();
-            }
-        });
-        repulsiveEdgesCheckBox.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                updateSimpleCompatibilityMeasureCheckBox();
-                updateDirectionAffectsCompatibilityCheckBox();
-                updateRepulsionSpinner();
-            }
-        });
-        clusterButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jFlowMap.clusterNodes();
-            }
-        });
         updateDirectionAffectsCompatibilityCheckBox();
         updateDirectionAffectsCompatibilityCheckBox();
         updateRepulsionSpinner();
+        updateMarkersInputs();
     }
 
     private void updateRepulsionSpinner() {
@@ -172,10 +133,15 @@ public class ControlPanel {
         }
     }
 
-    public void setFlowMapParamsModel(FlowMapParamsModel model) {
-        this.flowMapModel = model;
-        initModels();
-        setData(model);
+    private void updateMarkersInputs() {
+        boolean showMarkers = showDirectionMarkersCheckBox.isSelected();
+        proportionalDirectionMarkersCheckBox.setEnabled(showMarkers);
+        edgeMarkerSizeSlider.setEnabled(showMarkers);
+        edgeMarkerSizeSpinner.setEnabled(showMarkers);
+        edgeMarkerSizeLabel.setEnabled(showMarkers);
+        edgeMarkerOpacitySlider.setEnabled(showMarkers);
+        edgeMarkerOpacitySpinner.setEnabled(showMarkers);
+        edgeMarkerOpacityLabel.setEnabled(showMarkers);
     }
 
     private void initModelsOnce() {
@@ -201,7 +167,9 @@ public class ControlPanel {
 
     private void initModels() {
         initializing = true;
-        Stats valueStats = flowMapModel.getGraphStats().getValueEdgeAttrStats();
+        GraphStats stats = getGraphStats();
+
+        Stats valueStats = stats.getValueEdgeAttrStats();
 
         minValueFilterSpinner.setModel(new SpinnerNumberModel(valueStats.min, valueStats.min, valueStats.max, 1));
         maxValueFilterSpinner.setModel(new SpinnerNumberModel(valueStats.max, valueStats.min, valueStats.max, 1));
@@ -211,7 +179,7 @@ public class ControlPanel {
         maxValueFilterSlider.setMinimum(toValueEdgeFilterSliderValue(valueStats.min));
         maxValueFilterSlider.setMaximum(toValueEdgeFilterSliderValue(valueStats.max));
 
-        Stats lengthStats = flowMapModel.getGraphStats().getEdgeLengthStats();
+        Stats lengthStats = stats.getEdgeLengthStats();
 
         minLengthFilterSpinner.setModel(new SpinnerNumberModel(lengthStats.min, lengthStats.min, lengthStats.max, 1));
         maxLengthFilterSpinner.setModel(new SpinnerNumberModel(lengthStats.max, lengthStats.min, lengthStats.max, 1));
@@ -225,6 +193,10 @@ public class ControlPanel {
         edgeOpacitySlider.setMinimum(0);
         edgeOpacitySlider.setMaximum(255);
 
+        edgeMarkerSizeSpinner.setModel(new SpinnerNumberModel(0, 0, 0.5, 0.01));
+        edgeMarkerSizeSlider.setMinimum(0);
+        edgeMarkerSizeSlider.setMaximum(50);
+
         edgeMarkerOpacitySpinner.setModel(new SpinnerNumberModel(0, 0, 255, 1));
         edgeMarkerOpacitySlider.setMinimum(0);
         edgeMarkerOpacitySlider.setMaximum(255);
@@ -233,6 +205,37 @@ public class ControlPanel {
         maxEdgeWidthSlider.setMinimum(0);
         maxEdgeWidthSlider.setMaximum(100);
         initializing = false;
+    }
+
+    public void setData(FlowMapParamsModel data) {
+        autoAdjustColorScaleCheckBox.setSelected(data.getAutoAdjustColorScale());
+        useLogWidthScaleCheckbox.setSelected(data.isUseLogWidthScale());
+        useLogColorScaleCheckbox.setSelected(data.isUseLogColorScale());
+
+        minLengthFilterSlider.setValue(toEdgeLengthFilterSliderValue(data.getEdgeLengthFilterMin()));
+        maxLengthFilterSlider.setValue(toEdgeLengthFilterSliderValue(data.getEdgeLengthFilterMax()));
+        minLengthFilterSpinner.setValue(data.getEdgeLengthFilterMin());
+        maxLengthFilterSpinner.setValue(data.getEdgeLengthFilterMax());
+
+        minValueFilterSlider.setValue(toValueEdgeFilterSliderValue(data.getValueFilterMin()));
+        maxValueFilterSlider.setValue(toValueEdgeFilterSliderValue(data.getValueFilterMax()));
+        minValueFilterSpinner.setValue(data.getValueFilterMin());
+        maxValueFilterSpinner.setValue(data.getValueFilterMax());
+
+        edgeOpacitySpinner.setValue(data.getEdgeAlpha());
+        edgeOpacitySlider.setValue(data.getEdgeAlpha());
+        edgeMarkerOpacitySpinner.setValue(data.getDirectionMarkerAlpha());
+        edgeMarkerOpacitySlider.setValue(data.getDirectionMarkerAlpha());
+        edgeMarkerSizeSlider.setValue(toEdgeMarkerSizeSliderValue(data.getDirectionMarkerSize()));
+        edgeMarkerSizeSpinner.setValue(data.getDirectionMarkerSize());
+
+        showDirectionMarkersCheckBox.setSelected(data.getShowDirectionMarkers());
+        showNodesCheckBox.setSelected(data.getShowNodes());
+        fillEdgesWithGradientCheckBox.setSelected(data.getFillEdgesWithGradient());
+        proportionalDirectionMarkersCheckBox.setSelected(data.getUseProportionalDirectionMarkers());
+
+        maxEdgeWidthSpinner.setValue(data.getMaxEdgeWidth());
+        maxEdgeWidthSlider.setValue((int) Math.round(data.getMaxEdgeWidth()));
     }
 
     private void initChangeListeners() {
@@ -305,6 +308,47 @@ public class ControlPanel {
         });
 
 
+        // Aesthetics
+        fillEdgesWithGradientCheckBox.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
+                getFlowMapModel().setFillEdgesWithGradient(
+                        fillEdgesWithGradientCheckBox.isSelected());
+            }
+        });
+        showDirectionMarkersCheckBox.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
+                getFlowMapModel().setShowDirectionMarkers(
+                        showDirectionMarkersCheckBox.isSelected());
+                updateMarkersInputs();
+            }
+        });
+        proportionalDirectionMarkersCheckBox.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
+                getFlowMapModel().setUseProportionalDirectionMarkers(
+                        proportionalDirectionMarkersCheckBox.isSelected());
+            }
+        });
+
+        // Direction marker size
+        edgeMarkerSizeSpinner.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
+                edgeMarkerSizeSlider.setValue(toEdgeMarkerSizeSliderValue(
+                        (Double) edgeMarkerSizeSpinner.getValue()));
+            }
+        });
+        edgeMarkerSizeSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
+                double value = fromEdgeMarkerSizeSliderValue(edgeMarkerSizeSlider.getValue());
+                getFlowMapModel().setDirectionMarkerSize(value);
+                edgeMarkerSizeSpinner.setValue(value);
+            }
+        });
+
         // Edge opacity
         edgeOpacitySpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -332,7 +376,7 @@ public class ControlPanel {
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
                 int value = edgeMarkerOpacitySlider.getValue();
-                getFlowMapModel().setEdgeMarkerAlpha(value);
+                getFlowMapModel().setDirectionMarkerAlpha(value);
                 edgeMarkerOpacitySpinner.setValue(value);
             }
         });
@@ -352,20 +396,86 @@ public class ControlPanel {
                 maxEdgeWidthSpinner.setValue(value);
             }
         });
+
+
+        // Edge Bundling
+        bundleButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                fdBundlingParams.setNumCycles((Integer) numberOfCyclesSpinner.getValue());
+                fdBundlingParams.setI((Integer) stepsInCycleSpinner.getValue());
+                fdBundlingParams.setK((Double) edgeStiffnessSpinner.getValue());
+                fdBundlingParams.setEdgeCompatibilityThreshold((Double) edgeCompatibilityThresholdSpinner.getValue());
+                fdBundlingParams.setS((Double) stepSizeSpinner.getValue());
+                fdBundlingParams.setStepDampingFactor((Double) stepDampingFactorSpinner.getValue());
+                fdBundlingParams.setDirectionAffectsCompatibility(directionAffectsCompatibilityCheckBox.isSelected());
+                fdBundlingParams.setBinaryCompatibility(binaryCompatibilityCheckBox.isSelected());
+                fdBundlingParams.setUseInverseQuadraticModel(inverseQuadraticModelCheckBox.isSelected());
+                fdBundlingParams.setUseRepulsionForOppositeEdges(repulsiveEdgesCheckBox.isSelected());
+                fdBundlingParams.setUseSimpleCompatibilityMeasure(simpleCompatibilityMeasureCheckBox.isSelected());
+                fdBundlingParams.setRepulsionAmount((Double) repulsionSpinner.getValue());
+                fdBundlingParams.setEdgeValueAffectsAttraction(edgeValueAffectsAttractionCheckBox.isSelected());
+                jFlowMap.bundleEdges(fdBundlingParams);
+            }
+        });
+        resetButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jFlowMap.resetBundling();
+            }
+        });
+        defaultValuesButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                fdBundlingParams.resetToDefaults();
+                initForceDirectedEdgeBundlerParamsModels();
+            }
+        });
+        simpleCompatibilityMeasureCheckBox.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                updateDirectionAffectsCompatibilityCheckBox();
+            }
+        });
+        repulsiveEdgesCheckBox.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                updateSimpleCompatibilityMeasureCheckBox();
+                updateDirectionAffectsCompatibilityCheckBox();
+                updateRepulsionSpinner();
+            }
+        });
+
+
+        // Node clustering
+        clusterButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jFlowMap.clusterNodes();
+            }
+        });
     }
 
     private void loadFlowMap(JFlowMap.DatasetSpec dataset) {
         VisualFlowMap visualFlowMap = jFlowMap.loadFlowMap(dataset);
         jFlowMap.setVisualFlowMap(visualFlowMap);
-        setFlowMapParamsModel(visualFlowMap.getModel());
+        setFlowMapParamsModel(getFlowMapModel());
+    }
+
+    private void setFlowMapParamsModel(FlowMapParamsModel model) {
+        initModels();
+        setData(model);
     }
 
     public FlowMapParamsModel getFlowMapModel() {
-        return flowMapModel;
+        return getVisualFlowMap().getModel();
+    }
+
+    private VisualFlowMap getVisualFlowMap() {
+        return jFlowMap.getVisualFlowMap();
+    }
+
+    private GraphStats getGraphStats() {
+        return getVisualFlowMap().getGraphStats();
     }
 
     private double fromValueEdgeFilterSliderValue(final int logValue) {
-        Stats stats = flowMapModel.getGraphStats().getValueEdgeAttrStats();
+        Stats stats = getGraphStats().getValueEdgeAttrStats();
         double value = Math.round(Math.pow(Math.E, logValue));
         if (value < stats.min) {
             value = stats.min;
@@ -378,7 +488,7 @@ public class ControlPanel {
 
     private double fromLengthEdgeFilterSliderValue(int value) {
         double v = value;
-        Stats stats = flowMapModel.getGraphStats().getEdgeLengthStats();
+        Stats stats = getGraphStats().getEdgeLengthStats();
         if (v < stats.min) {
             v = stats.min;
         }
@@ -397,32 +507,16 @@ public class ControlPanel {
         return (int) value;
     }
 
-    public JPanel getPanel() {
-        return panel1;
+    private int toEdgeMarkerSizeSliderValue(double value) {
+        return (int) (Math.round(100 * value));
     }
 
-    public void setData(FlowMapParamsModel data) {
-        autoAdjustColorScaleCheckBox.setSelected(data.getAutoAdjustColorScale());
-        useLogWidthScaleCheckbox.setSelected(data.isUseLogWidthScale());
-        useLogColorScaleCheckbox.setSelected(data.isUseLogColorScale());
+    private double fromEdgeMarkerSizeSliderValue(int value) {
+        return value / 100.0;
+    }
 
-        minLengthFilterSlider.setValue(toEdgeLengthFilterSliderValue(data.getEdgeLengthFilterMin()));
-        maxLengthFilterSlider.setValue(toEdgeLengthFilterSliderValue(data.getEdgeLengthFilterMax()));
-        minLengthFilterSpinner.setValue(data.getEdgeLengthFilterMin());
-        maxLengthFilterSpinner.setValue(data.getEdgeLengthFilterMax());
-
-        minValueFilterSlider.setValue(toValueEdgeFilterSliderValue(data.getValueFilterMin()));
-        maxValueFilterSlider.setValue(toValueEdgeFilterSliderValue(data.getValueFilterMax()));
-        minValueFilterSpinner.setValue(data.getValueFilterMin());
-        maxValueFilterSpinner.setValue(data.getValueFilterMax());
-
-        edgeOpacitySpinner.setValue(data.getEdgeAlpha());
-        edgeOpacitySlider.setValue(data.getEdgeAlpha());
-        edgeMarkerOpacitySpinner.setValue(data.getEdgeMarkerAlpha());
-        edgeMarkerOpacitySlider.setValue(data.getEdgeMarkerAlpha());
-
-        maxEdgeWidthSpinner.setValue(data.getMaxEdgeWidth());
-        maxEdgeWidthSlider.setValue((int) Math.round(data.getMaxEdgeWidth()));
+    public JPanel getPanel() {
+        return panel1;
     }
 
 //    public void getData(FlowMapModel data) {
@@ -504,14 +598,14 @@ public class ControlPanel {
         separator2.setOrientation(1);
         panel2.add(separator2, cc.xywh(10, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         final JPanel panel3 = new JPanel();
-        panel3.setLayout(new FormLayout("right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow(2.0),left:4dlu:noGrow,fill:92px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:50px:noGrow", "center:26px:noGrow,top:4dlu:noGrow,center:24px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:d:noGrow"));
+        panel3.setLayout(new FormLayout("right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow(2.0),left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:p:noGrow", "center:26px:noGrow,top:4dlu:noGrow,center:24px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:d:noGrow"));
         tabbedPane1.addTab("Filter", panel3);
         panel3.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         minValueFilterSpinner = new JSpinner();
         panel3.add(minValueFilterSpinner, cc.xy(5, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JSeparator separator3 = new JSeparator();
         separator3.setOrientation(1);
-        panel3.add(separator3, cc.xywh(7, 1, 1, 8, CellConstraints.CENTER, CellConstraints.FILL));
+        panel3.add(separator3, cc.xywh(7, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label6 = new JLabel();
         label6.setText("Min length:");
         panel3.add(label6, cc.xy(9, 1));
@@ -539,7 +633,7 @@ public class ControlPanel {
         panel3.add(maxLengthFilterSpinner, cc.xy(13, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new FormLayout("fill:d:grow", "center:d:grow"));
-        panel3.add(panel4, cc.xy(5, 9));
+        panel3.add(panel4, cc.xy(5, 7));
         final JLabel label9 = new JLabel();
         label9.setText("Min value:");
         panel3.add(label9, cc.xy(1, 1));
@@ -572,7 +666,7 @@ public class ControlPanel {
         separator5.setOrientation(1);
         panel5.add(separator5, cc.xywh(6, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         final JPanel panel6 = new JPanel();
-        panel6.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:110px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:39px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:6dlu:noGrow,fill:max(d;4px):grow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        panel6.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:110px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):grow,left:4dlu:noGrow,fill:39px:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Aesthetics", panel6);
         panel6.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         final JLabel label10 = new JLabel();
@@ -582,83 +676,99 @@ public class ControlPanel {
         comboBox5 = new JComboBox();
         comboBox5.setEnabled(false);
         panel6.add(comboBox5, cc.xy(3, 1));
-        final JLabel label11 = new JLabel();
-        label11.setText("Edge opacity:");
-        panel6.add(label11, cc.xy(7, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        final JLabel label12 = new JLabel();
-        label12.setText("Edge marker opacity:");
-        panel6.add(label12, cc.xy(7, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        edgeOpacitySlider = new JSlider();
-        panel6.add(edgeOpacitySlider, cc.xy(9, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
-        edgeMarkerOpacitySlider = new JSlider();
-        panel6.add(edgeMarkerOpacitySlider, cc.xy(9, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        edgeOpacitySpinner = new JSpinner();
-        panel6.add(edgeOpacitySpinner, cc.xy(11, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
-        edgeMarkerOpacitySpinner = new JSpinner();
-        panel6.add(edgeMarkerOpacitySpinner, cc.xy(11, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JSeparator separator6 = new JSeparator();
         separator6.setOrientation(1);
-        panel6.add(separator6, cc.xywh(5, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
-        maxEdgeWidthSpinner = new JSpinner();
-        panel6.add(maxEdgeWidthSpinner, cc.xy(11, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
+        panel6.add(separator6, cc.xywh(5, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JLabel label11 = new JLabel();
+        label11.setText("Edge width:");
+        panel6.add(label11, cc.xy(10, 1, CellConstraints.RIGHT, CellConstraints.CENTER));
         maxEdgeWidthSlider = new JSlider();
         maxEdgeWidthSlider.setPaintLabels(false);
         maxEdgeWidthSlider.setPaintTicks(false);
         maxEdgeWidthSlider.setPaintTrack(true);
-        panel6.add(maxEdgeWidthSlider, cc.xy(9, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label13 = new JLabel();
-        label13.setText("Max edge width:");
-        panel6.add(label13, cc.xy(7, 5, CellConstraints.RIGHT, CellConstraints.CENTER));
-        final JSeparator separator7 = new JSeparator();
-        separator7.setOrientation(1);
-        panel6.add(separator7, cc.xywh(13, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        panel6.add(maxEdgeWidthSlider, cc.xy(12, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
+        maxEdgeWidthSpinner = new JSpinner();
+        panel6.add(maxEdgeWidthSpinner, cc.xy(14, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
+        final JLabel label12 = new JLabel();
+        label12.setText("Edge opacity:");
+        panel6.add(label12, cc.xy(10, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        edgeOpacitySlider = new JSlider();
+        panel6.add(edgeOpacitySlider, cc.xy(12, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        edgeOpacitySpinner = new JSpinner();
+        panel6.add(edgeOpacitySpinner, cc.xy(14, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         showNodesCheckBox = new JCheckBox();
         showNodesCheckBox.setText("Show nodes");
-        panel6.add(showNodesCheckBox, cc.xy(15, 1));
+        panel6.add(showNodesCheckBox, cc.xy(7, 1));
+        final JSeparator separator7 = new JSeparator();
+        separator7.setOrientation(1);
+        panel6.add(separator7, cc.xywh(8, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        showDirectionMarkersCheckBox = new JCheckBox();
+        showDirectionMarkersCheckBox.setText("Show direction markers");
+        panel6.add(showDirectionMarkersCheckBox, cc.xy(7, 5));
+        fillEdgesWithGradientCheckBox = new JCheckBox();
+        fillEdgesWithGradientCheckBox.setText("Fill edges with gradient");
+        panel6.add(fillEdgesWithGradientCheckBox, cc.xy(7, 3));
+        proportionalDirectionMarkersCheckBox = new JCheckBox();
+        proportionalDirectionMarkersCheckBox.setText("Proportional direction markers");
+        panel6.add(proportionalDirectionMarkersCheckBox, cc.xy(7, 7));
+        edgeMarkerSizeSpinner = new JSpinner();
+        panel6.add(edgeMarkerSizeSpinner, cc.xy(14, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
+        edgeMarkerSizeSlider = new JSlider();
+        panel6.add(edgeMarkerSizeSlider, cc.xy(12, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
+        edgeMarkerOpacitySpinner = new JSpinner();
+        panel6.add(edgeMarkerOpacitySpinner, cc.xy(14, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
+        edgeMarkerOpacitySlider = new JSlider();
+        panel6.add(edgeMarkerOpacitySlider, cc.xy(12, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
+        edgeMarkerSizeLabel = new JLabel();
+        edgeMarkerSizeLabel.setText("Direction marker size:");
+        panel6.add(edgeMarkerSizeLabel, cc.xy(10, 5, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        edgeMarkerOpacityLabel = new JLabel();
+        edgeMarkerOpacityLabel.setText("Direction marker opacity:");
+        panel6.add(edgeMarkerOpacityLabel, cc.xy(10, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         final JPanel panel7 = new JPanel();
-        panel7.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:12dlu:noGrow,fill:p:noGrow,fill:d:noGrow,left:d:noGrow,left:6dlu:noGrow,fill:m:noGrow,left:4dlu:noGrow,fill:d:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:69px:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow"));
+        panel7.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:12dlu:noGrow,fill:p:noGrow,fill:d:noGrow,left:d:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:25px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Edge bundling", panel7);
         panel7.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         final JSeparator separator8 = new JSeparator();
         separator8.setOrientation(1);
-        panel7.add(separator8, cc.xywh(9, 1, 1, 6, CellConstraints.CENTER, CellConstraints.FILL));
-        final JLabel label14 = new JLabel();
-        label14.setHorizontalAlignment(4);
-        label14.setText("Step damping factor:");
-        panel7.add(label14, cc.xy(11, 3));
+        panel7.add(separator8, cc.xywh(9, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JLabel label13 = new JLabel();
+        label13.setHorizontalAlignment(4);
+        label13.setText("Step damping factor:");
+        panel7.add(label13, cc.xy(11, 3));
         stepDampingFactorSpinner = new JSpinner();
         panel7.add(stepDampingFactorSpinner, cc.xy(13, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         stepSizeSpinner = new JSpinner();
         panel7.add(stepSizeSpinner, cc.xy(13, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
+        final JLabel label14 = new JLabel();
+        label14.setHorizontalAlignment(4);
+        label14.setText("Step size (S):");
+        panel7.add(label14, cc.xy(11, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         final JLabel label15 = new JLabel();
         label15.setHorizontalAlignment(4);
-        label15.setText("Step size (S):");
-        panel7.add(label15, cc.xy(11, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        final JLabel label16 = new JLabel();
-        label16.setHorizontalAlignment(4);
-        label16.setText("Edge stiffness (K):");
-        panel7.add(label16, cc.xy(5, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        label15.setText("Edge stiffness (K):");
+        panel7.add(label15, cc.xy(5, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         edgeStiffnessSpinner = new JSpinner();
         panel7.add(edgeStiffnessSpinner, cc.xy(7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JSeparator separator9 = new JSeparator();
         separator9.setOrientation(1);
-        panel7.add(separator9, cc.xywh(14, 1, 1, 6, CellConstraints.CENTER, CellConstraints.FILL));
-        final JLabel label17 = new JLabel();
-        label17.setHorizontalAlignment(4);
-        label17.setText("Number of cycles:");
-        panel7.add(label17, cc.xy(5, 1));
+        panel7.add(separator9, cc.xywh(14, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JLabel label16 = new JLabel();
+        label16.setHorizontalAlignment(4);
+        label16.setText("Number of cycles:");
+        panel7.add(label16, cc.xy(5, 1));
         numberOfCyclesSpinner = new JSpinner();
         panel7.add(numberOfCyclesSpinner, cc.xy(7, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label18 = new JLabel();
-        label18.setHorizontalAlignment(4);
-        label18.setText("Compatibility threshold:");
-        panel7.add(label18, cc.xy(5, 5));
+        final JLabel label17 = new JLabel();
+        label17.setHorizontalAlignment(4);
+        label17.setText("Compatibility threshold:");
+        panel7.add(label17, cc.xy(5, 5));
         edgeCompatibilityThresholdSpinner = new JSpinner();
         panel7.add(edgeCompatibilityThresholdSpinner, cc.xy(7, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label19 = new JLabel();
-        label19.setHorizontalAlignment(4);
-        label19.setText("Steps in 1st cycle (I):");
-        panel7.add(label19, cc.xy(11, 5));
+        final JLabel label18 = new JLabel();
+        label18.setHorizontalAlignment(4);
+        label18.setText("Steps in 1st cycle (I):");
+        panel7.add(label18, cc.xy(11, 5));
         stepsInCycleSpinner = new JSpinner();
         panel7.add(stepsInCycleSpinner, cc.xy(13, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         bundleButton = new JButton();
@@ -672,30 +782,27 @@ public class ControlPanel {
         panel7.add(defaultValuesButton, cc.xy(1, 5));
         final JSeparator separator10 = new JSeparator();
         separator10.setOrientation(1);
-        panel7.add(separator10, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        panel7.add(separator10, cc.xywh(3, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        repulsiveEdgesCheckBox = new JCheckBox();
+        repulsiveEdgesCheckBox.setText("Repulsion:");
+        panel7.add(repulsiveEdgesCheckBox, cc.xy(5, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        repulsionSpinner = new JSpinner();
+        panel7.add(repulsionSpinner, cc.xy(7, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
+        binaryCompatibilityCheckBox = new JCheckBox();
+        binaryCompatibilityCheckBox.setText("Binary compatibility");
+        panel7.add(binaryCompatibilityCheckBox, cc.xy(17, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        simpleCompatibilityMeasureCheckBox = new JCheckBox();
+        simpleCompatibilityMeasureCheckBox.setText("Simple compatibility measure");
+        panel7.add(simpleCompatibilityMeasureCheckBox, cc.xy(17, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        inverseQuadraticModelCheckBox = new JCheckBox();
+        inverseQuadraticModelCheckBox.setText("Inverse-quadratic model");
+        panel7.add(inverseQuadraticModelCheckBox, cc.xyw(11, 7, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         directionAffectsCompatibilityCheckBox = new JCheckBox();
         directionAffectsCompatibilityCheckBox.setText("Direction affects compatibility");
         panel7.add(directionAffectsCompatibilityCheckBox, cc.xy(17, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        simpleCompatibilityMeasureCheckBox = new JCheckBox();
-        simpleCompatibilityMeasureCheckBox.setText("Simple compatibility measure");
-        panel7.add(simpleCompatibilityMeasureCheckBox, cc.xy(17, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        repulsionSpinner = new JSpinner();
-        panel7.add(repulsionSpinner, cc.xy(23, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        repulsiveEdgesCheckBox = new JCheckBox();
-        repulsiveEdgesCheckBox.setText("Repulsion:");
-        panel7.add(repulsiveEdgesCheckBox, cc.xy(21, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        binaryCompatibilityCheckBox = new JCheckBox();
-        binaryCompatibilityCheckBox.setText("Binary compatibility");
-        panel7.add(binaryCompatibilityCheckBox, cc.xy(17, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        inverseQuadraticModelCheckBox = new JCheckBox();
-        inverseQuadraticModelCheckBox.setText("Inverse-quadratic model");
-        panel7.add(inverseQuadraticModelCheckBox, cc.xyw(21, 1, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        final JSeparator separator11 = new JSeparator();
-        separator11.setOrientation(1);
-        panel7.add(separator11, cc.xywh(19, 1, 1, 6, CellConstraints.CENTER, CellConstraints.FILL));
         edgeValueAffectsAttractionCheckBox = new JCheckBox();
         edgeValueAffectsAttractionCheckBox.setText("Edge value affects attraction");
-        panel7.add(edgeValueAffectsAttractionCheckBox, cc.xyw(21, 5, 5));
+        panel7.add(edgeValueAffectsAttractionCheckBox, cc.xy(17, 3));
         final JPanel panel8 = new JPanel();
         panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:d:grow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:6dlu:noGrow,center:max(p;47px):noGrow"));
         tabbedPane1.addTab("Node clustering", panel8);
@@ -711,14 +818,14 @@ public class ControlPanel {
         clusterButton = new JButton();
         clusterButton.setText("Cluster");
         panel8.add(clusterButton, cc.xy(1, 3));
-        final JSeparator separator12 = new JSeparator();
-        separator12.setOrientation(1);
-        panel8.add(separator12, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator11 = new JSeparator();
+        separator11.setOrientation(1);
+        panel8.add(separator11, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         clusterSizeSlider = new JSlider();
         panel8.add(clusterSizeSlider, cc.xy(7, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label20 = new JLabel();
-        label20.setText("Cluster size:");
-        panel8.add(label20, cc.xy(5, 1));
+        final JLabel label19 = new JLabel();
+        label19.setText("Cluster size:");
+        panel8.add(label19, cc.xy(5, 1));
     }
 
     /**

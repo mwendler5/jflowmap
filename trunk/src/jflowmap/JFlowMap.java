@@ -15,6 +15,7 @@ import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.models.FlowMapParamsModel;
 import jflowmap.models.map.AreaMap;
 import jflowmap.ui.ControlPanel;
+import jflowmap.util.GraphStats;
 import jflowmap.util.PanHandler;
 import jflowmap.util.ZoomHandler;
 import jflowmap.visuals.VisualAreaMap;
@@ -58,12 +59,13 @@ public class JFlowMap extends JComponent {
             }
         });
         
-        
-        VisualFlowMap visFlowMap = loadFlowMap(datasetSpecs[0]);
-        controlPanel = new ControlPanel(this, visFlowMap.getModel());
+        visualFlowMap = loadFlowMap(datasetSpecs[0]);
+        canvas.getLayer().addChild(visualFlowMap);
+
+        controlPanel = new ControlPanel(this);
         add(controlPanel.getPanel(), BorderLayout.SOUTH);
         
-        setVisualFlowMap(visFlowMap);
+        fitFlowMapInView();
     }
 
     public void resetBundling() {
@@ -81,6 +83,10 @@ public class JFlowMap extends JComponent {
     public Frame getApp() {
         return app;
     }
+    
+    public VisualFlowMap getVisualFlowMap() {
+		return visualFlowMap;
+	}
 
     public void setVisualFlowMap(VisualFlowMap newFlowMap) {
         if (visualFlowMap != null) {
@@ -88,24 +94,29 @@ public class JFlowMap extends JComponent {
         }
         canvas.getLayer().addChild(newFlowMap);
         visualFlowMap = newFlowMap;
+        fitFlowMapInView();
+    }
 
-        SwingUtilities.invokeLater(new Runnable() {
+	public void fitFlowMapInView() {
+		SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 visualFlowMap.fitInCameraView();
             }
         });
-    }
+	}
 
     public VisualFlowMap loadFlowMap(DatasetSpec dataset) {
         logger.info("> Loading flow map \"" + dataset + "\"");
         FlowMapParamsModel model = null;
         try {
             Graph graph = loadGraph(dataset.filename);
-            model = new FlowMapParamsModel(graph, dataset.valueAttrName, dataset.labelAttrName);
+            GraphStats stats = makeGraphStats(dataset, graph);
+            model = new FlowMapParamsModel(stats, dataset.valueAttrName, 
+            		dataset.xNodeAttr, dataset.yNodeAttr, dataset.labelAttrName);
             if (!Double.isNaN(dataset.valueFilterMin)) {
                 model.setValueFilterMin(dataset.valueFilterMin);
             }
-            VisualFlowMap visualFlowMap = new VisualFlowMap(this, canvas, graph, model);
+            VisualFlowMap visualFlowMap = new VisualFlowMap(this, canvas, graph, stats, model);
             if (dataset.areaMapFilename != null) {
                 VisualAreaMap map = loadAreaMap(dataset.areaMapFilename);
                 visualFlowMap.addChild(map);
@@ -118,6 +129,11 @@ public class JFlowMap extends JComponent {
         }
         return null;
     }
+
+	private GraphStats makeGraphStats(DatasetSpec dataset, Graph graph) {
+		return new GraphStats(
+				graph, dataset.valueAttrName, dataset.xNodeAttr, dataset.yNodeAttr);
+	}
 
     private Graph loadGraph(String filename) throws DataIOException {
         logger.info("Loading graph \"" + filename + "\"");
@@ -140,13 +156,19 @@ public class JFlowMap extends JComponent {
     }
 
     public static class DatasetSpec {
-        public DatasetSpec(String filename, String valueAttrName, String labelAttrName, String areaMapFilename) {
-            this(filename, valueAttrName, labelAttrName, areaMapFilename, Double.NaN);
+        public DatasetSpec(String filename, String valueAttrName, String xNodeAttr, String yNodeAttr,
+        		String labelAttrName, String areaMapFilename) {
+            this(filename, valueAttrName, xNodeAttr, yNodeAttr, 
+            		labelAttrName, areaMapFilename, Double.NaN);
         }
         
-        public DatasetSpec(String filename, String valueAttrName, String labelAttrName, String areaMapFilename, double valueFilterMin) {
+        public DatasetSpec(String filename, String valueAttrName,
+        		String xNodeAttr, String yNodeAttr, 
+        		String labelAttrName, String areaMapFilename, double valueFilterMin) {
             this.filename = filename;
             this.valueAttrName = valueAttrName;
+            this.xNodeAttr = xNodeAttr;
+            this.yNodeAttr = yNodeAttr;
             this.labelAttrName = labelAttrName;
             this.areaMapFilename = areaMapFilename;
             this.valueFilterMin = valueFilterMin;
@@ -155,6 +177,7 @@ public class JFlowMap extends JComponent {
         public final String areaMapFilename;
         public final String valueAttrName;
         public final String labelAttrName;
+        public final String xNodeAttr, yNodeAttr;
         public final double valueFilterMin;
 
         @Override
@@ -164,45 +187,45 @@ public class JFlowMap extends JComponent {
     }
     
     public static final DatasetSpec[] datasetSpecs = new DatasetSpec[] {
-            new DatasetSpec("data/refugees-2008-no-various.xml", "refugees", "name", "data/countries-areas.xml", 1000),
-            new DatasetSpec("data/migrations-unique.xml", "value", "tooltip", null, 1000),
-            new DatasetSpec("data/airlines.xml", "value", "tooltip", null),
+            new DatasetSpec("data/refugees-2008-no-various.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/migrations-unique.xml", "value", "x", "y", "tooltip", null, 1000),
+            new DatasetSpec("data/airlines.xml", "value", "x", "y", "tooltip", null),
 //            new DatasetSpec("data/bundling-test2.xml", "data", "name", null),
 //            new DatasetSpec("data/bundling-test6.xml", "data", "name", null),
-            new DatasetSpec("data/refugees-2008.xml", "refugees", "name", "data/countries-areas.xml", 1000),
-            new DatasetSpec("data/refugees-2007.xml", "refugees", "name", "data/countries-areas.xml", 1000),
-            new DatasetSpec("data/refugees-2006.xml", "refugees", "name", "data/countries-areas.xml", 1000),
-            new DatasetSpec("data/refugees-2005.xml", "refugees", "name", "data/countries-areas.xml", 1000),
-            new DatasetSpec("data/refugees-2004.xml", "refugees", "name", "data/countries-areas.xml", 1000),
-            new DatasetSpec("data/refugees-2003.xml", "refugees", "name", "data/countries-areas.xml", 1000),
-            new DatasetSpec("data/refugees-2002.xml", "refugees", "name", "data/countries-areas.xml", 1000),
-            new DatasetSpec("data/refugees-2001.xml", "refugees", "name", "data/countries-areas.xml", 1000),
-            new DatasetSpec("data/refugees-2000.xml", "refugees", "name", "data/countries-areas.xml", 1000),
-            new DatasetSpec("data/refugees-1999.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1998.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1997.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1996.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1995.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1994.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1993.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1992.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1991.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1990.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1989.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1988.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1987.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1986.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1985.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1984.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1983.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1982.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1981.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1980.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1979.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1978.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1977.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1976.xml", "refugees", "name", "data/countries-areas.xml"),
-            new DatasetSpec("data/refugees-1975.xml", "refugees", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-2008.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugees-2007.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugees-2006.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugees-2005.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugees-2004.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugees-2003.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugees-2002.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugees-2001.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugees-2000.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("data/refugees-1999.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1998.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1997.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1996.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1995.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1994.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1993.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1992.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1991.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1990.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1989.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1988.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1987.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1986.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1985.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1984.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1983.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1982.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1981.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1980.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1979.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1978.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1977.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1976.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
+            new DatasetSpec("data/refugees-1975.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
     };
 
 }

@@ -79,11 +79,11 @@ public class LineVisualEdge extends VisualEdge {
         addChild(line);
     }
 
-    public void updateEdgeMarkerColors() {
-        if (!showMarkers) return;
-        startMarker.setStrokePaint(getValueColor(START_MARKER_STROKE_PAINT, true));
-        endMarker.setStrokePaint(getValueColor(END_MARKER_STROKE_PAINT, true));
-    }
+//    public void updateEdgeMarkerColors() {
+//        if (!showMarkers) return;
+//        startMarker.setStrokePaint(getValueColor(START_MARKER_STROKE_PAINT, true));
+//        endMarker.setStrokePaint(getValueColor(END_MARKER_STROKE_PAINT, true));
+//    }
 
     public void updateEdgeWidth() {
         Stroke stroke = createStroke();

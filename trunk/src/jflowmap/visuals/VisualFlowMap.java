@@ -19,6 +19,7 @@ import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.bundling.ForceDirectedEdgeBundler;
 import jflowmap.clustering.NodeSimilarityDistanceMeasure;
 import jflowmap.models.FlowMapParamsModel;
+import jflowmap.util.GraphStats;
 
 import org.apache.log4j.Logger;
 
@@ -55,11 +56,14 @@ public class VisualFlowMap extends PNode {
     private Map<Edge, VisualEdge> edgesToVisuals;
     private final PCanvas canvas;
     private final Graph graph;
+    private GraphStats graphStats;
     private final JFlowMap jFlowMap;
 
-    public VisualFlowMap(JFlowMap jFlowMap, PCanvas canvas, Graph graph, FlowMapParamsModel model) {
+    public VisualFlowMap(JFlowMap jFlowMap, PCanvas canvas, Graph graph,
+    		GraphStats stats, FlowMapParamsModel model) {
         this.jFlowMap = jFlowMap;
         this.graph = graph;
+        this.graphStats = stats;
         this.canvas = canvas;
     	this.model = model;
 
@@ -83,7 +87,7 @@ public class VisualFlowMap extends PNode {
 //        fitInCameraView();
 //        fitInCameraView(false);
     }
-
+    
     private void createNodes() {
         nodeLayer.removeAllChildren();
 
@@ -149,7 +153,7 @@ public class VisualFlowMap extends PNode {
 
                 VisualEdge ve;
                 if (edgeSplinePoints == null) {
-                    ve = new LineVisualEdge(this, edge, fromNode, toNode, true);
+                    ve = new LineVisualEdge(this, edge, fromNode, toNode, false);
                 } else {
                     ve = new BSplineVisualEdge(this, edge, fromNode, toNode, edgeSplinePoints[edge.getRow()], showPoints);
                 }
@@ -178,6 +182,10 @@ public class VisualFlowMap extends PNode {
         }
         return nodeBounds;
     }
+
+    public GraphStats getGraphStats() {
+		return graphStats;
+	}
 
     public FlowMapParamsModel getModel() {
         return model;
@@ -285,48 +293,33 @@ public class VisualFlowMap extends PNode {
     }
 
     private void initModelChangeListeners(FlowMapParamsModel model) {
-        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_AUTO_ADJUST_COLOR_SCALE, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                updateEdgeColors();
-                updateEdgeMarkerColors();
-            }
-        });
-
-        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_MAX_EDGE_WIDTH, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                updateEdgeWidths();
-            }
-        });
-
-        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_EDGE_ALPHA, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                updateEdgeColors();
-            }
-        });
-
-        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_EDGE_MARKER_ALPHA, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                updateEdgeMarkerColors();
-            }
-        });
-
-        PropertyChangeListener valueFilterListener = new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                updateEdgeVisibility();
-                updateEdgeColors();
-                updateEdgeMarkerColors();
-            }
-        };
-        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_VALUE_FILTER_MIN, valueFilterListener);
-        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_VALUE_FILTER_MAX, valueFilterListener);
-
-        PropertyChangeListener edgeLengthFilterListener = new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                updateEdgeVisibility();
-            }
-        };
-        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_EDGE_LENGTH_FILTER_MIN, edgeLengthFilterListener);
-        model.addPropertyChangeListener(FlowMapParamsModel.PROPERTY_EDGE_LENGTH_FILTER_MAX, edgeLengthFilterListener);
+    	model.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				String prop = evt.getPropertyName();
+				if (prop.equals(FlowMapParamsModel.PROPERTY_AUTO_ADJUST_COLOR_SCALE)  ||
+					prop.equals(FlowMapParamsModel.PROPERTY_EDGE_ALPHA)  ||
+					prop.equals(FlowMapParamsModel.PROPERTY_DIRECTION_MARKER_ALPHA)  ||
+					prop.equals(FlowMapParamsModel.PROPERTY_FILL_EDGES_WITH_GRADIENT) ||
+					prop.equals(FlowMapParamsModel.PROPERTY_SHOW_DIRECTION_MARKERS)  ||
+					prop.equals(FlowMapParamsModel.PROPERTY_USE_PROPORTIONAL_DIRECTION_MARKERS)  ||
+					prop.equals(FlowMapParamsModel.PROPERTY_DIRECTION_MARKER_SIZE)
+				) {
+					updateEdgeColors();
+				} else if (prop.equals(FlowMapParamsModel.PROPERTY_MAX_EDGE_WIDTH)) {
+					updateEdgeWidths();
+				} else if (prop.equals(FlowMapParamsModel.PROPERTY_VALUE_FILTER_MIN) ||
+						prop.equals(FlowMapParamsModel.PROPERTY_VALUE_FILTER_MAX))
+				{
+	                updateEdgeVisibility();
+	                updateEdgeColors();
+				} else if (prop.equals(FlowMapParamsModel.PROPERTY_EDGE_LENGTH_FILTER_MIN) ||
+						prop.equals(FlowMapParamsModel.PROPERTY_EDGE_LENGTH_FILTER_MAX))
+				{
+	                updateEdgeVisibility();
+				}
+			}
+		});
     }
 
     private void updateEdgeColors() {
@@ -337,13 +330,13 @@ public class VisualFlowMap extends PNode {
         }
     }
 
-    private void updateEdgeMarkerColors() {
-        for (PNode node : (List<PNode>) edgeLayer.getChildrenReference()) {
-            if (node instanceof VisualEdge) {
-                ((VisualEdge) node).updateEdgeMarkerColors();
-            }
-        }
-    }
+//    private void updateEdgeMarkerColors() {
+//        for (PNode node : (List<PNode>) edgeLayer.getChildrenReference()) {
+//            if (node instanceof VisualEdge) {
+//                ((VisualEdge) node).updateEdgeMarkerColors();
+//            }
+//        }
+//    }
 
     private void updateEdgeVisibility() {
         for (VisualEdge ve : edgesToVisuals.values()) {
@@ -380,7 +373,6 @@ public class VisualFlowMap extends PNode {
         ProgressDialog dialog = new ProgressDialog(jFlowMap.getApp(), "Edge Bundling", worker, true);
         pt.addProgressListener(dialog);
         pt.addTaskCompletionListener(new TaskCompletionListener() {
-            @Override
             public void taskCompleted(int taskId) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {

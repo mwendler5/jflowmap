@@ -159,15 +159,13 @@
             <rowspec value="center:24px:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
-            <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:5dlu:noGrow"/>
             <rowspec value="center:d:noGrow"/>
             <colspec value="right:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:d:grow(2.0)"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:92px:noGrow"/>
+            <colspec value="fill:p:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:20px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
@@ -175,7 +173,7 @@
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:d:grow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:50px:noGrow"/>
+            <colspec value="fill:p:noGrow"/>
             <constraints>
               <tabbedpane title="Filter"/>
             </constraints>
@@ -193,7 +191,7 @@
               </component>
               <component id="1cc15" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="6" row-span="8" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="6" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -283,7 +281,7 @@
                 <rowspec value="center:d:grow"/>
                 <colspec value="fill:d:grow"/>
                 <constraints>
-                  <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties/>
@@ -395,6 +393,8 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:110px:noGrow"/>
@@ -402,16 +402,13 @@
             <colspec value="fill:20px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:39px:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:20px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="left:6dlu:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(d;4px):grow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:39px:noGrow"/>
             <constraints>
               <tabbedpane title="Aesthetics"/>
             </constraints>
@@ -439,71 +436,27 @@
                   <enabled value="false"/>
                 </properties>
               </component>
-              <component id="f5650" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Edge opacity:"/>
-                </properties>
-              </component>
-              <component id="5065a" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Edge marker opacity:"/>
-                </properties>
-              </component>
-              <component id="e94f4" class="javax.swing.JSlider" binding="edgeOpacitySlider">
-                <constraints>
-                  <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="2ec9a" class="javax.swing.JSlider" binding="edgeMarkerOpacitySlider">
-                <constraints>
-                  <grid row="2" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="f9c2a" class="javax.swing.JSpinner" binding="edgeOpacitySpinner">
-                <constraints>
-                  <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="cd097" class="javax.swing.JSpinner" binding="edgeMarkerOpacitySpinner">
-                <constraints>
-                  <grid row="2" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
               <component id="66cd7" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="4" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="4" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
                   <orientation value="1"/>
                 </properties>
               </component>
-              <component id="59b8d" class="javax.swing.JSpinner" binding="maxEdgeWidthSpinner">
+              <component id="9ab73" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="4" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
+                  <grid row="0" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <text value="Edge width:"/>
+                </properties>
               </component>
               <component id="22885" class="javax.swing.JSlider" binding="maxEdgeWidthSlider">
                 <constraints>
-                  <grid row="4" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -512,31 +465,125 @@
                   <paintTrack value="true"/>
                 </properties>
               </component>
-              <component id="9ab73" class="javax.swing.JLabel">
+              <component id="59b8d" class="javax.swing.JSpinner" binding="maxEdgeWidthSpinner">
                 <constraints>
-                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                  <grid row="0" column="13" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="f5650" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <text value="Max edge width:"/>
+                  <text value="Edge opacity:"/>
+                </properties>
+              </component>
+              <component id="e94f4" class="javax.swing.JSlider" binding="edgeOpacitySlider">
+                <constraints>
+                  <grid row="2" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="f9c2a" class="javax.swing.JSpinner" binding="edgeOpacitySpinner">
+                <constraints>
+                  <grid row="2" column="13" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="e0783" class="javax.swing.JCheckBox" binding="showNodesCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Show nodes"/>
                 </properties>
               </component>
               <component id="70cc1" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="12" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="7" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
                   <orientation value="1"/>
                 </properties>
               </component>
-              <component id="e0783" class="javax.swing.JCheckBox" binding="showNodesCheckBox" default-binding="true">
+              <component id="fad06" class="javax.swing.JCheckBox" binding="showDirectionMarkersCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="0" column="14" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Show nodes"/>
+                  <text value="Show direction markers"/>
+                </properties>
+              </component>
+              <component id="8ecf2" class="javax.swing.JCheckBox" binding="fillEdgesWithGradientCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Fill edges with gradient"/>
+                </properties>
+              </component>
+              <component id="22205" class="javax.swing.JCheckBox" binding="proportionalDirectionMarkersCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Proportional direction markers"/>
+                </properties>
+              </component>
+              <component id="59260" class="javax.swing.JSpinner" binding="edgeMarkerSizeSpinner">
+                <constraints>
+                  <grid row="4" column="13" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="7ed0" class="javax.swing.JSlider" binding="edgeMarkerSizeSlider">
+                <constraints>
+                  <grid row="4" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="cd097" class="javax.swing.JSpinner" binding="edgeMarkerOpacitySpinner">
+                <constraints>
+                  <grid row="6" column="13" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="2ec9a" class="javax.swing.JSlider" binding="edgeMarkerOpacitySlider">
+                <constraints>
+                  <grid row="6" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="16ec0" class="javax.swing.JLabel" binding="edgeMarkerSizeLabel">
+                <constraints>
+                  <grid row="4" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Direction marker size:"/>
+                </properties>
+              </component>
+              <component id="5065a" class="javax.swing.JLabel" binding="edgeMarkerOpacityLabel">
+                <constraints>
+                  <grid row="6" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Direction marker opacity:"/>
                 </properties>
               </component>
             </children>
@@ -544,10 +591,11 @@
           <grid id="e8f37" layout-manager="FormLayout">
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="center:25px:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:12px:noGrow"/>
@@ -565,14 +613,6 @@
             <colspec value="fill:p:noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:d:noGrow"/>
-            <colspec value="left:6dlu:noGrow"/>
-            <colspec value="fill:m:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:d:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:p:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:69px:noGrow"/>
             <constraints>
               <tabbedpane title="Edge bundling"/>
             </constraints>
@@ -583,7 +623,7 @@
             <children>
               <component id="b27ba" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="8" row-span="6" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="8" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -645,7 +685,7 @@
               </component>
               <component id="bdf4c" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="13" row-span="6" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="13" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -732,11 +772,54 @@
               </component>
               <component id="4298" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="2" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="2" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
                   <orientation value="1"/>
+                </properties>
+              </component>
+              <component id="a30d2" class="javax.swing.JCheckBox" binding="repulsiveEdgesCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Repulsion:"/>
+                </properties>
+              </component>
+              <component id="e3e63" class="javax.swing.JSpinner" binding="repulsionSpinner">
+                <constraints>
+                  <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="6" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Binary compatibility"/>
+                </properties>
+              </component>
+              <component id="83fa4" class="javax.swing.JCheckBox" binding="simpleCompatibilityMeasureCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="4" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Simple compatibility measure"/>
+                </properties>
+              </component>
+              <component id="7954a" class="javax.swing.JCheckBox" binding="inverseQuadraticModelCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="6" column="10" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Inverse-quadratic model"/>
                 </properties>
               </component>
               <component id="500e9" class="javax.swing.JCheckBox" binding="directionAffectsCompatibilityCheckBox" default-binding="true">
@@ -748,61 +831,9 @@
                   <text value="Direction affects compatibility"/>
                 </properties>
               </component>
-              <component id="83fa4" class="javax.swing.JCheckBox" binding="simpleCompatibilityMeasureCheckBox" default-binding="true">
+              <component id="26269" class="javax.swing.JCheckBox" binding="edgeValueAffectsAttractionCheckBox" default-binding="true">
                 <constraints>
                   <grid row="2" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Simple compatibility measure"/>
-                </properties>
-              </component>
-              <component id="e3e63" class="javax.swing.JSpinner" binding="repulsionSpinner">
-                <constraints>
-                  <grid row="2" column="22" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="a30d2" class="javax.swing.JCheckBox" binding="repulsiveEdgesCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="2" column="20" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Repulsion:"/>
-                </properties>
-              </component>
-              <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="4" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Binary compatibility"/>
-                </properties>
-              </component>
-              <component id="7954a" class="javax.swing.JCheckBox" binding="inverseQuadraticModelCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="0" column="20" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Inverse-quadratic model"/>
-                </properties>
-              </component>
-              <component id="8eae9" class="javax.swing.JSeparator">
-                <constraints>
-                  <grid row="0" column="18" row-span="6" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
-                </constraints>
-                <properties>
-                  <orientation value="1"/>
-                </properties>
-              </component>
-              <component id="9b4e8" class="javax.swing.JCheckBox" binding="edgeValueAffectsAttractionCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="4" column="20" row-span="1" col-span="5" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
