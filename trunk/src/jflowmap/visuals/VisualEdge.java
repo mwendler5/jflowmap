@@ -310,8 +310,8 @@ public abstract class VisualEdge extends PNode {
                 paint = createPaint();
             }
             ppath.setStrokePaint(paint);
-            getSourceNode().setVisible(value);
-            getTargetNode().setVisible(value);
+//            getSourceNode().setVisible(value);
+//            getTargetNode().setVisible(value);
         }
     }
 

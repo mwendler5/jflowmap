@@ -28,7 +28,7 @@ public class FlowMapParamsModel {
     private String yNodeAttr;
     private String labelAttr = "tooltip";
 
-    private int edgeAlpha = 100;
+    private int edgeAlpha = 40;
     private int directionMarkerAlpha = 200;
 
     private double valueFilterMin = Double.MIN_VALUE;

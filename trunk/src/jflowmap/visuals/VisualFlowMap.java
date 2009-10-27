@@ -1,5 +1,6 @@
 package jflowmap.visuals;
 
+import java.awt.Color;
 import java.awt.Insets;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -17,8 +18,9 @@ import javax.swing.SwingUtilities;
 import jflowmap.JFlowMap;
 import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.bundling.ForceDirectedEdgeBundler;
-import jflowmap.clustering.NodeSimilarityDistanceMeasure;
+import jflowmap.clustering.NodeDistanceMeasure;
 import jflowmap.models.FlowMapParamsModel;
+import jflowmap.util.ColorUtils;
 import jflowmap.util.GraphStats;
 
 import org.apache.log4j.Logger;
@@ -31,8 +33,10 @@ import at.fhj.utils.misc.TaskCompletionListener;
 import at.fhj.utils.swing.ProgressDialog;
 import at.fhj.utils.swing.ProgressWorker;
 import ch.unifr.dmlib.cluster.ClusterNode;
+import ch.unifr.dmlib.cluster.ClusterSetBuilder;
 import ch.unifr.dmlib.cluster.HierarchicalClusterer;
 import ch.unifr.dmlib.cluster.Linkage;
+import ch.unifr.dmlib.cluster.HierarchicalClusterer.DistanceMatrix;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
@@ -43,6 +47,7 @@ import edu.umd.cs.piccolo.util.PBounds;
  */
 public class VisualFlowMap extends PNode {
 
+    private static final Color SINGLE_ELEMENT_CLUSTER_COLOR = new Color(100, 100, 100, 150);
     private static Logger logger = Logger.getLogger(VisualFlowMap.class);
     private static final int DEFAULT_NODE_SIZE = 2;
     private final Tooltip tooltipBox;
@@ -407,24 +412,77 @@ public class VisualFlowMap extends PNode {
             }
             return null;
         }
-
     }
 
     private ClusterNode<VisualNode> rootCluster = null;
+    private List<VisualNodeDistance> nodeDistanceList;
+    private double maxClusterDistance;
+
+    public ClusterNode<VisualNode> getRootCluster() {
+        return rootCluster;
+    }
+
+    public List<VisualNodeDistance> getNodeDistanceList() {
+        return nodeDistanceList;
+    }
     
-    public void clusterNodes() {
-        logger.info("Clustering nodes");
-        rootCluster = HierarchicalClusterer.cluster(
-                new ArrayList<VisualNode>(nodesToVisuals.values()),
-                new NodeSimilarityDistanceMeasure(), 
-                Linkage.SINGLE, new ProgressTracker());
-//        rootCluster.get
-//        logger.debug(rootCluster.dumpToString());
+    public void setMaxClusterDistance(double value) {
+        this.maxClusterDistance = value;
+        updateClusters();
     }
     
     public void updateClusters() {
+        if (rootCluster != null) {
+            List<List<VisualNode>> clusters = ClusterSetBuilder.getClusters(rootCluster, maxClusterDistance);
+            
+            hideClusterMarkers();
+            int numClusters = 0;
+            for (List<VisualNode> cluster : clusters) {
+                if (cluster.size() > 1) {
+                    numClusters++; 
+                }
+            }
+            Color[] colors = ColorUtils.createCategoryColors(numClusters, 150);
+            int lastColor = 0;
+            for (List<VisualNode> cluster : clusters) {
+                for (VisualNode node : cluster) {
+                    if (cluster.size() > 1) {
+                        node.showClusterMarker(colors[lastColor]);
+                    } else {
+                        node.showClusterMarker(SINGLE_ELEMENT_CLUSTER_COLOR);
+                    }
+                }
+                if (cluster.size() > 1) {
+                    lastColor++;
+                }
+            }
+        }
+    }
+
+    private void hideClusterMarkers() {
+        for (VisualNode node : nodesToVisuals.values()) {
+            node.hideClusterMarker();
+        }
+    }
+
+    public void clusterNodes(NodeDistanceMeasure distanceMeasure) {
+        logger.info("Clustering nodes");
+        doCluster(distanceMeasure, new ArrayList<VisualNode>(nodesToVisuals.values()), new ProgressTracker());
+        if (logger.isDebugEnabled()) {
+//        	logger.debug(rootCluster.dumpToString());
+        	logger.debug("\n" + rootCluster.dumpToTreeString());
+        }
+    }
+
+    private void doCluster(NodeDistanceMeasure distanceMeasure, List<VisualNode> items, ProgressTracker tracker) {
+        HierarchicalClusterer<VisualNode> clusterer = 
+            new HierarchicalClusterer<VisualNode>(distanceMeasure, Linkage.SINGLE);
         
+        items = distanceMeasure.filterNodes(items);
+
+        DistanceMatrix<VisualNode> distances = clusterer.makeDistanceMatrix(items, tracker);
+        nodeDistanceList = VisualNodeDistance.makeDistanceList(items, distances);
+        rootCluster = clusterer.cluster(items, distances, tracker);
     }
 
 }
-    

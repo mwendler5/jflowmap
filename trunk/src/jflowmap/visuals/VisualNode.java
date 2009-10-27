@@ -27,8 +27,8 @@ public class VisualNode extends PPath {
     private static final long serialVersionUID = 1L;
     
     private static final Stroke STROKE = new PFixedWidthStroke(1);
-    private static final Color PAINT = new Color(100, 100, 100, 120);
-    private static final Color STROKE_PAINT = new Color(255, 255, 255, 100);
+    private static final Color PAINT = new Color(100, 100, 100, 50);
+    private static final Color STROKE_PAINT = new Color(255, 255, 255, 50);
     private static final Color HIGHLIGHTED_PAINT = new Color(255, 0, 0, 120);
     private static final Color SELECTED_STROKE_PAINT = new Color(255, 255, 0, 255);
     
@@ -46,6 +46,8 @@ public class VisualNode extends PPath {
 	private boolean highlighted;
     private boolean alwaysVisible;
 
+    private PPath clusterMarker;
+
     public VisualNode(VisualFlowMap visualFlowMap, Node node, double x, double y, double size) {
         super(new Ellipse2D.Double(x - size/2, y - size/2, size, size));
         if (Double.isNaN(x)  ||  Double.isNaN(y)) {
@@ -62,7 +64,7 @@ public class VisualNode extends PPath {
         this.node = node;
         this.visualFlowMap = visualFlowMap;
         addInputEventListener(INPUT_EVENT_HANDLER);
-        setVisible(false);
+//        setVisible(false);
 	}
 
     public double getValueX() {
@@ -107,36 +109,36 @@ public class VisualNode extends PPath {
     private static final PInputEventListener INPUT_EVENT_HANDLER = new PBasicInputEventHandler() {
         @Override
         public void mouseClicked(PInputEvent event) {
-            PNode node = event.getPickedNode();
-            if (node instanceof VisualNode) {
-                VisualNode vnode = (VisualNode)node;
-                vnode.visualFlowMap.setSelectedNode(vnode.isSelected() ? null : vnode);
-            }
+            VisualNode vnode = getParentVisualNode(event.getPickedNode());
+            vnode.visualFlowMap.setSelectedNode(vnode.isSelected() ? null : vnode);
         }
         
         @Override
         public void mouseEntered(PInputEvent event) {
-            PNode node = event.getPickedNode();
-            if (node instanceof VisualNode) {
-                VisualNode vnode = (VisualNode)node;
-                vnode.setHighlighted(true);
-                vnode.getVisualGraph().showTooltip(vnode, event.getPosition());
-            }
+            VisualNode vnode = getParentVisualNode(event.getPickedNode());
+            vnode.setHighlighted(true);
+            vnode.getVisualGraph().showTooltip(vnode, event.getPosition());
         }
 
         @Override
         public void mouseExited(PInputEvent event) {
-            PNode node = event.getPickedNode();
-            if (node instanceof VisualNode) {
-                VisualNode vnode = (VisualNode)node;
-                if (!vnode.isSelected()) {
-                    vnode.setHighlighted(false);
-                }
-                vnode.getVisualGraph().hideTooltip();
+            VisualNode vnode = getParentVisualNode(event.getPickedNode());
+            vnode.setHighlighted(true);
+            if (!vnode.isSelected()) {
+                vnode.setHighlighted(false);
             }
+            vnode.getVisualGraph().hideTooltip();
         }
     };
-    
+
+    private static final VisualNode getParentVisualNode(PNode node) {
+        PNode parent = node;
+        while (parent != null && !(parent instanceof VisualNode)) {
+            parent = parent.getParent();
+        }
+        return (VisualNode) parent;
+    }
+
     public void addOutgoingEdge(VisualEdge flow) {
         outgoingEdges.add(flow);
     }
@@ -173,7 +175,7 @@ public class VisualNode extends PPath {
 //                System.out.println(" > " + this + " outgoing edge "  + flow + " visible=" + flow.getVisible());
                 if (flow.getVisible()) {
                     flow.getTargetNode().setAlwaysVisible(selected);
-                    flow.getTargetNode().setVisible(selected);
+//                    flow.getTargetNode().setVisible(selected);
                     flow.setHighlighted(selected, true, false);
                 }
             }
@@ -182,7 +184,7 @@ public class VisualNode extends PPath {
 //                System.out.println(" > " + this + " incoming edge "  + flow + " visible=" + flow.getVisible());
                 if (flow.getVisible()) {
                     flow.getSourceNode().setAlwaysVisible(selected);
-                    flow.getSourceNode().setVisible(selected);
+//                    flow.getSourceNode().setVisible(selected);
                     flow.setHighlighted(selected, true, true);
                 }
             }
@@ -194,7 +196,7 @@ public class VisualNode extends PPath {
 
     public void setHighlighted(boolean highlighted) {
         this.highlighted = highlighted;
-        setVisible(highlighted);
+//        setVisible(highlighted);
         if (highlighted) {
             setPaint(HIGHLIGHTED_PAINT);
         } else {
@@ -241,21 +243,40 @@ public class VisualNode extends PPath {
     }
 
     public void updatePickability() {
-        boolean pickable = false;
-        for (VisualEdge ve : outgoingEdges) {
-            if (ve.getVisible()) {
-                pickable = true;
-                break;
-            }
+//        boolean pickable = false;
+//        for (VisualEdge ve : outgoingEdges) {
+//            if (ve.getVisible()) {
+//                pickable = true;
+//                break;
+//            }
+//        }
+//        if (!pickable)
+//        for (VisualEdge ve : incomingEdges) {
+//            if (ve.getVisible()) {
+//                pickable = true;
+//                break;
+//            }
+//        }
+//        setPickable(pickable);
+//        setChildrenPickable(pickable);
+    }
+
+    
+    public void hideClusterMarker() {
+        if (clusterMarker != null) {
+            removeChild(clusterMarker);
+            clusterMarker = null;
         }
-        if (!pickable)
-        for (VisualEdge ve : incomingEdges) {
-            if (ve.getVisible()) {
-                pickable = true;
-                break;
-            }
+    }
+    
+    public void showClusterMarker(Color color) {
+        if (clusterMarker == null) {
+            double size = 10;
+            clusterMarker = new PPath(new Ellipse2D.Double(getValueX() - size/2, getValueY() - size/2, size, size));
+            clusterMarker.setStroke(new PFixedWidthStroke(1));
+            addChild(clusterMarker);
+            clusterMarker.moveToBack();
         }
-        setPickable(pickable);
-        setChildrenPickable(pickable);
+        clusterMarker.setPaint(color);
     }
 }
