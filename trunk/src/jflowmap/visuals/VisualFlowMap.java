@@ -416,7 +416,8 @@ public class VisualFlowMap extends PNode {
 
     private ClusterNode<VisualNode> rootCluster = null;
     private List<VisualNodeDistance> nodeDistanceList;
-    private double maxClusterDistance;
+    private double maxNodeDistance;
+    private double clusterDistanceThreshold;
 
     public ClusterNode<VisualNode> getRootCluster() {
         return rootCluster;
@@ -425,15 +426,30 @@ public class VisualFlowMap extends PNode {
     public List<VisualNodeDistance> getNodeDistanceList() {
         return nodeDistanceList;
     }
-    
-    public void setMaxClusterDistance(double value) {
-        this.maxClusterDistance = value;
+
+    public double getMaxNodeDistance() {
+        if (Double.isNaN(maxNodeDistance)) {
+            List<VisualNodeDistance> distances = getNodeDistanceList();
+            double max = Double.NaN;
+            if (distances.size() > 0) {
+                max = 0;
+                for (VisualNodeDistance d : distances) {
+                    if (!Double.isInfinite(d.getDistance()) && d.getDistance() > max) max = d.getDistance();
+                }
+            }
+            maxNodeDistance = max;
+        }
+        return maxNodeDistance;
+    }
+
+    public void setClusterDistanceThreshold(double value) {
+        this.clusterDistanceThreshold = value;
         updateClusters();
     }
     
     public void updateClusters() {
         if (rootCluster != null) {
-            List<List<VisualNode>> clusters = ClusterSetBuilder.getClusters(rootCluster, maxClusterDistance);
+            List<List<VisualNode>> clusters = ClusterSetBuilder.getClusters(rootCluster, clusterDistanceThreshold);
             
             hideClusterMarkers();
             int numClusters = 0;
@@ -468,10 +484,9 @@ public class VisualFlowMap extends PNode {
     public void clusterNodes(NodeDistanceMeasure distanceMeasure) {
         logger.info("Clustering nodes");
         doCluster(distanceMeasure, new ArrayList<VisualNode>(nodesToVisuals.values()), new ProgressTracker());
-        if (logger.isDebugEnabled()) {
-//        	logger.debug(rootCluster.dumpToString());
-        	logger.debug("\n" + rootCluster.dumpToTreeString());
-        }
+//        if (logger.isDebugEnabled()) {
+//        	logger.debug("\n" + rootCluster.dumpToTreeString());
+//        }
     }
 
     private void doCluster(NodeDistanceMeasure distanceMeasure, List<VisualNode> items, ProgressTracker tracker) {
@@ -482,6 +497,7 @@ public class VisualFlowMap extends PNode {
 
         DistanceMatrix<VisualNode> distances = clusterer.makeDistanceMatrix(items, tracker);
         nodeDistanceList = VisualNodeDistance.makeDistanceList(items, distances);
+        maxNodeDistance = Double.NaN;
         rootCluster = clusterer.cluster(items, distances, tracker);
     }
 

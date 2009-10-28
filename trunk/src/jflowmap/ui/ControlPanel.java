@@ -35,6 +35,7 @@ import jflowmap.util.Stats;
 import jflowmap.visuals.VisualFlowMap;
 import jflowmap.visuals.VisualNode;
 import jflowmap.visuals.VisualNodeDistance;
+import at.fhj.utils.graphics.AxisMarks;
 import at.fhj.utils.swing.FancyTable;
 import at.fhj.utils.swing.TableSorter;
 import ch.unifr.dmlib.cluster.DistanceMeasure;
@@ -104,6 +105,7 @@ public class ControlPanel {
     private boolean initializing;
     private final ForceDirectedBundlerParameters fdBundlingParams = new ForceDirectedBundlerParameters();
     private NodeSimilarityDistancesTableModel similarNodesTableModel;
+    private TableSorter similarNodesTableSorter;
 
     public ControlPanel(JFlowMap flowMap) {
         this.jFlowMap = flowMap;
@@ -458,37 +460,29 @@ public class ControlPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 getVisualFlowMap().clusterNodes((NodeDistanceMeasure)distanceMeasureCombo.getSelectedItem());
-                List<VisualNodeDistance> distances = getVisualFlowMap().getNodeDistanceList();
-                double max = Double.NaN;
-                if (distances.size() > 0) {
-                    max = 0;
-                    for (VisualNodeDistance d : distances) {
-                        if (!Double.isInfinite(d.getDistance()) && d.getDistance() > max) max = d.getDistance();
-                    }
-                }
-                int maxi = (int) Math.ceil(max);
-                int val = maxi / 2;
-                maxClusterDistanceSpinner.setModel(new SpinnerNumberModel(val, 0, maxi, 1));
-                maxClusterDistanceSlider.setValue(val);
-                maxClusterDistanceSlider.setMaximum(maxi);
-                similarNodesTableModel.setDistances(distances);
-                getVisualFlowMap().setMaxClusterDistance(val);
+                double max = getVisualFlowMap().getMaxNodeDistance();
+                double val = max / 2;
+                maxClusterDistanceSpinner.setModel(new SpinnerNumberModel(val, 0, max, AxisMarks.ordAlpha(max / 100)));
+                maxClusterDistanceSlider.setValue(toMaxClusterDistanceSliderValue(val));
+                maxClusterDistanceSlider.setMaximum(toMaxClusterDistanceSliderValue(max));
+                similarNodesTableModel.setDistances(getVisualFlowMap().getNodeDistanceList());
+                similarNodesTableSorter.setSortingStatus(2, TableSorter.ASCENDING);
+                getVisualFlowMap().setClusterDistanceThreshold(val);
             }
         });
         maxClusterDistanceSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
-                Integer value = (Integer) maxClusterDistanceSpinner.getValue();
-                maxClusterDistanceSlider.setValue(value);
-                getVisualFlowMap().setMaxClusterDistance(maxClusterDistanceSlider.getValue());
+                maxClusterDistanceSlider.setValue(toMaxClusterDistanceSliderValue((Double) maxClusterDistanceSpinner.getValue()));
+                getVisualFlowMap().setClusterDistanceThreshold((Double)maxClusterDistanceSpinner.getValue());
             }
         });
         maxClusterDistanceSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
-                maxClusterDistanceSpinner.setValue(maxClusterDistanceSlider.getValue());
+                maxClusterDistanceSpinner.setValue(fromMaxClusterDistanceSliderValue(maxClusterDistanceSlider.getValue()));
             }
         });
     }
@@ -537,6 +531,16 @@ public class ControlPanel {
     }
 
 
+    private int toMaxClusterDistanceSliderValue(double value) {
+        double max = getVisualFlowMap().getMaxNodeDistance();
+        return (int) Math.round(value / (max / 100));
+    }
+    
+    private double fromMaxClusterDistanceSliderValue(int value) {
+        double max = getVisualFlowMap().getMaxNodeDistance();
+        return ((double) value) * (max / 100);
+    }
+    
     private int toValueEdgeFilterSliderValue(double value) {
         return (int) Math.round(Math.log(value));
     }
@@ -576,6 +580,7 @@ public class ControlPanel {
         // custom component creation code here
         similarNodesTableModel = new NodeSimilarityDistancesTableModel();
         TableSorter sorter = new TableSorter(similarNodesTableModel);
+        similarNodesTableSorter = sorter;
         sorter.setColumnSortable(0, true);
         sorter.setColumnSortable(1, true);
         sorter.setColumnSortable(2, true);

@@ -279,4 +279,31 @@ public class VisualNode extends PPath {
         }
         clusterMarker.setPaint(color);
     }
+    
+    /**
+     * Returns a list of the opposite nodes of the node's incoming/outgoing edges. 
+     * @param ofIncomingEdges False for outgoing edges
+     * @return Opposite nodes of incoming edges if ofIncomingEdges is true or of 
+     *         outgoing edges if ofIncomingEdges is false.
+     */
+    public List<VisualNode> getOppositeNodes(boolean ofIncomingEdges) {
+        List<VisualEdge> edges;
+        if (ofIncomingEdges) {
+            edges = incomingEdges;
+        } else {
+            edges = outgoingEdges;
+        }
+        List<VisualNode> nodes = new ArrayList<VisualNode>(edges.size());
+        for (VisualEdge edge : edges) {
+            VisualNode opposite;
+            if (ofIncomingEdges) {
+                opposite = edge.getSourceNode();
+            } else {
+                opposite = edge.getTargetNode();
+            }
+            nodes.add(opposite);
+        }
+        return nodes;
+   }
+    
 }
