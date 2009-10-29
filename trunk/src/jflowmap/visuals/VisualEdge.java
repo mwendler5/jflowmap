@@ -150,6 +150,28 @@ public abstract class VisualEdge extends PNode {
         return targetNode;
     }
 
+    /**
+     * Returns source node if source is true or target node otherwise.
+     */
+    public VisualNode getNode(boolean source) {
+        if (source) {
+            return getSourceNode();
+        } else {
+            return getTargetNode();
+        }
+    }
+
+    public VisualNode getOppositeNode(VisualNode node) {
+        if (targetNode == node) {
+            return sourceNode;
+        }
+        if (sourceNode == node) {
+            return targetNode;
+        }
+        throw new IllegalArgumentException(
+                "Node '" + node.getLabel() + "' is neither the source nor the target node of the edge '" + getLabel() + "'");
+    }
+
     @Override
     public String toString() {
         return "VisualEdge{" +
@@ -360,5 +382,6 @@ public abstract class VisualEdge extends PNode {
         }
         return (VisualEdge) parent;
     }
+
 
 }

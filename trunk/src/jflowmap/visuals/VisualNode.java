@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jflowmap.util.GeomUtils;
+
 import org.apache.log4j.Logger;
 
 import prefuse.data.Node;
@@ -154,6 +156,18 @@ public class VisualNode extends PPath {
     public List<VisualEdge> getIncomingEdges() {
         return Collections.unmodifiableList(incomingEdges);
     }
+    
+    /**
+     * Returns an unmodifiable list of incoming edges if incoming is true
+     * and outgoing if incoming is false.
+     */
+    public List<VisualEdge> getEdges(boolean incoming) {
+        if (incoming) {
+            return getIncomingEdges();
+        } else {
+            return getOutgoingEdges();
+        }
+    }
 
     public boolean isSelected() {
         return selected;
@@ -271,7 +285,7 @@ public class VisualNode extends PPath {
     
     public void showClusterMarker(Color color) {
         if (clusterMarker == null) {
-            double size = 10;
+            double size = 5;
             clusterMarker = new PPath(new Ellipse2D.Double(getValueX() - size/2, getValueY() - size/2, size, size));
             clusterMarker.setStroke(new PFixedWidthStroke(1));
             addChild(clusterMarker);
@@ -305,5 +319,22 @@ public class VisualNode extends PPath {
         }
         return nodes;
    }
-    
+
+   public double distanceTo(VisualNode node) {
+       return GeomUtils.distance(getValueX(), getValueY(), node.getValueX(), node.getValueY());
+   }
+
+   public boolean hasIncomingEdges() {
+       return incomingEdges.size() > 0;
+   }
+
+    public boolean hasOutgoingEdges() {
+        return outgoingEdges.size() > 0;
+    }
+
+    public boolean hasEdges() {
+        return hasIncomingEdges()  ||  hasOutgoingEdges();
+    }
+
+
 }

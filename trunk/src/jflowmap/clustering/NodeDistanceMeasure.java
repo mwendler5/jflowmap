@@ -1,16 +1,12 @@
 package jflowmap.clustering;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import jflowmap.util.GeomUtils;
 import jflowmap.visuals.VisualEdge;
 import jflowmap.visuals.VisualNode;
 import ch.unifr.dmlib.cluster.DistanceMeasure;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * @author Ilya Boyandin
@@ -24,6 +20,24 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             double dy = t1.getValueY() - t2.getValueY();
             double dist = Math.sqrt(dx * dx + dy * dy);
             return dist;
+        }        
+    },
+    COSINE_IN("Cosine: incoming", NodeFilter.IN) {
+        @Override
+        public double distance(VisualNode t1, VisualNode t2) {
+            return Cosine.IN.distance(t1, t2);
+        }        
+    },
+    COSINE_OUT("Cosine: outgoing", NodeFilter.OUT) {
+        @Override
+        public double distance(VisualNode t1, VisualNode t2) {
+            return Cosine.OUT.distance(t1, t2);
+        }        
+    },
+    COSINE_IN_OUT("Cosine: incoming and outgoing", NodeFilter.IN_OR_OUT) {
+        @Override
+        public double distance(VisualNode t1, VisualNode t2) {
+            return Cosine.IN_AND_OUT.distance(t1, t2);
         }        
     },
     COMMON_EDGES_IN("Common edges: incoming", NodeFilter.IN) {
@@ -145,71 +159,84 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
      * @author Ilya Boyandin
      */
     private enum Cosine implements DistanceMeasure<VisualNode> {
-        IN(true),
-        OUT(false)
+        IN(true, false),
+        OUT(false, true),
+        IN_AND_OUT(true, true),
         ;
 
-        private boolean useEdgeWeights;
-        private boolean incomingNotOutgoing;
+        private boolean includeIncoming;
+        private boolean includeOutgoing;
 
-        private Cosine(boolean incomingNotOutgoing) {
-            this.incomingNotOutgoing = incomingNotOutgoing;
+        private Cosine(boolean incoming, boolean outgoing) {
+            this.includeIncoming = incoming;
+            this.includeOutgoing = outgoing;
+        }
+
+        private double valueSquareSum(VisualNode node, boolean incoming) {
+            double sum = 0;
+            for (VisualEdge e : node.getEdges(incoming)) {
+                double v = e.getValue();
+                sum += v * v;
+            }
+            return sum;
         }
         
         @Override
         public double distance(VisualNode node1, VisualNode node2) {
-            Set<VisualEdge> edges1;
-            Set<VisualEdge> edges2;
-            if (incomingNotOutgoing) {
-                edges1 = ImmutableSet.copyOf(node1.getIncomingEdges());
-                edges2 = ImmutableSet.copyOf(node2.getIncomingEdges());
-            } else {
-                edges1 = ImmutableSet.copyOf(node1.getOutgoingEdges());
-                edges2 = ImmutableSet.copyOf(node2.getOutgoingEdges());
+            double numerator = 0;
+            if (includeIncoming) {
+                numerator += valueProductsSum(node1, node2, true);
             }
-            
-            double dist = 0;
-            
-            /*
-            int intersectionSize = 0;
-            double weightedIntersectionSize = 0;
-            List<VisualEdge> edges1;
-            List<VisualEdge> edges2;
-            if (incomingNotOutgoing) {
-                edges1 = node1.getIncomingEdges();
-                edges2 = node2.getIncomingEdges();
-            } else {
-                edges1 = node1.getOutgoingEdges();
-                edges2 = node2.getOutgoingEdges();
+            if (includeOutgoing) {
+                numerator += valueProductsSum(node1, node2, false);
             }
+
+            double denominator = 0;
+            double denomSum1 = 0;
+            double denomSum2 = 0;
+            if (includeIncoming) {
+                denomSum1 += valueSquareSum(node1, true);
+                denomSum2 += valueSquareSum(node2, true);
+            }
+            if (includeOutgoing) {
+                denomSum1 += valueSquareSum(node1, false);
+                denomSum2 += valueSquareSum(node2, false);
+            }
+            denominator = Math.sqrt(denomSum1) * Math.sqrt(denomSum2);
+            
+            double similarity = numerator / denominator;
+            return 1.0 - similarity;
+        }
+
+        private double valueProductsSum(VisualNode node1, VisualNode node2, boolean incoming) {
+            double sum = 0;
+            List<VisualEdge> edges1 = node1.getEdges(incoming);
             for (VisualEdge edge1 : edges1) {
-                VisualNode opposite1;
-                if (incomingNotOutgoing) {
-                    opposite1 = edge1.getSourceNode();
-                } else {
-                    opposite1 = edge1.getTargetNode();
-                }
-                for (VisualEdge edge2 : edges2) {
-                    VisualNode opposite2;
-                    if (incomingNotOutgoing) {
-                        opposite2 = edge2.getSourceNode();
-                    } else {
-                        opposite2 = edge2.getTargetNode();
-                    }
-                    if (opposite1 == opposite2) {
-                        intersectionSize++;
-                        double value2 = edge2.getValue();
-                        double value1 = edge1.getValue();
-                        weightedIntersectionSize += (value1 > value2 ? value2 / value1 : value1 / value2);
-                        break;
-                    }
+                VisualEdge matchingEdge = findMatchingEdge(edge1, node2, incoming);
+                if (matchingEdge != null) {
+                    sum += edge1.getValue() * matchingEdge.getValue();
                 }
             }
-            int unionSize = edges1.size() + edges2.size() - intersectionSize;
-            
-            double dist = 1.0 - (double)weightedIntersectionSize / unionSize;
-            */
-            return dist;
+            return sum;
+        }
+
+        /**
+         * Finds an incoming or outgoing (depending on the incoming parameter) edge of 
+         * node2 which matches the given edge1. Meaning that the returned edge goes from/to
+         * the same node as edge1. 
+         */
+        private VisualEdge findMatchingEdge(VisualEdge edge1, VisualNode node2, boolean incoming) {
+            VisualEdge matchingEdge = null;
+            VisualNode opposite1 = edge1.getNode(incoming ? true : false);    // source if incoming, target if outgoing
+            // find an edge 
+            for (VisualEdge edge2 : node2.getEdges(incoming)) {
+                VisualNode opposite2 = edge2.getOppositeNode(node2);
+                if (opposite1 == opposite2) {
+                    matchingEdge = edge2;
+                    break;
+                }
+            }
+            return matchingEdge;
         }
     }
 
@@ -290,19 +317,19 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
         IN {
             @Override
             protected boolean accept(VisualNode node) {
-                return node.getIncomingEdges().size() > 0;
+                return node.hasIncomingEdges();
             }
         },
         OUT {
             @Override
             protected boolean accept(VisualNode node) {
-                return node.getOutgoingEdges().size() > 0;
+                return node.hasOutgoingEdges();
             }
         },
         IN_OR_OUT {
             @Override
             protected boolean accept(VisualNode node) {
-                return (node.getOutgoingEdges().size() > 0)  ||  (node.getIncomingEdges().size() > 0);
+                return node.hasEdges();
             }
         };
         

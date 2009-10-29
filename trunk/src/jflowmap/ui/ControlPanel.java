@@ -462,7 +462,7 @@ public class ControlPanel {
                 getVisualFlowMap().clusterNodes((NodeDistanceMeasure)distanceMeasureCombo.getSelectedItem());
                 double max = getVisualFlowMap().getMaxNodeDistance();
                 double val = max / 2;
-                maxClusterDistanceSpinner.setModel(new SpinnerNumberModel(val, 0, max, AxisMarks.ordAlpha(max / 100)));
+                maxClusterDistanceSpinner.setModel(new SpinnerNumberModel(val, 0, max, AxisMarks.ordAlpha(max / 1000)));
                 maxClusterDistanceSlider.setValue(toMaxClusterDistanceSliderValue(val));
                 maxClusterDistanceSlider.setMaximum(toMaxClusterDistanceSliderValue(max));
                 similarNodesTableModel.setDistances(getVisualFlowMap().getNodeDistanceList());
