@@ -296,7 +296,6 @@ public abstract class VisualEdge extends PNode {
 	        		fractions = DEFAULT_GRADIENT_FRACTIONS;
 	        		colors = new Color[] { startEdgeColor, endEdgeColor };
 	        	}
-//	        	System.out.println(Arrays.toString(fractions));
 				return new LinearGradientPaint(
 	                    (float)getSourceX(), (float)getSourceY(),
 	                    (float)getTargetX(), (float)getTargetY(),

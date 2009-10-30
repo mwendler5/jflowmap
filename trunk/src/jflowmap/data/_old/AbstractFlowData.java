@@ -53,37 +53,30 @@ public abstract class AbstractFlowData implements IFlowData {
 		}
 	}
 	
-	@Override
 	public int numFlows() {
 		return numFlows;
 	}
 
-	@Override
 	public String getFlowLabel(int flowIdx) {
 		return labels.get(flowIdx);
 	}
 
-	@Override
 	public String getFlowStartNodeId(int flowIdx) {
 		return startNodeIds.get(flowIdx);
 	}
 
-	@Override
 	public String getFlowEndNodeId(int flowIdx) {
 		return endNodeIds.get(flowIdx);
 	}
 
-	@Override
 	public int numAttrs() {
 		return attrNamesList.size();
 	}
 
-	@Override
 	public String getAttrName(int attrIdx) {
 		return attrNamesList.get(attrIdx);
 	}
 	
-	@Override
 	public IAttrValue<?> getAttrValue(int flowIdx, String attrName) {
 		return attrValuesMap.get(createAttrValueKey(flowIdx, attrName));
 	}
@@ -134,7 +127,6 @@ public abstract class AbstractFlowData implements IFlowData {
 		}
 	}
 
-	@Override
 	public double getAttrValueAsDouble(int flowIdx, String attrName) {
 		return DoubleAttrValue.asDouble(getAttrValue(flowIdx, attrName));
 	}

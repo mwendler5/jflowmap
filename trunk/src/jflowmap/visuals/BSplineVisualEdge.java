@@ -1,17 +1,12 @@
 package jflowmap.visuals;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.LinearGradientPaint;
-import java.awt.Paint;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.Arrays;
 
-import jflowmap.models.FlowMapParamsModel;
 import jflowmap.util.BSplinePath;
-
 import prefuse.data.Edge;
 import edu.umd.cs.piccolo.nodes.PPath;
 

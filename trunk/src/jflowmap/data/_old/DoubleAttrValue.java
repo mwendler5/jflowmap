@@ -13,7 +13,6 @@ public class DoubleAttrValue extends AbstractAttrValue<Double> {
 		super(value);
 	}
 
-	@Override
 	public Class<Double> getType() {
 		return Double.class;
 	}

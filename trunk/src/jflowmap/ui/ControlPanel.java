@@ -457,7 +457,6 @@ public class ControlPanel {
 
         // Node clustering
         clusterButton.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
                 getVisualFlowMap().clusterNodes((NodeDistanceMeasure)distanceMeasureCombo.getSelectedItem());
                 double max = getVisualFlowMap().getMaxNodeDistance();
@@ -471,7 +470,6 @@ public class ControlPanel {
             }
         });
         maxClusterDistanceSpinner.addChangeListener(new ChangeListener() {
-            @Override
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
                 maxClusterDistanceSlider.setValue(toMaxClusterDistanceSliderValue((Double) maxClusterDistanceSpinner.getValue()));
@@ -479,7 +477,6 @@ public class ControlPanel {
             }
         });
         maxClusterDistanceSlider.addChangeListener(new ChangeListener() {
-            @Override
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
                 maxClusterDistanceSpinner.setValue(fromMaxClusterDistanceSliderValue(maxClusterDistanceSlider.getValue()));

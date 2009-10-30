@@ -47,22 +47,18 @@ public class NodeAndFlowData implements INodeAndFlowData {
 		}
 	}
 	
-	@Override
 	public int flowNode1(int flowIdx) {
 		return flowStartNodeIdx[flowIdx];
 	}
 
-	@Override
 	public int flowNode2(int flowIdx) {
 		return flowEndNodeIdx[flowIdx];
 	}
 
-	@Override
 	public IFlowData getFlowData() {
 		return flowData;
 	}
 
-	@Override
 	public INodeData getNodeData() {
 		return nodeData;
 	}
@@ -84,17 +80,14 @@ public class NodeAndFlowData implements INodeAndFlowData {
         return new Stats(min, max);
     }
 
-	@Override
 	public String getNodeId(int nodeIdx) {
 		return nodeData.nodeId(nodeIdx);
 	}
 
-	@Override
 	public int getNodeIndex(String nodeId) {
 		return nodeIdToIndex.get(nodeId);
 	}
 	
-	@Override
 	public double getOutgoingTotal(String nodeId, String attrName) {
 	    final int nodeIdx = nodeIdToIndex.get(nodeId);
 	    double total = 0;
@@ -107,7 +100,6 @@ public class NodeAndFlowData implements INodeAndFlowData {
 	    return total;
 	}
 	
-    @Override
 	public double getIncomingTotal(String nodeId, String attrName) {
         final int nodeIdx = nodeIdToIndex.get(nodeId);
         double total = 0;

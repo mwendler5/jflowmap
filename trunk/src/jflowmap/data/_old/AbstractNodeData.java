@@ -28,32 +28,26 @@ public abstract class AbstractNodeData implements INodeData {
 		positions.add(new Point2D.Double(x, y));
 	}
 	
-	@Override
 	public String nodeId(int nodeIdx) {
 		return ids.get(nodeIdx);
 	}
 
-	@Override
 	public String nodeLabel(int nodeIdx) {
 		return labels.get(nodeIdx);
 	}
 
-	@Override
 	public double nodeX(int nodeIdx) {
 		return positions.get(nodeIdx).x;
 	}
 
-	@Override
 	public double nodeY(int nodeIdx) {
 		return positions.get(nodeIdx).y;
 	}
 
-	@Override
 	public Point2D.Double nodePosition(int nodeIdx) {
 		return positions.get(nodeIdx);
 	}
 
-	@Override
 	public int numNodes() {
 		return ids.size();
 	}

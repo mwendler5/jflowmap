@@ -285,7 +285,7 @@ public class VisualNode extends PPath {
     
     public void showClusterMarker(Color color) {
         if (clusterMarker == null) {
-            double size = 5;
+            double size = 7;
             clusterMarker = new PPath(new Ellipse2D.Double(getValueX() - size/2, getValueY() - size/2, size, size));
             clusterMarker.setStroke(new PFixedWidthStroke(1));
             addChild(clusterMarker);

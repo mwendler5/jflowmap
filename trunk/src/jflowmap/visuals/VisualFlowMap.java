@@ -299,7 +299,6 @@ public class VisualFlowMap extends PNode {
 
     private void initModelChangeListeners(FlowMapParamsModel model) {
     	model.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				String prop = evt.getPropertyName();
 				if (prop.equals(FlowMapParamsModel.PROPERTY_AUTO_ADJUST_COLOR_SCALE)  ||

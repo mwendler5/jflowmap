@@ -11,7 +11,6 @@ public abstract class AbstractAttrValue<T> implements IAttrValue<T> {
 		this.value = value;
 	}
 
-	@Override
 	public T getValue() {
 		return value;
 	}

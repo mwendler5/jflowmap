@@ -23,7 +23,7 @@
 	</target>
 
 	<target name="compile">
-		<javac destdir="${path.classes}" failonerror="true" debug="true">
+		<javac destdir="${path.classes}" failonerror="true" debug="true" target="1.5">
 			<src path="${path.src}"/>
 			<classpath refid="master-classpath"/>
 		</javac>

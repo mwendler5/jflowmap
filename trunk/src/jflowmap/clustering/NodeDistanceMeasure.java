@@ -14,7 +14,6 @@ import ch.unifr.dmlib.cluster.DistanceMeasure;
 public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
 
     EUCLIDEAN("Euclidean", NodeFilter.ALL) {
-        @Override
         public double distance(VisualNode t1, VisualNode t2) {
             double dx = t1.getValueX() - t2.getValueX();
             double dy = t1.getValueY() - t2.getValueY();
@@ -23,79 +22,66 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
         }        
     },
     COSINE_IN("Cosine: incoming", NodeFilter.IN) {
-        @Override
         public double distance(VisualNode t1, VisualNode t2) {
             return Cosine.IN.distance(t1, t2);
         }        
     },
     COSINE_OUT("Cosine: outgoing", NodeFilter.OUT) {
-        @Override
         public double distance(VisualNode t1, VisualNode t2) {
             return Cosine.OUT.distance(t1, t2);
         }        
     },
     COSINE_IN_OUT("Cosine: incoming and outgoing", NodeFilter.IN_OR_OUT) {
-        @Override
         public double distance(VisualNode t1, VisualNode t2) {
             return Cosine.IN_AND_OUT.distance(t1, t2);
         }        
     },
     COMMON_EDGES_IN("Common edges: incoming", NodeFilter.IN) {
-        @Override
         public double distance(VisualNode t1, VisualNode t2) {
             return CommonEdges.IN.distance(t1, t2);
         }        
     },
     COMMON_EDGES_OUT("Common edges: outgoing", NodeFilter.OUT) {
-        @Override
         public double distance(VisualNode t1, VisualNode t2) {
             return CommonEdges.OUT.distance(t1, t2);
         }        
     },
     COMMON_EDGES_WEIGHTED_IN("Common edges weighted: incoming", NodeFilter.IN) {
-        @Override
         public double distance(VisualNode t1, VisualNode t2) {
             return Cosine.IN.distance(t1, t2);
         }        
     },
     COMMON_EDGES_WEIGHTED_OUT("Common edges weighted: outgoing", NodeFilter.OUT) {
-        @Override
         public double distance(VisualNode t1, VisualNode t2) {
             return Cosine.OUT.distance(t1, t2);
         }        
     },
     INCOMING_AND_OUTGOING_EDGES_WITH_WEIGHTS("Edge barycenter: Incoming and outgoing with weights", NodeFilter.IN_OR_OUT) {
-        @Override
         public double distance(VisualNode n1, VisualNode n2) {
             return (EdgeCombinations.IN_WITH_WEIGHTS.distance(n1, n2) + EdgeCombinations.OUT_WITH_WEIGHTS.distance(n1, n2)) / 2;
         }
     },
     INCOMING_EDGES_WITH_WEIGHTS("Edge barycenter: Incoming with weights", NodeFilter.IN) {
-        @Override
         public double distance(VisualNode n1, VisualNode n2) {
             return EdgeCombinations.IN_WITH_WEIGHTS.distance(n1, n2);
         }
     },
     OUTGOING_EDGES_WITH_WEIGHTS("Edge barycenter: Outgoing with weights", NodeFilter.OUT) {
-        @Override
         public double distance(VisualNode n1, VisualNode n2) {
             return EdgeCombinations.OUT_WITH_WEIGHTS.distance(n1, n2);
         }
     },
     INCOMING_AND_OUTGOING_EDGES("Edge barycenter: Incoming and outgoing", NodeFilter.IN_OR_OUT) {
-        @Override
         public double distance(VisualNode n1, VisualNode n2) {
             return (EdgeCombinations.IN.distance(n1, n2) + EdgeCombinations.OUT.distance(n1, n2)) / 2;
         }
     },
     INCOMING_EDGES("Edge barycenter: Incoming", NodeFilter.IN) {
-        @Override
         public double distance(VisualNode n1, VisualNode n2) {
             return EdgeCombinations.IN.distance(n1, n2);
         }
     },
     OUTGOING_EDGES("Edge barycenter: Outgoing", NodeFilter.OUT) {
-        @Override
         public double distance(VisualNode n1, VisualNode n2) {
             return EdgeCombinations.OUT.distance(n1, n2);
         }
@@ -130,7 +116,6 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             this.incomingNotOutgoing = incomingNotOutgoing;
         }
         
-        @Override
         public double distance(VisualNode node1, VisualNode node2) {
             List<VisualNode> oppositeNodes1 = node1.getOppositeNodes(incomingNotOutgoing);
             List<VisualNode> oppositeNodes2 = node2.getOppositeNodes(incomingNotOutgoing);
@@ -166,6 +151,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
 
         private boolean includeIncoming;
         private boolean includeOutgoing;
+        private boolean preciseNodeMatching;
 
         private Cosine(boolean incoming, boolean outgoing) {
             this.includeIncoming = incoming;
@@ -181,7 +167,6 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             return sum;
         }
         
-        @Override
         public double distance(VisualNode node1, VisualNode node2) {
             double numerator = 0;
             if (includeIncoming) {
@@ -254,7 +239,6 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             this.incomingNotOutgoing = incomingNotOutgoing;
         }
         
-        @Override
         public double distance(VisualNode n1, VisualNode n2) {
             double numerator = 0;
             double denominator = 0;

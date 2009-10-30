@@ -9,7 +9,6 @@ public class StringAttrValue extends AbstractAttrValue<String> {
 		super(value);
 	}
 	
-	@Override
 	public Class<String> getType() {
 		return String.class;
 	}
