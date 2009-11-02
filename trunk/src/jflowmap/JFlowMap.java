@@ -11,7 +11,7 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import jflowmap.bundling.ForceDirectedBundlerParameters;
+import jflowmap.data.GraphFileFormats;
 import jflowmap.models.FlowMapParamsModel;
 import jflowmap.models.map.AreaMap;
 import jflowmap.ui.ControlPanel;
@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 
 import prefuse.data.Graph;
 import prefuse.data.io.DataIOException;
-import prefuse.data.io.GraphMLReader;
 import edu.umd.cs.piccolo.PCanvas;
 
 /**
@@ -39,7 +38,7 @@ public class JFlowMap extends JComponent {
     private final PCanvas canvas;
     private final ControlPanel controlPanel;
     private VisualFlowMap visualFlowMap;
-    private final FlowMapMain app;
+    private final Frame app;
 
     public JFlowMap(FlowMapMain app) {
         setLayout(new BorderLayout());
@@ -129,8 +128,7 @@ public class JFlowMap extends JComponent {
 
     private Graph loadGraph(String filename) throws DataIOException {
         logger.info("Loading graph \"" + filename + "\"");
-        GraphMLReader reader = new GraphMLReader();
-        Graph graph = reader.readGraph(filename);
+        Graph graph = GraphFileFormats.createReaderFor(filename).readGraph(filename);
         logger.info("Loaded graph \"" + filename + "\": " + graph.getNodeCount() + " nodes, " + graph.getEdgeCount() + " edges");
         return graph;
     }
@@ -180,6 +178,7 @@ public class JFlowMap extends JComponent {
     
     public static final DatasetSpec[] datasetSpecs = new DatasetSpec[] {
             new DatasetSpec("data/refugees-2008-no-various.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
+            new DatasetSpec("C:/Data/uni-konstanz/PhotoTrails/sline_test_1.csv", "value", "x", "y", null, null),
             new DatasetSpec("data/migrations-unique.xml", "value", "x", "y", "tooltip", null, 1000),
             new DatasetSpec("data/airlines.xml", "value", "x", "y", "tooltip", null),
 //            new DatasetSpec("data/bundling-test2.xml", "data", "name", null),

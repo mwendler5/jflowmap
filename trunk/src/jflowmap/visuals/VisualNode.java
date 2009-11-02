@@ -50,6 +50,8 @@ public class VisualNode extends PPath {
 
     private PPath clusterMarker;
 
+    private String clusterLabel;
+
     public VisualNode(VisualFlowMap visualFlowMap, Node node, double x, double y, double size) {
         super(new Ellipse2D.Double(x - size/2, y - size/2, size, size));
         if (Double.isNaN(x)  ||  Double.isNaN(y)) {
@@ -66,7 +68,7 @@ public class VisualNode extends PPath {
         this.node = node;
         this.visualFlowMap = visualFlowMap;
         addInputEventListener(INPUT_EVENT_HANDLER);
-//        setVisible(false);
+        setVisible(false);
 	}
 
     public double getValueX() {
@@ -105,7 +107,15 @@ public class VisualNode extends PPath {
 	}
 
 	public String getLabel() {
-		return node.getString(visualFlowMap.getLabelAttr());
+		StringBuilder sb = new StringBuilder();
+		String labelAttr = visualFlowMap.getLabelAttr();
+		if (labelAttr != null) {
+		    sb.append(node.getString(labelAttr));
+		}
+		if (clusterLabel != null) {
+		    sb.append(" [Cluster ").append(clusterLabel).append("]");
+		}
+        return sb.toString();
 	}
 
     private static final PInputEventListener INPUT_EVENT_HANDLER = new PBasicInputEventHandler() {
@@ -283,7 +293,8 @@ public class VisualNode extends PPath {
         }
     }
     
-    public void showClusterMarker(Color color) {
+    public void showClusterMarker(String label, Color color) {
+        this.clusterLabel = label;
         if (clusterMarker == null) {
             double size = 7;
             clusterMarker = new PPath(new Ellipse2D.Double(getValueX() - size/2, getValueY() - size/2, size, size));
