@@ -2,9 +2,10 @@ package jflowmap.data._old;
 
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-import jflowmap.util.Stats;
+import jflowmap.util.MinMax;
 
 /**
  * @author Ilya Boyandin
@@ -63,21 +64,22 @@ public class NodeAndFlowData implements INodeAndFlowData {
 		return nodeData;
 	}
 
-    public static Stats getFlowStats(INodeAndFlowData data, String attrName) {
-    	IFlowData flowData = data.getFlowData();
+    public static MinMax getFlowStats(INodeAndFlowData data, final String attrName) {
+        final IFlowData flowData = data.getFlowData();
         final int size = flowData.numFlows();
 
-        double max = Double.MIN_VALUE;
-        double min = Double.MAX_VALUE;
-
-        for (int i = 0; i < size; i++) {
-			final double v = DoubleAttrValue.asDouble(flowData.getAttrValue(i, attrName));
-            if (v > max)
-                max = v;
-            if (v < min)
-                min = v;
-        }
-        return new Stats(min, max);
+        return MinMax.createFor(new Iterator<Double>() {
+            int i = 0;
+            public boolean hasNext() {
+                return i < size - 1;
+            }
+            public Double next() {
+                return DoubleAttrValue.asDouble(flowData.getAttrValue(i++, attrName));
+            }
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        });
     }
 
 	public String getNodeId(int nodeIdx) {

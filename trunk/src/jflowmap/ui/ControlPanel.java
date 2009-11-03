@@ -31,14 +31,12 @@ import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.clustering.NodeDistanceMeasure;
 import jflowmap.models.FlowMapParamsModel;
 import jflowmap.util.GraphStats;
-import jflowmap.util.Stats;
+import jflowmap.util.MinMax;
 import jflowmap.visuals.VisualFlowMap;
-import jflowmap.visuals.VisualNode;
 import jflowmap.visuals.VisualNodeDistance;
 import at.fhj.utils.graphics.AxisMarks;
 import at.fhj.utils.swing.FancyTable;
 import at.fhj.utils.swing.TableSorter;
-import ch.unifr.dmlib.cluster.DistanceMeasure;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -103,21 +101,32 @@ public class ControlPanel {
     private JComboBox distanceMeasureCombo;
     private final JFlowMap jFlowMap;
     private boolean initializing;
-    private final ForceDirectedBundlerParameters fdBundlingParams = new ForceDirectedBundlerParameters();
+    private ForceDirectedBundlerParameters fdBundlingParams;
     private NodeSimilarityDistancesTableModel similarNodesTableModel;
     private TableSorter similarNodesTableSorter;
+    private boolean modelsInitialized;
 
     public ControlPanel(JFlowMap flowMap) {
         this.jFlowMap = flowMap;
         $$$setupUI$$$();
-        initModelsOnce();
-        initModels();
-        setData(flowMap.getVisualFlowMap().getModel());
+        
+        loadFlowMapData(flowMap.getVisualFlowMap());
         initChangeListeners();
+
         updateDirectionAffectsCompatibilityCheckBox();
         updateDirectionAffectsCompatibilityCheckBox();
         updateRepulsionSpinner();
         updateMarkersInputs();
+    }
+    
+    private void loadFlowMapData(VisualFlowMap visualFlowMap) {
+        fdBundlingParams = new ForceDirectedBundlerParameters(visualFlowMap.getGraphStats());
+        if (!modelsInitialized) {
+            initModelsOnce();
+            modelsInitialized = true;
+        }
+        initModels();
+        setData(visualFlowMap.getModel());
     }
 
     private void updateRepulsionSpinner() {
@@ -155,15 +164,21 @@ public class ControlPanel {
 
     private void initModelsOnce() {
         datasetCombo.setModel(new DefaultComboBoxModel(JFlowMap.datasetSpecs));
-        initForceDirectedEdgeBundlerParamsModels();
     }
 
     public void initForceDirectedEdgeBundlerParamsModels() {
         numberOfCyclesSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getNumCycles(), 1, 10, 1));
         stepsInCycleSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getI(), 1, 1000, 1));
-        edgeStiffnessSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getK(), 0.0, 1000.0, 1.0));
         edgeCompatibilityThresholdSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getEdgeCompatibilityThreshold(), 0.0, 1.0, 0.1));
-        stepSizeSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getS(), 0.0, 1.0, 0.1));
+        
+        double s = fdBundlingParams.getS();
+        double sExp = AxisMarks.ordAlpha(s);
+        double sStep = sExp / 100;
+        double sMax = sExp * 100;
+        stepSizeSpinner.setModel(new SpinnerNumberModel(s, 0.0, sMax, sStep));
+        
+        edgeStiffnessSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getK(), 0.0, 1000.0, 1.0));
+        
         stepDampingFactorSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getStepDampingFactor(), 0.0, 1.0, 0.1));
         directionAffectsCompatibilityCheckBox.setSelected(fdBundlingParams.getDirectionAffectsCompatibility());
         binaryCompatibilityCheckBox.setSelected(fdBundlingParams.getBinaryCompatibility());
@@ -178,25 +193,25 @@ public class ControlPanel {
         initializing = true;
         GraphStats stats = getGraphStats();
 
-        Stats valueStats = stats.getValueEdgeAttrStats();
+        MinMax valueStats = stats.getValueEdgeAttrStats();
 
-        minValueFilterSpinner.setModel(new SpinnerNumberModel(valueStats.min, valueStats.min, valueStats.max, 1));
-        maxValueFilterSpinner.setModel(new SpinnerNumberModel(valueStats.max, valueStats.min, valueStats.max, 1));
+        minValueFilterSpinner.setModel(new SpinnerNumberModel(valueStats.getMin(), valueStats.getMin(), valueStats.getMax(), 1));
+        maxValueFilterSpinner.setModel(new SpinnerNumberModel(valueStats.getMax(), valueStats.getMin(), valueStats.getMax(), 1));
 
-        minValueFilterSlider.setMinimum(toValueEdgeFilterSliderValue(valueStats.min));
-        minValueFilterSlider.setMaximum(toValueEdgeFilterSliderValue(valueStats.max));
-        maxValueFilterSlider.setMinimum(toValueEdgeFilterSliderValue(valueStats.min));
-        maxValueFilterSlider.setMaximum(toValueEdgeFilterSliderValue(valueStats.max));
+        minValueFilterSlider.setMinimum(toValueEdgeFilterSliderValue(valueStats.getMin()));
+        minValueFilterSlider.setMaximum(toValueEdgeFilterSliderValue(valueStats.getMax()));
+        maxValueFilterSlider.setMinimum(toValueEdgeFilterSliderValue(valueStats.getMin()));
+        maxValueFilterSlider.setMaximum(toValueEdgeFilterSliderValue(valueStats.getMax()));
 
-        Stats lengthStats = stats.getEdgeLengthStats();
+        MinMax lengthStats = stats.getEdgeLengthStats();
 
-        minLengthFilterSpinner.setModel(new SpinnerNumberModel(lengthStats.min, lengthStats.min, lengthStats.max, 1));
-        maxLengthFilterSpinner.setModel(new SpinnerNumberModel(lengthStats.max, lengthStats.min, lengthStats.max, 1));
+        minLengthFilterSpinner.setModel(new SpinnerNumberModel(lengthStats.getMin(), lengthStats.getMin(), lengthStats.getMax(), 1));
+        maxLengthFilterSpinner.setModel(new SpinnerNumberModel(lengthStats.getMax(), lengthStats.getMin(), lengthStats.getMax(), 1));
 
-        minLengthFilterSlider.setMinimum(toEdgeLengthFilterSliderValue(lengthStats.min));
-        minLengthFilterSlider.setMaximum(toEdgeLengthFilterSliderValue(lengthStats.max));
-        maxLengthFilterSlider.setMinimum(toEdgeLengthFilterSliderValue(lengthStats.min));
-        maxLengthFilterSlider.setMaximum(toEdgeLengthFilterSliderValue(lengthStats.max));
+        minLengthFilterSlider.setMinimum(toEdgeLengthFilterSliderValue(lengthStats.getMin()));
+        minLengthFilterSlider.setMaximum(toEdgeLengthFilterSliderValue(lengthStats.getMax()));
+        maxLengthFilterSlider.setMinimum(toEdgeLengthFilterSliderValue(lengthStats.getMin()));
+        maxLengthFilterSlider.setMaximum(toEdgeLengthFilterSliderValue(lengthStats.getMax()));
 
         edgeOpacitySpinner.setModel(new SpinnerNumberModel(0, 0, 255, 1));
         edgeOpacitySlider.setMinimum(0);
@@ -214,6 +229,8 @@ public class ControlPanel {
         maxEdgeWidthSlider.setMinimum(0);
         maxEdgeWidthSlider.setMaximum(100);
         initializing = false;
+
+        initForceDirectedEdgeBundlerParamsModels();
 
         maxClusterDistanceSpinner.setModel(new SpinnerNumberModel(0, 0, 10000, 1));
         maxClusterDistanceSlider.setMinimum(0);
@@ -487,8 +504,7 @@ public class ControlPanel {
     private void loadFlowMap(JFlowMap.DatasetSpec dataset) {
         VisualFlowMap visualFlowMap = jFlowMap.loadFlowMap(dataset);
         jFlowMap.setVisualFlowMap(visualFlowMap);
-        initModels();
-        setData(getFlowMapModel());
+        loadFlowMapData(visualFlowMap);
     }
 
     public FlowMapParamsModel getFlowMapModel() {
@@ -504,25 +520,25 @@ public class ControlPanel {
     }
 
     private double fromValueEdgeFilterSliderValue(final int logValue) {
-        Stats stats = getGraphStats().getValueEdgeAttrStats();
+        MinMax stats = getGraphStats().getValueEdgeAttrStats();
         double value = Math.round(Math.pow(Math.E, logValue));
-        if (value < stats.min) {
-            value = stats.min;
+        if (value < stats.getMin()) {
+            value = stats.getMin();
         }
-        if (value > stats.max) {
-            value = stats.max;
+        if (value > stats.getMax()) {
+            value = stats.getMax();
         }
         return value;
     }
 
     private double fromLengthEdgeFilterSliderValue(int value) {
         double v = value;
-        Stats stats = getGraphStats().getEdgeLengthStats();
-        if (v < stats.min) {
-            v = stats.min;
+        MinMax stats = getGraphStats().getEdgeLengthStats();
+        if (v < stats.getMin()) {
+            v = stats.getMin();
         }
-        if (v > stats.max) {
-            v = stats.max;
+        if (v > stats.getMax()) {
+            v = stats.getMax();
         }
         return v;
     }

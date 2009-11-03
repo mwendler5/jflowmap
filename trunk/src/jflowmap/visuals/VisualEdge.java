@@ -7,7 +7,7 @@ import java.awt.Stroke;
 
 import jflowmap.models.FlowMapParamsModel;
 import jflowmap.util.GeomUtils;
-import jflowmap.util.Stats;
+import jflowmap.util.MinMax;
 
 import org.apache.log4j.Logger;
 
@@ -130,8 +130,8 @@ public abstract class VisualEdge extends PNode {
     }
 
     public String getLabel() {
-        return sourceNode.getNode().getString(visualFlowMap.getLabelAttr()) + " -> " +
-               targetNode.getNode().getString(visualFlowMap.getLabelAttr());
+        return sourceNode.getLabel() + " -> " +
+               targetNode.getLabel();
     }
 
     public double getValue() {
@@ -193,7 +193,7 @@ public abstract class VisualEdge extends PNode {
                 nv = (Math.log(value - model.getValueFilterMin()) - minLog) / (maxLog - minLog);
             }
         } else {
-            Stats stats = visualFlowMap.getGraphStats().getValueEdgeAttrStats();
+            MinMax stats = visualFlowMap.getGraphStats().getValueEdgeAttrStats();
             nv = stats.normalizeLog(value);
         }
         if (Double.isNaN(nv)) {
@@ -205,7 +205,7 @@ public abstract class VisualEdge extends PNode {
     public double getNormalizedValue() {
         double nv;
     
-        Stats stats = visualFlowMap.getGraphStats().getValueEdgeAttrStats();
+        MinMax stats = visualFlowMap.getGraphStats().getValueEdgeAttrStats();
         nv = stats.normalize(getValue());
 
         if (Double.isNaN(nv)) {
@@ -263,10 +263,10 @@ public abstract class VisualEdge extends PNode {
 		        	if (model.getUseProportionalDirectionMarkers()) {
 		        		markerSize = (float)model.getDirectionMarkerSize();
 		        	} else {
-		        		Stats lstats = visualFlowMap.getGraphStats().getEdgeLengthStats();
+		        		MinMax lstats = visualFlowMap.getGraphStats().getEdgeLengthStats();
 						markerSize = (float)Math.min(
 								.5 - MIN_FRACTION_DIFF,	 // the markers must not be longer than half of an edge
-								((lstats.min + model.getDirectionMarkerSize() * (lstats.max - lstats.min)) 
+								((lstats.getMin() + model.getDirectionMarkerSize() * (lstats.getMax() - lstats.getMin())) 
 								/ 2)			
 								/ edgeLength	// the markers must be of equal length for every edge
 												// (excepting the short ones)

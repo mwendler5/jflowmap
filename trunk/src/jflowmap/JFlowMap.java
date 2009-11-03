@@ -48,7 +48,8 @@ public class JFlowMap extends JComponent {
         canvas = new PCanvas();
         canvas.setBackground(Color.BLACK);
 //        canvas.setBackground(Color.WHITE);
-        canvas.addInputEventListener(new ZoomHandler(.5, 50));
+//        canvas.addInputEventListener(new ZoomHandler(.5, 50));
+        canvas.addInputEventListener(new ZoomHandler());
         canvas.setPanEventHandler(new PanHandler());
         add(canvas, BorderLayout.CENTER);
         addComponentListener(new ComponentAdapter() {
@@ -122,7 +123,7 @@ public class JFlowMap extends JComponent {
     }
 
 	private GraphStats makeGraphStats(DatasetSpec dataset, Graph graph) {
-		return new GraphStats(
+		return GraphStats.createFor(
 				graph, dataset.valueAttrName, dataset.xNodeAttr, dataset.yNodeAttr);
 	}
 

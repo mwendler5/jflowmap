@@ -1,5 +1,9 @@
 package jflowmap.bundling;
 
+import at.fhj.utils.graphics.AxisMarks;
+import jflowmap.util.GraphStats;
+import jflowmap.util.MinMax;
+
 /**
  * @author Ilya Boyandin
  */
@@ -19,17 +23,23 @@ public class ForceDirectedBundlerParameters {
     private boolean useSimpleCompatibilityMeasure;
     private boolean edgeValueAffectsAttraction;
     private double repulsionAmount;
+    private GraphStats graphStats;
     
-    public ForceDirectedBundlerParameters() {
+    public ForceDirectedBundlerParameters(GraphStats graphStats) {
+        this.graphStats = graphStats;
         resetToDefaults();
     }
     
     public void resetToDefaults() {
         numCycles = 6;
         P = 1;
-        S = 0.4;
+        MinMax xStats = graphStats.getNodeXStats();
+        MinMax yStats = graphStats.getNodeYStats();
+//        S = 0.4;
+        S = AxisMarks.ordAlpha(Math.min(xStats.getMax() - xStats.getMin(), yStats.getMax() - yStats.getMin()) / 1000) * 4;
         I = 50;
-        K = 0.1;
+//        K = 0.1;
+        K = AxisMarks.ordAlpha(Math.min(xStats.getMax() - xStats.getMin(), yStats.getMax() - yStats.getMin()) / 1000);
         repulsionAmount = 1.0;
         stepDampingFactor = 0.5;
         edgeCompatibilityThreshold = 0.60;
@@ -39,6 +49,10 @@ public class ForceDirectedBundlerParameters {
         useRepulsionForOppositeEdges = false;
         useSimpleCompatibilityMeasure = false;
         edgeValueAffectsAttraction = false;
+    }
+    
+    public GraphStats getGraphStats() {
+        return graphStats;
     }
     
     private void ensureDirectionAffectsCompatibilityValueIsValid() {
@@ -162,6 +176,39 @@ public class ForceDirectedBundlerParameters {
         this.repulsionAmount = repulsionAmount;
     }
 
-
-
+    /**
+     * Constructs a <code>String</code> with all attributes
+     * in name = value format.
+     *
+     * @return a <code>String</code> representation 
+     * of this object.
+     */
+    public String toString()
+    {
+        final String TAB = "    ";
+        
+        String retValue = "";
+        
+        retValue = "ForceDirectedBundlerParameters ( "
+            + super.toString() + TAB
+            + "numCycles = " + this.numCycles + TAB
+            + "P = " + this.P + TAB
+            + "S = " + this.S + TAB
+            + "I = " + this.I + TAB
+            + "K = " + this.K + TAB
+            + "stepDampingFactor = " + this.stepDampingFactor + TAB
+            + "edgeCompatibilityThreshold = " + this.edgeCompatibilityThreshold + TAB
+            + "directionAffectsCompatibility = " + this.directionAffectsCompatibility + TAB
+            + "binaryCompatibility = " + this.binaryCompatibility + TAB
+            + "useInverseQuadraticModel = " + this.useInverseQuadraticModel + TAB
+            + "useRepulsionForOppositeEdges = " + this.useRepulsionForOppositeEdges + TAB
+            + "useSimpleCompatibilityMeasure = " + this.useSimpleCompatibilityMeasure + TAB
+            + "edgeValueAffectsAttraction = " + this.edgeValueAffectsAttraction + TAB
+            + "repulsionAmount = " + this.repulsionAmount + TAB
+//            + "graphStats = " + this.graphStats + TAB
+            + " )";
+    
+        return retValue;
+    }
+    
 }

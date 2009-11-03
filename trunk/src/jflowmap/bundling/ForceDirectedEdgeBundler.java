@@ -77,7 +77,7 @@ public class ForceDirectedEdgeBundler {
     }
     
     public void bundle(ProgressTracker pt) {
-        logger.info("FDE bundling started");
+        logger.info("FDE bundling started with the following parameters: " + params);
         pt.startTask("Initializing", .05);
         init(pt);
         if (!pt.isCancelled()) {
@@ -139,6 +139,7 @@ public class ForceDirectedEdgeBundler {
         this.I = params.getI();
         this.P = params.getP();
         this.S = params.getS();
+//        this.S = 1e-6;
         
         calcEdgeCompatibilityMeasures();
         

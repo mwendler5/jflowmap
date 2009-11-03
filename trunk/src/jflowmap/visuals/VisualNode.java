@@ -29,7 +29,7 @@ public class VisualNode extends PPath {
     private static final long serialVersionUID = 1L;
     
     private static final Stroke STROKE = new PFixedWidthStroke(1);
-    private static final Color PAINT = new Color(100, 100, 100, 50);
+    private static final Color PAINT = new Color(255, 255, 255, 70);
     private static final Color STROKE_PAINT = new Color(255, 255, 255, 50);
     private static final Color HIGHLIGHTED_PAINT = new Color(255, 0, 0, 120);
     private static final Color SELECTED_STROKE_PAINT = new Color(255, 255, 0, 255);
@@ -52,23 +52,28 @@ public class VisualNode extends PPath {
 
     private String clusterLabel;
 
+    private double markerSize;
+
     public VisualNode(VisualFlowMap visualFlowMap, Node node, double x, double y, double size) {
         super(new Ellipse2D.Double(x - size/2, y - size/2, size, size));
+        this.markerSize = size;
         if (Double.isNaN(x)  ||  Double.isNaN(y)) {
             logger.error("NaN coordinates passed in for node: " + node);
             throw new IllegalArgumentException("NaN coordinates passed in for node " + node);
         }
         this.valueX = x;
         this.valueY = y;
-        setStrokePaint(STROKE_PAINT);
+//        setStrokePaint(STROKE_PAINT);
         setPaint(PAINT);
-        setStroke(STROKE);
+//        setStroke(STROKE);
+        setStroke(null);
 //    	this.x = x;
 //    	this.y = y;
         this.node = node;
         this.visualFlowMap = visualFlowMap;
         addInputEventListener(INPUT_EVENT_HANDLER);
-        setVisible(false);
+//        setVisible(false);
+        setVisible(true);
 	}
 
     public double getValueX() {
@@ -111,6 +116,8 @@ public class VisualNode extends PPath {
 		String labelAttr = visualFlowMap.getLabelAttr();
 		if (labelAttr != null) {
 		    sb.append(node.getString(labelAttr));
+		} else {
+		    sb.append("(").append(getValueX()).append(",").append(getValueY()).append(")");
 		}
 		if (clusterLabel != null) {
 		    sb.append(" [Cluster ").append(clusterLabel).append("]");
@@ -296,7 +303,7 @@ public class VisualNode extends PPath {
     public void showClusterMarker(String label, Color color) {
         this.clusterLabel = label;
         if (clusterMarker == null) {
-            double size = 7;
+            double size = markerSize * 2;
             clusterMarker = new PPath(new Ellipse2D.Double(getValueX() - size/2, getValueY() - size/2, size, size));
             clusterMarker.setStroke(new PFixedWidthStroke(1));
             addChild(clusterMarker);

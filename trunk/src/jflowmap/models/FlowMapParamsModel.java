@@ -4,7 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import jflowmap.util.GraphStats;
-import jflowmap.util.Stats;
+import jflowmap.util.MinMax;
 
 import org.apache.log4j.Logger;
 
@@ -50,18 +50,18 @@ public class FlowMapParamsModel {
         this.yNodeAttr = yNodeAttr;
         this.labelAttr = labelAttrName;
 
-        Stats minMax = graphStats.getValueEdgeAttrStats();
-        this.valueFilterMin = minMax.min;
-        this.valueFilterMax = minMax.max;
+        MinMax minMax = graphStats.getValueEdgeAttrStats();
+        this.valueFilterMin = minMax.getMin();
+        this.valueFilterMax = minMax.getMax();
 
-        if (minMax.max - minMax.min > 10.0) {
+        if (minMax.getMax() - minMax.getMin() > 10.0) {
             maxEdgeWidth = 10.0;
         } else {
-            maxEdgeWidth = Math.floor(minMax.max - minMax.min);
+            maxEdgeWidth = Math.floor(minMax.getMax() - minMax.getMin());
         }
-        Stats lengthStats = graphStats.getEdgeLengthStats();
-        this.edgeLengthFilterMin = lengthStats.min;
-        this.edgeLengthFilterMax = lengthStats.max;
+        MinMax lengthStats = graphStats.getEdgeLengthStats();
+        this.edgeLengthFilterMin = lengthStats.getMin();
+        this.edgeLengthFilterMax = lengthStats.getMax();
 
     }
 

@@ -1,13 +1,12 @@
 package jflowmap.util;
 
-import prefuse.data.Graph;
-import prefuse.data.Edge;
-import prefuse.data.Node;
-
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-import jflowmap.util.Stats;
+import prefuse.data.Edge;
+import prefuse.data.Graph;
+import prefuse.data.Node;
 
 /**
  * @author Ilya Boyandin
@@ -17,20 +16,25 @@ public class GraphStats {
 
     private Graph graph;
 
-    private final Map<String, Stats> statsCache = new HashMap<String, Stats>();
+    private final Map<String, MinMax> statsCache = new HashMap<String, MinMax>();
     private String valueEdgeAttr;
     private String xNodeAttr;
     private String yNodeAttr;
     private double[] edgeLengths;
 
-    public GraphStats(Graph graph, String valueEdgeAttr, String xNodeAttr, String yNodeAttr) {
+    private GraphStats(Graph graph, String valueEdgeAttr, String xNodeAttr, String yNodeAttr) {
         this.graph = graph;
         this.valueEdgeAttr = valueEdgeAttr;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
     }
 
-    public Stats getValueEdgeAttrStats() {
+    public static GraphStats createFor(Graph graph, String valueEdgeAttr, String xNodeAttr, String yNodeAttr) {
+        return new GraphStats(graph, valueEdgeAttr, xNodeAttr, yNodeAttr);
+    }
+
+    
+    public MinMax getValueEdgeAttrStats() {
         return getValueEdgeAttrStats(valueEdgeAttr);
     }
 
@@ -53,42 +57,74 @@ public class GraphStats {
         return edgeLengths;
     }
 
-    public Stats getEdgeLengthStats() {
-        double max = Double.MIN_VALUE;
-        double min = Double.MAX_VALUE;
-
-        double[] lengths = getEdgeLengths();
-        for (int i = 0; i < lengths.length; i++) {
-            double v = lengths[i];
-            if (v > max) {
-                max = v;
+    public MinMax getEdgeLengthStats() {
+        final double[] lengths = getEdgeLengths();
+        return MinMax.createFor(new Iterator<Double>() {
+            int i = 0;
+            public boolean hasNext() {
+                return i < lengths.length - 1;
             }
-            if (v < min) {
-                min = v;
+            public Double next() {
+                return lengths[i++];
             }
-        }
-        return new Stats(min, max);
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        });
     }
 
-    public Stats getValueEdgeAttrStats(String attrName) {
+    public MinMax getValueEdgeAttrStats(String attrName) {
         String key = "edge-" + attrName;
-        Stats stats = statsCache.get(key);
+        MinMax stats = statsCache.get(key);
         if (stats == null) {
-            stats = Stats.getTupleStats(graph.getEdges(), attrName);
+            stats = TupleStats.createFor(graph.getEdges(), attrName);
             statsCache.put(key, stats);
         }
         return stats;
     }
-
-    public Stats getNodeAttrStats(String attrName) {
+    
+    public MinMax getNodeAttrStats(String attrName) {
     	String key = "node-" + attrName;
-    	Stats stats = statsCache.get(key);
+    	MinMax stats = statsCache.get(key);
     	if (stats == null) {
-            stats = Stats.getTupleStats(graph.getNodes(), attrName);
+            stats = TupleStats.createFor(graph.getNodes(), attrName);
             statsCache.put(key, stats);
     	}
     	return stats;
     }
+    
+    public MinMax getNodeXStats() {
+        return getNodeAttrStats(xNodeAttr);
+    }
 
+    public MinMax getNodeYStats() {
+        return getNodeAttrStats(yNodeAttr);
+    }
+
+    /**
+     * Constructs a <code>String</code> with all attributes
+     * in name = value format.
+     *
+     * @return a <code>String</code> representation 
+     * of this object.
+     */
+    public String toString()
+    {
+        final String TAB = "    ";
+        
+        String retValue = "";
+        
+        retValue = "GraphStats ( "
+            + super.toString() + TAB
+            + "graph = " + this.graph + TAB
+            + "statsCache = " + this.statsCache + TAB
+            + "valueEdgeAttr = " + this.valueEdgeAttr + TAB
+            + "xNodeAttr = " + this.xNodeAttr + TAB
+            + "yNodeAttr = " + this.yNodeAttr + TAB
+            + "edgeLengths = " + this.edgeLengths + TAB
+            + " )";
+    
+        return retValue;
+    }
 
 }

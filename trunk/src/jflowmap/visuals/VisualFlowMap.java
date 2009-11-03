@@ -22,6 +22,7 @@ import jflowmap.clustering.NodeDistanceMeasure;
 import jflowmap.models.FlowMapParamsModel;
 import jflowmap.util.ColorUtils;
 import jflowmap.util.GraphStats;
+import jflowmap.util.MinMax;
 
 import org.apache.log4j.Logger;
 
@@ -49,7 +50,6 @@ public class VisualFlowMap extends PNode {
 
     private static final Color SINGLE_ELEMENT_CLUSTER_COLOR = new Color(100, 100, 100, 150);
     private static Logger logger = Logger.getLogger(VisualFlowMap.class);
-    private static final int DEFAULT_NODE_SIZE = 2;
     private final Tooltip tooltipBox;
     private PBounds nodeBounds;
 
@@ -99,8 +99,15 @@ public class VisualFlowMap extends PNode {
         final int numNodes = graph.getNodeCount();
         nodesToVisuals = new LinkedHashMap<Node, VisualNode>();
 
-//        Stats xStats = model.getNodeAttrStats(model.getXNodeAttr());
-//        Stats yStats = model.getNodeAttrStats(model.getYNodeAttr());
+//        MinMax xStats = graphStats.getNodeXStats();
+//        MinMax yStats = graphStats.getNodeYStats();
+//        double nodeSize = (Math.min(xStats.getMax() - xStats.getMin(), yStats.getMax() - yStats.getMin()) / 250);
+        MinMax lenStats = graphStats.getEdgeLengthStats();
+//        double nodeSize = lenStats.getMin() / 10;
+        double nodeSize = lenStats.getAvg() / 50;
+//        double nodeSize = Math.max(
+//                lenStats.getAvg() / 70,
+//                Math.min(xStats.getMax() - xStats.getMin(), yStats.getMax() - yStats.getMin()) / 100);
 
         for (int i = 0; i < numNodes; i++) {
             Node node = graph.getNode(i);
@@ -108,7 +115,7 @@ public class VisualFlowMap extends PNode {
             VisualNode vnode = new VisualNode(this, node,
                     node.getDouble(model.getXNodeAttr()),// - xStats.min,
                     node.getDouble(model.getYNodeAttr()),// - yStats.min,
-                    DEFAULT_NODE_SIZE);
+                    nodeSize);
             nodeLayer.addChild(vnode);
             nodesToVisuals.put(node, vnode);
         }
