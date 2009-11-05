@@ -5,6 +5,7 @@ import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import jflowmap.util.GeomUtils;
@@ -28,6 +29,8 @@ public class VisualNode extends PPath {
 
     private static final long serialVersionUID = 1L;
     
+    public static final int NO_CLUSTER = 0;
+
     private static final Stroke STROKE = new PFixedWidthStroke(1);
     private static final Color PAINT = new Color(255, 255, 255, 70);
     private static final Color STROKE_PAINT = new Color(255, 255, 255, 50);
@@ -49,8 +52,8 @@ public class VisualNode extends PPath {
     private boolean alwaysVisible;
 
     private PPath clusterMarker;
-
-    private String clusterLabel;
+    private int clusterId = NO_CLUSTER;
+    private Color clusterColor = null;
 
     private double markerSize;
 
@@ -110,19 +113,28 @@ public class VisualNode extends PPath {
     public VisualFlowMap getVisualGraph() {
 		return visualFlowMap;
 	}
-
-	public String getLabel() {
-		StringBuilder sb = new StringBuilder();
-		String labelAttr = visualFlowMap.getLabelAttr();
-		if (labelAttr != null) {
-		    sb.append(node.getString(labelAttr));
-		} else {
-		    sb.append("(").append(getValueX()).append(",").append(getValueY()).append(")");
-		}
-		if (clusterLabel != null) {
-		    sb.append(" [Cluster ").append(clusterLabel).append("]");
-		}
+    
+    public String getLabel() {
+        StringBuilder sb = new StringBuilder();
+        String labelAttr = visualFlowMap.getLabelAttr();
+        if (labelAttr != null) {
+            sb.append(node.getString(labelAttr));
+        } else {
+            sb.append("(").append(getValueX()).append(",").append(getValueY()).append(")");
+        }
         return sb.toString();
+    }
+
+	public String getFullLabel() {
+	    String fullLabel;
+		if (clusterId != NO_CLUSTER) {
+	        StringBuilder sb = new StringBuilder(getLabel());
+		    sb.append(" [Cluster ").append(clusterId).append("]");
+		    fullLabel = sb.toString();
+		} else {
+		    fullLabel = getLabel();
+		}
+		return fullLabel;
 	}
 
     private static final PInputEventListener INPUT_EVENT_HANDLER = new PBasicInputEventHandler() {
@@ -300,8 +312,24 @@ public class VisualNode extends PPath {
         }
     }
     
-    public void showClusterMarker(String label, Color color) {
-        this.clusterLabel = label;
+    public void setClusterId(int clusterId) {
+        this.clusterId = clusterId;
+    }
+    
+    public int getClusterId() {
+        return clusterId;
+    }
+    
+    public void setClusterColor(Color clusterColor) {
+        this.clusterColor = clusterColor;
+        showClusterMarker();
+    }
+    
+    public Color getClusterColor() {
+        return clusterColor;
+    }
+    
+    private void showClusterMarker() {
         if (clusterMarker == null) {
             double size = markerSize * 2;
             clusterMarker = new PPath(new Ellipse2D.Double(getValueX() - size/2, getValueY() - size/2, size, size));
@@ -309,7 +337,7 @@ public class VisualNode extends PPath {
             addChild(clusterMarker);
             clusterMarker.moveToBack();
         }
-        clusterMarker.setPaint(color);
+        clusterMarker.setPaint(clusterColor);
     }
     
     /**
@@ -354,5 +382,10 @@ public class VisualNode extends PPath {
         return hasIncomingEdges()  ||  hasOutgoingEdges();
     }
 
+    public static final Comparator<VisualNode> LABEL_COMPARATOR = new Comparator<VisualNode>() {
+        public int compare(VisualNode o1, VisualNode o2) {
+            return o1.getLabel().compareTo(o2.getLabel());
+        }
+    };
 
 }

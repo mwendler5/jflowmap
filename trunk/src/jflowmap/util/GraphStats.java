@@ -20,7 +20,7 @@ public class GraphStats {
     private String valueEdgeAttr;
     private String xNodeAttr;
     private String yNodeAttr;
-    private double[] edgeLengths;
+    private MinMax edgeLengthStats;
 
     private GraphStats(Graph graph, String valueEdgeAttr, String xNodeAttr, String yNodeAttr) {
         this.graph = graph;
@@ -39,38 +39,39 @@ public class GraphStats {
     }
 
     private double[] getEdgeLengths() {
-        if (edgeLengths == null) {
-            int numEdges = graph.getEdgeCount();
-            edgeLengths = new double[numEdges];
-            for (int i = 0; i < numEdges; i++) {
-                Edge edge = graph.getEdge(i);
-                Node src = edge.getSourceNode();
-                Node target = edge.getTargetNode();
-                double x1 = src.getDouble(xNodeAttr);
-                double y1 = src.getDouble(yNodeAttr);
-                double x2 = target.getDouble(xNodeAttr);
-                double y2 = target.getDouble(yNodeAttr);
-                double d = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-                edgeLengths[i] = d;
-            }
+        int numEdges = graph.getEdgeCount();
+        double[] edgeLengths = new double[numEdges];
+        for (int i = 0; i < numEdges; i++) {
+            Edge edge = graph.getEdge(i);
+            Node src = edge.getSourceNode();
+            Node target = edge.getTargetNode();
+            double x1 = src.getDouble(xNodeAttr);
+            double y1 = src.getDouble(yNodeAttr);
+            double x2 = target.getDouble(xNodeAttr);
+            double y2 = target.getDouble(yNodeAttr);
+            double d = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+            edgeLengths[i] = d;
         }
         return edgeLengths;
     }
 
     public MinMax getEdgeLengthStats() {
-        final double[] lengths = getEdgeLengths();
-        return MinMax.createFor(new Iterator<Double>() {
-            int i = 0;
-            public boolean hasNext() {
-                return i < lengths.length - 1;
-            }
-            public Double next() {
-                return lengths[i++];
-            }
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        });
+        if (edgeLengthStats == null) {
+            final double[] lengths = getEdgeLengths();
+            edgeLengthStats = MinMax.createFor(new Iterator<Double>() {
+                int i = 0;
+                public boolean hasNext() {
+                    return i < lengths.length - 1;
+                }
+                public Double next() {
+                    return lengths[i++];
+                }
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            });
+        }
+        return edgeLengthStats;
     }
 
     public MinMax getValueEdgeAttrStats(String attrName) {
@@ -121,7 +122,7 @@ public class GraphStats {
             + "valueEdgeAttr = " + this.valueEdgeAttr + TAB
             + "xNodeAttr = " + this.xNodeAttr + TAB
             + "yNodeAttr = " + this.yNodeAttr + TAB
-            + "edgeLengths = " + this.edgeLengths + TAB
+            + "edgeLengthStats = " + this.edgeLengthStats + TAB
             + " )";
     
         return retValue;

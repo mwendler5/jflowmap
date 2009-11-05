@@ -1,6 +1,7 @@
 package jflowmap.visuals;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import ch.unifr.dmlib.cluster.HierarchicalClusterer.DistanceMatrix;
@@ -45,4 +46,18 @@ public class VisualNodeDistance implements Comparable<VisualNodeDistance> {
         }
         return list;
     }
+
+    public static final Comparator<VisualNodeDistance> FROM_LABEL_COMPARATOR = new Comparator<VisualNodeDistance>() {
+        public int compare(VisualNodeDistance o1, VisualNodeDistance o2) {
+            String src1 = o1.getSource().getLabel();
+            String src2 = o2.getSource().getLabel();
+            int c = src1.compareTo(src2);
+            if (c == 0) {
+                String trg1 = o1.getTarget().getLabel();
+                String trg2 = o2.getTarget().getLabel();
+                c = trg1.compareTo(trg2);
+            }
+            return c;
+        }
+    };
 }

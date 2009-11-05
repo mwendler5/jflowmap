@@ -10,6 +10,8 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.apache.log4j.Logger;
 
@@ -90,7 +92,7 @@ public class FlowMapMain extends JFrame {
 //                    break;
 //                }
 //            }
-//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+////            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }

@@ -858,7 +858,9 @@
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(p;50px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:268px:grow"/>
+            <colspec value="fill:20px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:400px:noGrow"/>
             <constraints>
               <tabbedpane title="Node clustering"/>
             </constraints>
@@ -867,22 +869,6 @@
               <size top="10" left="10" bottom="10" right="10"/>
             </border>
             <children>
-              <scrollpane id="155c4">
-                <constraints>
-                  <grid row="0" column="10" row-span="5" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
-                </constraints>
-                <properties/>
-                <border type="none" title=""/>
-                <children>
-                  <component id="ef50b" class="javax.swing.JTable" binding="similarNodesTable" custom-create="true">
-                    <constraints/>
-                    <properties>
-                      <preferredScrollableViewportSize width="450" height="100"/>
-                    </properties>
-                  </component>
-                </children>
-              </scrollpane>
               <component id="b4906" class="javax.swing.JSeparator">
                 <constraints>
                   <grid row="0" column="2" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
@@ -939,6 +925,59 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
+              </component>
+              <tabbedpane id="86023" binding="tabbedPane2" default-binding="true">
+                <constraints>
+                  <grid row="0" column="12" row-span="5" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <preferred-size width="200" height="200"/>
+                  </grid>
+                  <forms defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <tabPlacement value="3"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <scrollpane id="e4986">
+                    <constraints>
+                      <tabbedpane title="Clusters"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none" title=""/>
+                    <children>
+                      <component id="5b3e0" class="javax.swing.JTable" binding="clustersTable" custom-create="true">
+                        <constraints/>
+                        <properties>
+                          <preferredScrollableViewportSize width="450" height="100"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </scrollpane>
+                  <scrollpane id="155c4">
+                    <constraints>
+                      <tabbedpane title="Distances"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none" title=""/>
+                    <children>
+                      <component id="ef50b" class="javax.swing.JTable" binding="similarNodesTable" custom-create="true">
+                        <constraints/>
+                        <properties>
+                          <preferredScrollableViewportSize width="450" height="100"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </scrollpane>
+                </children>
+              </tabbedpane>
+              <component id="1ba28" class="javax.swing.JSeparator">
+                <constraints>
+                  <grid row="0" column="10" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <orientation value="1"/>
+                </properties>
               </component>
             </children>
           </grid>

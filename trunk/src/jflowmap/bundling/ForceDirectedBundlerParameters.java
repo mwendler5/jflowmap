@@ -35,8 +35,10 @@ public class ForceDirectedBundlerParameters {
         P = 1;
         MinMax xStats = graphStats.getNodeXStats();
         MinMax yStats = graphStats.getNodeYStats();
+//        MinMax lenStats = graphStats.getEdgeLengthStats();
 //        S = 0.4;
         S = AxisMarks.ordAlpha(Math.min(xStats.getMax() - xStats.getMin(), yStats.getMax() - yStats.getMin()) / 1000) * 4;
+//        S = AxisMarks.ordAlpha(lenStats.getAvg()) * 4 * 1e-3;
         I = 50;
 //        K = 0.1;
         K = AxisMarks.ordAlpha(Math.min(xStats.getMax() - xStats.getMin(), yStats.getMax() - yStats.getMin()) / 1000);

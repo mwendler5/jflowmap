@@ -36,21 +36,21 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             return Cosine.IN_AND_OUT.distance(t1, t2);
         }        
     },
-//    COSINE_WITH_NODE_PROXIMITY_IN("Cosine with node proximity: incoming", NodeFilter.IN) {
-//        public double distance(VisualNode t1, VisualNode t2) {
-//            return CosineWithNodeProximity.IN.distance(t1, t2);
-//        }        
-//    },
-//    COSINE_WITH_NODE_PROXIMITY_OUT("Cosine with node proximity: outgoing", NodeFilter.OUT) {
-//        public double distance(VisualNode t1, VisualNode t2) {
-//            return CosineWithNodeProximity.OUT.distance(t1, t2);
-//        }        
-//    },
-//    COSINE_WITH_NODE_PROXIMITY_IN_OUT("Cosine with node proximity: incoming and outgoing", NodeFilter.IN_OR_OUT) {
-//        public double distance(VisualNode t1, VisualNode t2) {
-//            return CosineWithNodeProximity.IN_AND_OUT.distance(t1, t2);
-//        }        
-//    },
+    COSINE_WITH_NODE_PROXIMITY_IN("Cosine with node proximity: incoming", NodeFilter.IN) {
+        public double distance(VisualNode t1, VisualNode t2) {
+            return CosineWithNodeProximity.IN.distance(t1, t2);
+        }        
+    },
+    COSINE_WITH_NODE_PROXIMITY_OUT("Cosine with node proximity: outgoing", NodeFilter.OUT) {
+        public double distance(VisualNode t1, VisualNode t2) {
+            return CosineWithNodeProximity.OUT.distance(t1, t2);
+        }        
+    },
+    COSINE_WITH_NODE_PROXIMITY_IN_OUT("Cosine with node proximity: incoming and outgoing", NodeFilter.IN_OR_OUT) {
+        public double distance(VisualNode t1, VisualNode t2) {
+            return CosineWithNodeProximity.IN_AND_OUT.distance(t1, t2);
+        }        
+    },
     COMMON_EDGES_IN("Common edges: incoming", NodeFilter.IN) {
         public double distance(VisualNode t1, VisualNode t2) {
             return CommonEdges.IN.distance(t1, t2);

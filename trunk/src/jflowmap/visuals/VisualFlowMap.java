@@ -7,6 +7,7 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -57,6 +58,7 @@ public class VisualFlowMap extends PNode {
     private final PNode nodeLayer;
 
     private final FlowMapParamsModel model;
+    private List<VisualNode> visualNodes;
     private Map<Node, VisualNode> nodesToVisuals;
     private Map<Edge, VisualEdge> edgesToVisuals;
     private final PCanvas canvas;
@@ -97,6 +99,7 @@ public class VisualFlowMap extends PNode {
         nodeLayer.removeAllChildren();
 
         final int numNodes = graph.getNodeCount();
+        visualNodes = new ArrayList<VisualNode>();
         nodesToVisuals = new LinkedHashMap<Node, VisualNode>();
 
 //        MinMax xStats = graphStats.getNodeXStats();
@@ -117,10 +120,14 @@ public class VisualFlowMap extends PNode {
                     node.getDouble(model.getYNodeAttr()),// - yStats.min,
                     nodeSize);
             nodeLayer.addChild(vnode);
+            visualNodes.add(vnode);
             nodesToVisuals.put(node, vnode);
         }
     }
 
+    public List<VisualNode> getVisualNodes() {
+        return Collections.unmodifiableList(visualNodes);
+    }
     
     private void createEdges() {
         createEdges(null, false);
@@ -183,7 +190,7 @@ public class VisualFlowMap extends PNode {
 //                    0, 0, (xStats.max - xStats.min) / 2, (yStats.max - yStats.min) / 2
 //            );
             PBounds b = null;
-            for (VisualNode node : nodesToVisuals.values()) {
+            for (VisualNode node : visualNodes) {
                 if (b == null) {
                     b = node.getBounds();
                 } else {
@@ -233,6 +240,7 @@ public class VisualFlowMap extends PNode {
 //        PPath boundRectPath = new PPath(boundRect);
 //        addChild(boundRectPath);
 //        boundRectPath.setStrokePaint(Color.red);
+        logger.info("Fit in camera view: Bounding box: " + boundRect);
         boundRect = (PBounds)getCamera().globalToLocal(boundRect);
 //        PiccoloUtils.setViewPaddedBounds(getCamera(), boundRect, new Insets(10, 10, 10, 10));
         getCamera().animateViewToCenterBounds(boundRect, true, 0);
@@ -249,7 +257,7 @@ public class VisualFlowMap extends PNode {
             VisualNode vnode = (VisualNode) component;
 //    		tooltipBox.setText(fnode.getId(), nodeData.nodeLabel(nodeIdx), "");
             tooltipBox.setText(
-                    vnode.getLabel(),
+                    vnode.getFullLabel(),
                     ""
 //			        "Outgoing " + selectedFlowAttrName + ": " + graph.getOutgoingTotal(fnode.getId(), selectedFlowAttrName) + "\n" +
 //			        "Incoming " + selectedFlowAttrName + ": " + graph.getIncomingTotal(fnode.getId(), selectedFlowAttrName)
@@ -353,7 +361,7 @@ public class VisualFlowMap extends PNode {
         for (VisualEdge ve : edgesToVisuals.values()) {
             ve.updateVisibiliy();
         }
-        for (VisualNode vn : nodesToVisuals.values()) {
+        for (VisualNode vn : visualNodes) {
             vn.updatePickability();
         }
     }
@@ -470,9 +478,11 @@ public class VisualFlowMap extends PNode {
                 List<VisualNode> cluster = clusters.get(i);
                 for (VisualNode node : cluster) {
                     if (cluster.size() > 1) {
-                        node.showClusterMarker(Integer.toString(i), colors[lastColor]);
+                        node.setClusterId(i + 1);
+                        node.setClusterColor(colors[lastColor]);
                     } else {
-                        node.showClusterMarker(null, SINGLE_ELEMENT_CLUSTER_COLOR);
+                        node.setClusterId(VisualNode.NO_CLUSTER);
+                        node.setClusterColor(SINGLE_ELEMENT_CLUSTER_COLOR);
                     }
                 }
                 if (cluster.size() > 1) {
@@ -483,14 +493,14 @@ public class VisualFlowMap extends PNode {
     }
 
     private void hideClusterMarkers() {
-        for (VisualNode node : nodesToVisuals.values()) {
+        for (VisualNode node : visualNodes) {
             node.hideClusterMarker();
         }
     }
 
     public void clusterNodes(NodeDistanceMeasure distanceMeasure) {
         logger.info("Clustering nodes");
-        doCluster(distanceMeasure, new ArrayList<VisualNode>(nodesToVisuals.values()), new ProgressTracker());
+        doCluster(distanceMeasure, new ArrayList<VisualNode>(visualNodes), new ProgressTracker());
 //        if (logger.isDebugEnabled()) {
 //        	logger.debug("\n" + rootCluster.dumpToTreeString());
 //        }
