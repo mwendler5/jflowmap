@@ -473,20 +473,20 @@ public class VisualFlowMap extends PNode {
                 }
             }
             Color[] colors = ColorUtils.createCategoryColors(numClusters, 150);
-            int lastColor = 0;
+            int lastCluster = 0;
             for (int i = 0, size = clusters.size(); i < size; i++) {
                 List<VisualNode> cluster = clusters.get(i);
                 for (VisualNode node : cluster) {
                     if (cluster.size() > 1) {
-                        node.setClusterId(i + 1);
-                        node.setClusterColor(colors[lastColor]);
+                        node.setClusterId(lastCluster + 1);
+                        node.setClusterColor(colors[lastCluster]);
                     } else {
                         node.setClusterId(VisualNode.NO_CLUSTER);
                         node.setClusterColor(SINGLE_ELEMENT_CLUSTER_COLOR);
                     }
                 }
                 if (cluster.size() > 1) {
-                    lastColor++;
+                    lastCluster++;
                 }
             }
         }

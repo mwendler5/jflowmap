@@ -215,6 +215,8 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
                     sum += edge1.getValue() * matchingEdge.getValue();
                 }
             }
+            // it's enough to iterate through edges1, because we only take 
+            // perfect matches (edges going to/from the same node) into the sum
             return sum;
         }
 
@@ -254,29 +256,26 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
         }
         
         public double distance(VisualNode node1, VisualNode node2) {
-            double numerator = 0;
+            SimilarityFraction sf = new SimilarityFraction();
             if (includeIncoming) {
-                numerator += valuesProductSum(node1, node2, true);
+                forEdges(sf, node1, node2, true, true);
+                forEdges(sf, node2, node1, true, false);  // same for node2 edges except for the perfect matches
             }
             if (includeOutgoing) {
-                numerator += valuesProductSum(node1, node2, false);
+                forEdges(sf, node1, node2, false, true);
+                forEdges(sf, node2, node1, false, false);  // same for node2 edges except for the perfect matches
             }
 
-            double denominator = 0;
-            double denomSum1 = 0;
-            double denomSum2 = 0;
             if (includeIncoming) {
-                denomSum1 += valueSquareSum(node1, true);
-                denomSum2 += valueSquareSum(node2, true);
+                sf.squareOfDenominator1 += valueSquareSum(node1, true);
+                sf.squareOfDenominator2 += valueSquareSum(node2, true);
             }
             if (includeOutgoing) {
-                denomSum1 += valueSquareSum(node1, false);
-                denomSum2 += valueSquareSum(node2, false);
+                sf.squareOfDenominator1 += valueSquareSum(node1, false);
+                sf.squareOfDenominator2 += valueSquareSum(node2, false);
             }
-            denominator = Math.sqrt(denomSum1) * Math.sqrt(denomSum2);
-            
-            double similarity = numerator / denominator;
-            return 1.0 - similarity;
+
+            return (1.0 - sf.similarity());
         }
 
         private double valueSquareSum(VisualNode node, boolean incoming) {
@@ -287,36 +286,62 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             }
             return sum;
         }
+        
+        private static class SimilarityFraction {
+            double numerator = 0;
+            double squareOfDenominator1 = 0;
+            double squareOfDenominator2 = 0;
+            double similarity() {
+                return numerator / (Math.sqrt(squareOfDenominator1) * Math.sqrt(squareOfDenominator2));
+            }
+        }
 
-        private double valuesProductSum(VisualNode node1, VisualNode node2, boolean incoming) {
-            double sum = 0;
-            List<VisualEdge> edges1 = node1.getEdges(incoming);
-            for (VisualEdge edge1 : edges1) {
-
+        private SimilarityFraction forEdges(SimilarityFraction sf, VisualNode node1, VisualNode node2,
+                boolean incoming,
+                boolean allowPerfectMatches) {
+            
+            for (VisualEdge e1 : node1.getEdges(incoming)) {
                 VisualEdge matchingEdge = null;
-                VisualNode opposite1 = edge1.getNode(incoming ? true : false);    // source if incoming, target if outgoing
+                final boolean oppositeIsSource = (incoming ? true : false);
+                VisualNode opposite1 = e1.getNode(oppositeIsSource);       // source if incoming, target if outgoing
                 
-                // find an edge
+                // find a matching edge
                 double minDist = Double.POSITIVE_INFINITY;
-                for (VisualEdge edge2 : node2.getEdges(incoming)) {
-                    VisualNode opposite2 = edge2.getOppositeNode(node2);
+                for (VisualEdge e2 : node2.getEdges(incoming)) {
+                    VisualNode opposite2 = e2.getOppositeNode(node2);
                     if (opposite1 == opposite2) {
                         minDist = 0;
-                        matchingEdge = edge2;
+                        matchingEdge = e2;
                         break;
                     } else {
                         double dist = opposite2.distanceTo(opposite1);
                         if (dist < minDist) {
                             minDist = dist;
-                            matchingEdge = edge2;
+                            matchingEdge = e2;
                         }
                     }
                 }
-                if (matchingEdge != null) {
-                    sum += edge1.getValue() * matchingEdge.getValue() * (1.0 - minDist);
+                boolean nonPerfectMatch = minDist > 0;
+                if (allowPerfectMatches  ||  nonPerfectMatch) {
+                    if (matchingEdge != null) {
+                        double mv = matchingValue(e1, matchingEdge, oppositeIsSource);
+                        double v = e1.getValue();
+                        sf.numerator += v * mv;
+                        if (nonPerfectMatch) {
+                            sf.squareOfDenominator1 += v * v;
+                            sf.squareOfDenominator2 += mv * mv;
+                        }
+                    }
                 }
             }
-            return sum;
+            return sf;
+        }
+        
+        private double matchingValue(VisualEdge edge, VisualEdge matchingEdge, boolean oppositeIsSource) {
+            VisualNode n1 = oppositeIsSource ? edge.getSourceNode() : edge.getTargetNode();
+            VisualNode n2 = oppositeIsSource ? matchingEdge.getSourceNode() : matchingEdge.getTargetNode();
+            double l_avg = (edge.getEdgeLength() + matchingEdge.getEdgeLength())/2;
+            return matchingEdge.getValue() * l_avg / (l_avg + n1.distanceTo(n2));
         }
     }
 

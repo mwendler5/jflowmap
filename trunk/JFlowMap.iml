@@ -86,9 +86,7 @@
           <root url="jar://$MODULE_DIR$/lib/fhj-utils.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="file://?FHJUtils" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">

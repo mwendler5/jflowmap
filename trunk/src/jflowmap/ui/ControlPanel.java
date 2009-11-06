@@ -34,7 +34,6 @@ import jflowmap.visuals.VisualFlowMap;
 import at.fhj.utils.graphics.AxisMarks;
 import at.fhj.utils.swing.FancyTable;
 import at.fhj.utils.swing.TableSorter;
-import at.fhj.utils.swing.FancyTable.FancyIconRenderer;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -85,7 +84,7 @@ public class ControlPanel {
     private JCheckBox showNodesCheckBox;
     private JSpinner repulsionSpinner;
     private JCheckBox edgeValueAffectsAttractionCheckBox;
-    private FancyTable similarNodesTable;
+    private JTable similarNodesTable;
     private JButton clusterButton;
     private JSlider maxClusterDistanceSlider;
     private JCheckBox fillEdgesWithGradientCheckBox;
@@ -98,7 +97,8 @@ public class ControlPanel {
     private JSpinner maxClusterDistanceSpinner;
     private JComboBox distanceMeasureCombo;
     private JTabbedPane tabbedPane2;
-    private FancyTable clustersTable;
+    private JTable clustersTable;
+    private JTable flowsTable;
     private final JFlowMap jFlowMap;
     private boolean initializing;
     private ForceDirectedBundlerParameters fdBundlingParams;
@@ -107,6 +107,8 @@ public class ControlPanel {
     private boolean modelsInitialized;
     private ClustersTableModel clustersTableModel;
     private TableSorter clustersTableSorter;
+    private FlowsTableModel flowTableModel;
+    private TableSorter flowTableSorter;
 
     public ControlPanel(JFlowMap flowMap) {
         this.jFlowMap = flowMap;
@@ -601,6 +603,11 @@ public class ControlPanel {
     private void createUIComponents() {
         // custom component creation code here
 
+        // flowsTable
+        flowTableModel = new FlowsTableModel();
+        flowTableSorter = new TableSorter(flowTableModel);
+        flowsTable = new FancyTable(flowTableSorter);
+        
         // clustersTable
         clustersTableModel = new ClustersTableModel();
         clustersTableSorter = new TableSorter(clustersTableModel);
@@ -608,7 +615,8 @@ public class ControlPanel {
         clustersTableSorter.setColumnSortable(1, true);
 
         clustersTable = new FancyTable(clustersTableSorter);
-        clustersTable.setDefaultRenderer(ClustersTableModel.ClusterIcon.class, clustersTable.new FancyIconRenderer());
+        clustersTable.setDefaultRenderer(ClustersTableModel.ClusterIcon.class,
+                ((FancyTable) clustersTable).new FancyIconRenderer());
         clustersTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 //        clustersTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         clustersTable.setAutoCreateColumnsFromModel(false);
@@ -621,7 +629,7 @@ public class ControlPanel {
         tcm1.getColumn(1).setPreferredWidth(50);
         tcm1.getColumn(1).setMaxWidth(100);
         tcm1.getColumn(1).setResizable(false);
-        
+
 //        tcm1.getColumn(1).setCellRenderer(new TableCellRenderer() {
 //           public Component getTableCellRendererComponent(JTable table,
 //                    Object value, boolean isSelected, boolean hasFocus,
@@ -643,7 +651,7 @@ public class ControlPanel {
 //                        g.fillOval(b.x + b.width/2 - r, b.y + b.height/2 - r, r, r);
 //                    }
 //                };
-//            } 
+//            }
 //        });
 
 
@@ -684,7 +692,7 @@ public class ControlPanel {
         tabbedPane1 = new JTabbedPane();
         panel1.add(tabbedPane1, BorderLayout.CENTER);
         final JPanel panel2 = new JPanel();
-        panel2.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:187px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:119px:noGrow,left:20dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:119px:noGrow,left:5dlu:noGrow,fill:max(d;4px):grow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        panel2.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:187px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:119px:noGrow,left:20dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:119px:noGrow,left:4dlu:noGrow,fill:max(d;20px):noGrow,left:5dlu:noGrow,fill:max(d;4px):grow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):grow"));
         tabbedPane1.addTab("Dataset", panel2);
         panel2.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         datasetCombo = new JComboBox();
@@ -727,15 +735,26 @@ public class ControlPanel {
         final JSeparator separator2 = new JSeparator();
         separator2.setOrientation(1);
         panel2.add(separator2, cc.xywh(10, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator3 = new JSeparator();
+        separator3.setOrientation(1);
+        panel2.add(separator3, cc.xywh(15, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JTabbedPane tabbedPane3 = new JTabbedPane();
+        tabbedPane3.setTabPlacement(3);
+        panel2.add(tabbedPane3, cc.xywh(17, 1, 1, 5, CellConstraints.DEFAULT, CellConstraints.FILL));
+        final JScrollPane scrollPane1 = new JScrollPane();
+        tabbedPane3.addTab("Flows", scrollPane1);
+        scrollPane1.setBorder(BorderFactory.createTitledBorder(""));
+        flowsTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
+        scrollPane1.setViewportView(flowsTable);
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new FormLayout("right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow(2.0),left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:p:noGrow", "center:26px:noGrow,top:4dlu:noGrow,center:24px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:d:noGrow"));
         tabbedPane1.addTab("Filter", panel3);
         panel3.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         minValueFilterSpinner = new JSpinner();
         panel3.add(minValueFilterSpinner, cc.xy(5, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JSeparator separator3 = new JSeparator();
-        separator3.setOrientation(1);
-        panel3.add(separator3, cc.xywh(7, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator4 = new JSeparator();
+        separator4.setOrientation(1);
+        panel3.add(separator4, cc.xywh(7, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label6 = new JLabel();
         label6.setText("Min length:");
         panel3.add(label6, cc.xy(9, 1));
@@ -773,9 +792,9 @@ public class ControlPanel {
         panel5.setLayout(new FormLayout("fill:d:noGrow,left:p:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:20dlu:noGrow,fill:max(d;4px):grow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:24px:noGrow,top:6dlu:noGrow,top:4dlu:noGrow"));
         tabbedPane1.addTab("Scales", panel5);
         panel5.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        final JSeparator separator4 = new JSeparator();
-        separator4.setOrientation(1);
-        panel5.add(separator4, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator5 = new JSeparator();
+        separator5.setOrientation(1);
+        panel5.add(separator5, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         useLogWidthScaleCheckbox = new JCheckBox();
         useLogWidthScaleCheckbox.setEnabled(false);
         useLogWidthScaleCheckbox.setText("Use log width scale");
@@ -792,9 +811,9 @@ public class ControlPanel {
         mapEdgeValueToCheckBox1.setEnabled(false);
         mapEdgeValueToCheckBox1.setText("Map edge value to width");
         panel5.add(mapEdgeValueToCheckBox1, cc.xy(5, 3));
-        final JSeparator separator5 = new JSeparator();
-        separator5.setOrientation(1);
-        panel5.add(separator5, cc.xywh(6, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator6 = new JSeparator();
+        separator6.setOrientation(1);
+        panel5.add(separator6, cc.xywh(6, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         final JPanel panel6 = new JPanel();
         panel6.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:110px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):grow,left:4dlu:noGrow,fill:max(m;50px):noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Aesthetics", panel6);
@@ -806,9 +825,9 @@ public class ControlPanel {
         comboBox5 = new JComboBox();
         comboBox5.setEnabled(false);
         panel6.add(comboBox5, cc.xy(3, 1));
-        final JSeparator separator6 = new JSeparator();
-        separator6.setOrientation(1);
-        panel6.add(separator6, cc.xywh(5, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator7 = new JSeparator();
+        separator7.setOrientation(1);
+        panel6.add(separator7, cc.xywh(5, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label11 = new JLabel();
         label11.setText("Edge width:");
         panel6.add(label11, cc.xy(10, 1, CellConstraints.RIGHT, CellConstraints.CENTER));
@@ -829,9 +848,9 @@ public class ControlPanel {
         showNodesCheckBox = new JCheckBox();
         showNodesCheckBox.setText("Show nodes");
         panel6.add(showNodesCheckBox, cc.xy(7, 1));
-        final JSeparator separator7 = new JSeparator();
-        separator7.setOrientation(1);
-        panel6.add(separator7, cc.xywh(8, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator8 = new JSeparator();
+        separator8.setOrientation(1);
+        panel6.add(separator8, cc.xywh(8, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
         showDirectionMarkersCheckBox = new JCheckBox();
         showDirectionMarkersCheckBox.setText("Show direction markers");
         panel6.add(showDirectionMarkersCheckBox, cc.xy(7, 5));
@@ -859,9 +878,9 @@ public class ControlPanel {
         panel7.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:12dlu:noGrow,fill:p:noGrow,fill:d:noGrow,left:d:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:25px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Edge bundling", panel7);
         panel7.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        final JSeparator separator8 = new JSeparator();
-        separator8.setOrientation(1);
-        panel7.add(separator8, cc.xywh(9, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator9 = new JSeparator();
+        separator9.setOrientation(1);
+        panel7.add(separator9, cc.xywh(9, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label13 = new JLabel();
         label13.setHorizontalAlignment(4);
         label13.setText("Step damping factor:");
@@ -880,9 +899,9 @@ public class ControlPanel {
         panel7.add(label15, cc.xy(5, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         edgeStiffnessSpinner = new JSpinner();
         panel7.add(edgeStiffnessSpinner, cc.xy(7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JSeparator separator9 = new JSeparator();
-        separator9.setOrientation(1);
-        panel7.add(separator9, cc.xywh(14, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator10 = new JSeparator();
+        separator10.setOrientation(1);
+        panel7.add(separator10, cc.xywh(14, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label16 = new JLabel();
         label16.setHorizontalAlignment(4);
         label16.setText("Number of cycles:");
@@ -910,9 +929,9 @@ public class ControlPanel {
         defaultValuesButton = new JButton();
         defaultValuesButton.setText("Default Values");
         panel7.add(defaultValuesButton, cc.xy(1, 5));
-        final JSeparator separator10 = new JSeparator();
-        separator10.setOrientation(1);
-        panel7.add(separator10, cc.xywh(3, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator11 = new JSeparator();
+        separator11.setOrientation(1);
+        panel7.add(separator11, cc.xywh(3, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
         repulsiveEdgesCheckBox = new JCheckBox();
         repulsiveEdgesCheckBox.setText("Repulsion:");
         panel7.add(repulsiveEdgesCheckBox, cc.xy(5, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
@@ -934,12 +953,12 @@ public class ControlPanel {
         edgeValueAffectsAttractionCheckBox.setText("Edge value affects attraction");
         panel7.add(edgeValueAffectsAttractionCheckBox, cc.xy(17, 3));
         final JPanel panel8 = new JPanel();
-        panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(p;50px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:400px:noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:91px:noGrow"));
+        panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(p;50px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:400px:noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:91px:grow"));
         tabbedPane1.addTab("Node clustering", panel8);
         panel8.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        final JSeparator separator11 = new JSeparator();
-        separator11.setOrientation(1);
-        panel8.add(separator11, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator12 = new JSeparator();
+        separator12.setOrientation(1);
+        panel8.add(separator12, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         maxClusterDistanceSlider = new JSlider();
         panel8.add(maxClusterDistanceSlider, cc.xy(7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label19 = new JLabel();
@@ -957,19 +976,19 @@ public class ControlPanel {
         tabbedPane2 = new JTabbedPane();
         tabbedPane2.setTabPlacement(3);
         panel8.add(tabbedPane2, cc.xywh(13, 1, 1, 5, CellConstraints.DEFAULT, CellConstraints.FILL));
-        final JScrollPane scrollPane1 = new JScrollPane();
-        tabbedPane2.addTab("Clusters", scrollPane1);
-        scrollPane1.setBorder(BorderFactory.createTitledBorder(""));
-        clustersTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
-        scrollPane1.setViewportView(clustersTable);
         final JScrollPane scrollPane2 = new JScrollPane();
-        tabbedPane2.addTab("Distances", scrollPane2);
+        tabbedPane2.addTab("Clusters", scrollPane2);
         scrollPane2.setBorder(BorderFactory.createTitledBorder(""));
+        clustersTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
+        scrollPane2.setViewportView(clustersTable);
+        final JScrollPane scrollPane3 = new JScrollPane();
+        tabbedPane2.addTab("Distances", scrollPane3);
+        scrollPane3.setBorder(BorderFactory.createTitledBorder(""));
         similarNodesTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
-        scrollPane2.setViewportView(similarNodesTable);
-        final JSeparator separator12 = new JSeparator();
-        separator12.setOrientation(1);
-        panel8.add(separator12, cc.xywh(11, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        scrollPane3.setViewportView(similarNodesTable);
+        final JSeparator separator13 = new JSeparator();
+        separator13.setOrientation(1);
+        panel8.add(separator13, cc.xywh(11, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
     }
 
     /**
