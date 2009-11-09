@@ -61,7 +61,7 @@ public class GraphStats {
             edgeLengthStats = MinMax.createFor(new Iterator<Double>() {
                 int i = 0;
                 public boolean hasNext() {
-                    return i < lengths.length - 1;
+                    return i < lengths.length;
                 }
                 public Double next() {
                     return lengths[i++];

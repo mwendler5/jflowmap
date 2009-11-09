@@ -71,7 +71,7 @@ public class NodeAndFlowData implements INodeAndFlowData {
         return MinMax.createFor(new Iterator<Double>() {
             int i = 0;
             public boolean hasNext() {
-                return i < size - 1;
+                return i < size;
             }
             public Double next() {
                 return DoubleAttrValue.asDouble(flowData.getAttrValue(i++, attrName));
