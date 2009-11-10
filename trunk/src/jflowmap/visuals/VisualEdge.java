@@ -5,7 +5,7 @@ import java.awt.LinearGradientPaint;
 import java.awt.Paint;
 import java.awt.Stroke;
 
-import jflowmap.models.FlowMapParamsModel;
+import jflowmap.models.FlowMapParams;
 import jflowmap.util.GeomUtils;
 import jflowmap.util.MinMax;
 
@@ -103,13 +103,13 @@ public abstract class VisualEdge extends PNode {
 //    public abstract void updateEdgeMarkerColors();
 
     public void updateVisibiliy() {
-        final FlowMapParamsModel model = visualFlowMap.getModel();
+        final FlowMapParams model = visualFlowMap.getModel();
         double valueFilterMin = model.getValueFilterMin();
         double valueFilterMax = model.getValueFilterMax();
 
         double edgeLengthFilterMin = model.getEdgeLengthFilterMin();
         double edgeLengthFilterMax = model.getEdgeLengthFilterMax();
-        final double value = getValue();
+        final double value = getEdgeAttrValue();
         double length = getEdgeLength();
         final boolean visible =
                 valueFilterMin <= value && value <= valueFilterMax    &&
@@ -134,8 +134,8 @@ public abstract class VisualEdge extends PNode {
                targetNode.getLabel();
     }
 
-    public double getValue() {
-        return edge.getDouble(visualFlowMap.getModel().getValueEdgeAttr());
+    public double getEdgeAttrValue() {
+        return edge.getDouble(visualFlowMap.getModel().getEdgeAttrName());
     }
 
     public double getEdgeLength() {
@@ -176,13 +176,13 @@ public abstract class VisualEdge extends PNode {
     public String toString() {
         return "VisualEdge{" +
                 "label='" + getLabel() + "', " +
-                "value=" + getValue() +
+                "value=" + getEdgeAttrValue() +
         '}';
     }
 
     public double getNormalizedLogValue() {
-        FlowMapParamsModel model = getVisualFlowMap().getModel();
-        double value = getValue();
+        FlowMapParams model = getVisualFlowMap().getModel();
+        double value = getEdgeAttrValue();
         double nv;
         if (model.getAutoAdjustEdgeColorScale()) {
             double minLog = 1.0;
@@ -193,7 +193,7 @@ public abstract class VisualEdge extends PNode {
                 nv = (Math.log(value - model.getValueFilterMin()) - minLog) / (maxLog - minLog);
             }
         } else {
-            MinMax stats = visualFlowMap.getGraphStats().getValueEdgeAttrStats();
+            MinMax stats = visualFlowMap.getGraphStats().getEdgeAttrStats();
             nv = stats.normalizeLog(value);
         }
         if (Double.isNaN(nv)) {
@@ -205,8 +205,8 @@ public abstract class VisualEdge extends PNode {
     public double getNormalizedValue() {
         double nv;
     
-        MinMax stats = visualFlowMap.getGraphStats().getValueEdgeAttrStats();
-        nv = stats.normalize(getValue());
+        MinMax stats = visualFlowMap.getGraphStats().getEdgeAttrStats();
+        nv = stats.normalize(getEdgeAttrValue());
 
         if (Double.isNaN(nv)) {
             logger.error("NaN normalized value for edge: " + this);
@@ -216,7 +216,7 @@ public abstract class VisualEdge extends PNode {
     }
 
 //    protected Color getValueColor(Color baseColor, boolean forMarker) {
-//        FlowMapParamsModel model = getVisualFlowMap().getModel();
+//        FlowMapParams model = getVisualFlowMap().getModel();
 //        final double normalizedValue = getNormalizedLogValue();
 //        int r = (int) Math.round(normalizedValue * baseColor.getRed());
 //        int g = (int) Math.round(normalizedValue * baseColor.getGreen());
@@ -236,7 +236,7 @@ public abstract class VisualEdge extends PNode {
     
     protected Paint createPaint() {
 		// TODO: use colors from color scheme
-        FlowMapParamsModel model = getVisualFlowMap().getModel();
+        FlowMapParams model = getVisualFlowMap().getModel();
         final double normalizedValue = getNormalizedLogValue();
         int intensity = (int)Math.round(255 * normalizedValue);
         int alpha = model.getEdgeAlpha();
@@ -314,14 +314,14 @@ public abstract class VisualEdge extends PNode {
         }
     }
 
-    public void setHighlighted(boolean value, boolean showDirection, boolean outgoing) {
+    public void setHighlighted(boolean value, boolean showDirection, boolean asOutgoing) {
         PPath ppath = getEdgePPath();
         if (ppath != null) {
             Paint paint;
             if (value) {
                 Color color;
                 if (showDirection) {
-                    color = (outgoing ? STROKE_HIGHLIGHTED_OUTGOING_PAINT : STROKE_HIGHLIGHTED_INCOMING_PAINT);
+                    color = (asOutgoing ? STROKE_HIGHLIGHTED_OUTGOING_PAINT : STROKE_HIGHLIGHTED_INCOMING_PAINT);
                 } else {
                     color = STROKE_HIGHLIGHTED_PAINT;
                 }

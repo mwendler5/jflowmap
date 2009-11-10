@@ -31,7 +31,7 @@ public class ForceDirectedEdgeBundler {
     private double[] edgeLengths;
     private final String xNodeAttr;
     private final String yNodeAttr;
-    private final String valueEdgeAttr;
+    private final String edgeAttrName;
     private final Graph graph;
 
     private List<CompatibleEdge>[] compatibleEdgeLists;
@@ -53,12 +53,12 @@ public class ForceDirectedEdgeBundler {
     
     public ForceDirectedEdgeBundler(
             Graph graph, 
-            String xNodeAttr, String yNodeAttr, String valueEdgeAttr,
+            String xNodeAttr, String yNodeAttr, String edgeAttrName,
             ForceDirectedBundlerParameters params) {
         this.graph = graph;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
-        this.valueEdgeAttr = valueEdgeAttr;
+        this.edgeAttrName = edgeAttrName;
         this.params = params;
     }
 
@@ -502,7 +502,7 @@ public class ForceDirectedEdgeBundler {
     }
     
     private double getValue(Edge edge) {
-        return edge.getDouble(valueEdgeAttr);
+        return edge.getDouble(edgeAttrName);
     }
 
     private double getStartX(Edge edge) {

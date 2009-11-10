@@ -6,24 +6,20 @@ import java.beans.PropertyChangeSupport;
 import jflowmap.util.GraphStats;
 import jflowmap.util.MinMax;
 
-import org.apache.log4j.Logger;
-
-import prefuse.data.Graph;
-
-
-public class FlowMapParamsModel {
-
-    private static Logger logger = Logger.getLogger(FlowMapParamsModel.class);
+/**
+ * @author Ilya Boyandin
+ */
+public class FlowMapParams {
 
     private boolean autoAdjustColorScale;
     private boolean useLogColorScale;
     private boolean useLogWidthScale;
     private boolean showNodes = true;
     private boolean showDirectionMarkers = true;
-    private boolean fillEdgesWithGradient = false;
+    private boolean fillEdgesWithGradient = true;
     private boolean useProportionalDirectionMarkers = true;
 
-    private String valueEdgeAttr;
+    private String edgeAttrName;
     private String xNodeAttr;
     private String yNodeAttr;
     private String labelAttr = "tooltip";
@@ -43,14 +39,14 @@ public class FlowMapParamsModel {
 
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
 
-    public FlowMapParamsModel(GraphStats graphStats, String valueEdgeAttrName, 
+    public FlowMapParams(GraphStats graphStats, String edgeAttrName, 
     		String xNodeAttr, String yNodeAttr, String labelAttrName) {
-        this.valueEdgeAttr = valueEdgeAttrName;
+        this.edgeAttrName = edgeAttrName;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
         this.labelAttr = labelAttrName;
 
-        MinMax minMax = graphStats.getValueEdgeAttrStats();
+        MinMax minMax = graphStats.getEdgeAttrStats();
         this.valueFilterMin = minMax.getMin();
         this.valueFilterMax = minMax.getMax();
 
@@ -103,8 +99,8 @@ public class FlowMapParamsModel {
         return yNodeAttr;
     }
 
-    public String getValueEdgeAttr() {
-        return valueEdgeAttr;
+    public String getEdgeAttrName() {
+        return edgeAttrName;
     }
 
     public String getLabelAttr() {

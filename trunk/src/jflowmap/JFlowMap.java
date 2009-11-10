@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import jflowmap.data.GraphFileFormats;
-import jflowmap.models.FlowMapParamsModel;
+import jflowmap.models.FlowMapParams;
 import jflowmap.models.map.AreaMap;
 import jflowmap.ui.ControlPanel;
 import jflowmap.util.GraphStats;
@@ -99,11 +99,11 @@ public class JFlowMap extends JComponent {
 
     public VisualFlowMap loadFlowMap(DatasetSpec dataset) {
         logger.info("> Loading flow map \"" + dataset + "\"");
-        FlowMapParamsModel model = null;
+        FlowMapParams model = null;
         try {
             Graph graph = loadGraph(dataset.filename);
             GraphStats stats = makeGraphStats(dataset, graph);
-            model = new FlowMapParamsModel(stats, dataset.valueAttrName, 
+            model = new FlowMapParams(stats, dataset.valueAttrName, 
             		dataset.xNodeAttr, dataset.yNodeAttr, dataset.labelAttrName);
             if (!Double.isNaN(dataset.valueFilterMin)) {
                 model.setValueFilterMin(dataset.valueFilterMin);

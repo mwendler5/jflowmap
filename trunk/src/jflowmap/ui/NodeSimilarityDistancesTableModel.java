@@ -32,7 +32,7 @@ class NodeSimilarityDistancesTableModel extends AbstractTableModel {
 //        }
 
         public void clearData() {
-            distances = null;
+            setDistances(null);
 //            selectedNode = null;
         }
 

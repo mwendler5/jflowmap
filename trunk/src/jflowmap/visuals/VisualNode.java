@@ -25,16 +25,16 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
  */
 public class VisualNode extends PPath {
 
-    private static Logger logger = Logger.getLogger(VisualNode.class);
-
     private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(VisualNode.class);
+    public enum Attributes {
+        SELECTED, HIGHLIGHTED, CLUSTER_TAG
+    }
     
-    public static final int NO_CLUSTER = 0;
-
     private static final Stroke STROKE = new PFixedWidthStroke(1);
     private static final Color PAINT = new Color(255, 255, 255, 70);
-    private static final Color STROKE_PAINT = new Color(255, 255, 255, 50);
     private static final Color HIGHLIGHTED_PAINT = new Color(255, 0, 0, 120);
+    private static final Color SELECTED_PAINT = new Color(200, 50, 0, 120);
     private static final Color SELECTED_STROKE_PAINT = new Color(255, 255, 0, 255);
     
     private final List<VisualEdge> outgoingEdges = new ArrayList<VisualEdge>();
@@ -47,13 +47,7 @@ public class VisualNode extends PPath {
 	private final double valueX;
 	private final double valueY;
     
-	private boolean selected;
-	private boolean highlighted;
-    private boolean alwaysVisible;
-
     private PPath clusterMarker;
-    private int clusterId = NO_CLUSTER;
-    private Color clusterColor = null;
 
     private double markerSize;
 
@@ -125,11 +119,21 @@ public class VisualNode extends PPath {
         return sb.toString();
     }
 
+    public void setClusterTag(ClusterTag tag) {
+        addAttribute(Attributes.CLUSTER_TAG, tag);
+        updateClusterMarker();
+    }
+    
+    public ClusterTag getClusterTag() {
+        return (ClusterTag)getAttribute(Attributes.CLUSTER_TAG, null);
+    }
+    
 	public String getFullLabel() {
 	    String fullLabel;
-		if (clusterId != NO_CLUSTER) {
+	    ClusterTag clusterTag = getClusterTag();
+		if (clusterTag != null) {
 	        StringBuilder sb = new StringBuilder(getLabel());
-		    sb.append(" [Cluster ").append(clusterId).append("]");
+		    sb.append(" [Cluster ").append(clusterTag.getClusterId()).append("]");
 		    fullLabel = sb.toString();
 		} else {
 		    fullLabel = getLabel();
@@ -154,10 +158,7 @@ public class VisualNode extends PPath {
         @Override
         public void mouseExited(PInputEvent event) {
             VisualNode vnode = getParentVisualNode(event.getPickedNode());
-            vnode.setHighlighted(true);
-            if (!vnode.isSelected()) {
-                vnode.setHighlighted(false);
-            }
+            vnode.setHighlighted(false);
             vnode.getVisualGraph().hideTooltip();
         }
     };
@@ -187,6 +188,17 @@ public class VisualNode extends PPath {
     }
     
     /**
+     * Returns a newly created and modifiable list of 
+     * incoming and outgoing edges of the node.
+     */
+    public List<VisualEdge> getEdges() {
+        List<VisualEdge> edges = new ArrayList<VisualEdge>(incomingEdges.size() + outgoingEdges.size());
+        edges.addAll(outgoingEdges);
+        edges.addAll(incomingEdges);
+        return edges;
+    }
+
+    /**
      * Returns an unmodifiable list of incoming edges if incoming is true
      * and outgoing if incoming is false.
      */
@@ -199,83 +211,55 @@ public class VisualNode extends PPath {
     }
 
     public boolean isSelected() {
-        return selected;
+        return getBooleanAttribute(Attributes.SELECTED.name(), false);
     }
 
     public void setSelected(boolean selected) {
-//        System.out.println(this + ".setSelected("  + selected + ")");
-        this.selected = selected;
-        setVisible(true);
-        setAlwaysVisible(selected);
-        if (selected) {
-            setStrokePaint(SELECTED_STROKE_PAINT);
-        } else {
-            setStrokePaint(STROKE_PAINT);
-        }
-        if (highlighted) {
-//            System.out.println(" > " + this + " outgoing edges # = "  + outgoingEdges.size());
-            for (VisualEdge flow : outgoingEdges) {
-//                System.out.println(" > " + this + " outgoing edge "  + flow + " visible=" + flow.getVisible());
-                if (flow.getVisible()) {
-                    flow.getTargetNode().setAlwaysVisible(selected);
-//                    flow.getTargetNode().setVisible(selected);
-                    flow.setHighlighted(selected, true, false);
-                }
-            }
-//            System.out.println(" > " + this + " incoming edges # = "  + incomingEdges.size());
-            for (VisualEdge flow : incomingEdges) {
-//                System.out.println(" > " + this + " incoming edge "  + flow + " visible=" + flow.getVisible());
-                if (flow.getVisible()) {
-                    flow.getSourceNode().setAlwaysVisible(selected);
-//                    flow.getSourceNode().setVisible(selected);
-                    flow.setHighlighted(selected, true, true);
-                }
-            }
-            if (!selected) {
-                setEdgesHighlighted(false);
-            }
-        }
+        addAttribute(Attributes.SELECTED.name(), selected);
+        updateColorsAndStroke();
+        updateEdgeColors();
+    }
+    
+    public boolean isHighlighted() {
+        return getBooleanAttribute(Attributes.HIGHLIGHTED.name(), false);
     }
 
     public void setHighlighted(boolean highlighted) {
-        this.highlighted = highlighted;
-//        setVisible(highlighted);
+        addAttribute(Attributes.HIGHLIGHTED.name(), highlighted);
+        updateColorsAndStroke();
+        updateEdgeColors();
+    }
+    
+    private void updateColorsAndStroke() {
+        boolean selected = isSelected();
+        boolean highlighted = isHighlighted();
+        if (selected) {
+            setStrokePaint(SELECTED_STROKE_PAINT);
+            setStroke(STROKE);
+            setPaint(SELECTED_PAINT);
+        } else {
+            setStroke(null);
+            if (!highlighted) setPaint(PAINT);
+        }
         if (highlighted) {
             setPaint(HIGHLIGHTED_PAINT);
         } else {
             setPaint(PAINT);
         }
-
-        setEdgesHighlighted(highlighted);
     }
 
-    private void setEdgesHighlighted(boolean highlighted) {
+    private void updateEdgeColors() {
+        boolean highlightEdges = (isSelected() || isHighlighted());
         for (VisualEdge flow : outgoingEdges) {
             if (flow.getVisible()) {
-                flow.setHighlighted(highlighted, true, false);
+                flow.setHighlighted(highlightEdges, true, false);
             }
         }
         for (VisualEdge flow : incomingEdges) {
             if (flow.getVisible()) {
-                flow.setHighlighted(highlighted, true, true);
+                flow.setHighlighted(highlightEdges, true, true);
             }
         }
-    }
-
-    @Override
-    public void setVisible(boolean visible) {
-        if (!visible  &&  alwaysVisible) {
-            return;
-        }
-        super.setVisible(visible);
-    }
-    
-    public boolean isAlwaysVisible() {
-        return alwaysVisible;
-    }
-
-    public void setAlwaysVisible(boolean alwaysVisible) {
-        this.alwaysVisible = alwaysVisible;
     }
 
     @Override
@@ -305,39 +289,23 @@ public class VisualNode extends PPath {
     }
 
     
-    public void hideClusterMarker() {
-        if (clusterMarker != null) {
-            removeChild(clusterMarker);
-            clusterMarker = null;
+    private void updateClusterMarker() {
+        ClusterTag clusterTag = getClusterTag();
+        if (clusterTag == null) {
+            if (clusterMarker != null) {    // hide marker
+                removeChild(clusterMarker);
+                clusterMarker = null;
+            }
+        } else {
+            if (clusterMarker == null) {    // show marker
+                double size = markerSize * 2;
+                clusterMarker = new PPath(new Ellipse2D.Double(getValueX() - size/2, getValueY() - size/2, size, size));
+                clusterMarker.setStroke(new PFixedWidthStroke(1));
+                addChild(clusterMarker);
+                clusterMarker.moveToBack();
+            }
+            clusterMarker.setPaint(clusterTag.getClusterColor());
         }
-    }
-    
-    public void setClusterId(int clusterId) {
-        this.clusterId = clusterId;
-    }
-    
-    public int getClusterId() {
-        return clusterId;
-    }
-    
-    public void setClusterColor(Color clusterColor) {
-        this.clusterColor = clusterColor;
-        showClusterMarker();
-    }
-    
-    public Color getClusterColor() {
-        return clusterColor;
-    }
-    
-    private void showClusterMarker() {
-        if (clusterMarker == null) {
-            double size = markerSize * 2;
-            clusterMarker = new PPath(new Ellipse2D.Double(getValueX() - size/2, getValueY() - size/2, size, size));
-            clusterMarker.setStroke(new PFixedWidthStroke(1));
-            addChild(clusterMarker);
-            clusterMarker.moveToBack();
-        }
-        clusterMarker.setPaint(clusterColor);
     }
     
     /**

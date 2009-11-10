@@ -32,9 +32,11 @@ import java.lang.reflect.Proxy;
  */
 public class EventListenerList<L> extends ArrayList<L> implements InvocationHandler {
 
+    private static final long serialVersionUID = 5260566399219798770L;
     private final Class<? extends L> listenerInterface;
     private final L proxy;
 
+    @SuppressWarnings("unchecked")
     public EventListenerList(Class<? extends L> listenerInterface) {
         this.listenerInterface = listenerInterface;
         proxy = (L) Proxy.newProxyInstance(listenerInterface.getClassLoader(),
@@ -55,6 +57,7 @@ public class EventListenerList<L> extends ArrayList<L> implements InvocationHand
         }
     }
 
+    @SuppressWarnings("unchecked")
     public L[] getListeners() {
         synchronized (proxy) {
             return toArray((L[]) Array.newInstance(listenerInterface, size()));
@@ -71,6 +74,7 @@ public class EventListenerList<L> extends ArrayList<L> implements InvocationHand
             objects = toArray(new Object[size()]);
         }
         for (Object l : objects) {
+            method.setAccessible(true);     // improves the invoke performance
             method.invoke(l, args);
         }
         return null;

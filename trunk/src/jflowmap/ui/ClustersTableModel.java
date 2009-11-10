@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 
+import jflowmap.visuals.ClusterTag;
 import jflowmap.visuals.VisualNode;
 
 import com.google.common.base.Predicate;
@@ -40,7 +41,7 @@ class ClustersTableModel extends AbstractTableModel {
                         nodes.iterator(),
                         new Predicate<VisualNode>() {
                             public boolean apply(VisualNode node) {
-                                return node.getClusterId() != VisualNode.NO_CLUSTER;
+                                return node.getClusterTag() != null;
                             }
                         }
                 )
@@ -52,13 +53,18 @@ class ClustersTableModel extends AbstractTableModel {
             initClusterIcons();
         }
     }
-    
+
+    public void clearData() {
+        setVisualNodes(null);
+    }
+
     private void initClusterIcons() {
         clusterIcons = new HashMap<Integer, ClusterIcon>();
         for (VisualNode node : visualNodes) {
-            int clusterId = node.getClusterId();
+            ClusterTag tag = node.getClusterTag();
+            int clusterId = tag.getClusterId();
             if (!clusterIcons.containsKey(clusterId)) {
-                clusterIcons.put(clusterId, new ClusterIcon(clusterId, node.getClusterColor()));
+                clusterIcons.put(clusterId, new ClusterIcon(clusterId, tag.getClusterColor()));
             }
         }
     }
@@ -104,7 +110,7 @@ class ClustersTableModel extends AbstractTableModel {
         switch (column) {
             case 0: return node.getLabel();
 //            case 1: return node.getClusterId();
-            case 1: return clusterIcons.get(node.getClusterId());
+            case 1: return clusterIcons.get(node.getClusterTag().getClusterId());
         }
         return null;
     }
@@ -150,5 +156,6 @@ class ClustersTableModel extends AbstractTableModel {
         }
         
     }
+
     
 }

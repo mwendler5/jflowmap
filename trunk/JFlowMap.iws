@@ -2,11 +2,12 @@
 <project relativePaths="false" version="4">
   <component name="ChangeListManager">
     <list default="true" readonly="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/clustering/NodeDistanceMeasure.java" afterPath="$PROJECT_DIR$/src/jflowmap/clustering/NodeDistanceMeasure.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.form" afterPath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.form" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/JFlowMap.iml" afterPath="$PROJECT_DIR$/JFlowMap.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/clustering/NodeDistanceMeasure.java" afterPath="$PROJECT_DIR$/src/jflowmap/clustering/NodeDistanceMeasure.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/JFlowMap.iws" afterPath="$PROJECT_DIR$/JFlowMap.iws" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java" afterPath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java" afterPath="$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/dmlib.jar" afterPath="$PROJECT_DIR$/lib/dmlib.jar" />
     </list>
     <ignored path="JFlowMap.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -95,10 +96,8 @@
       <file leaf-file-name="VisualFlowMap.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="474" column="36" selection-start="16725" selection-end="16725" vertical-scroll-proportion="0.0">
-              <folding>
-                <marker date="1257428492788" expanded="true" signature="18475:18550" placeholder="{...}" />
-              </folding>
+            <state line="475" column="36" selection-start="16801" selection-end="16801" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -115,13 +114,12 @@
       <file leaf-file-name="ControlPanel.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="13" selection-start="1244" selection-end="1244" vertical-scroll-proportion="0.0">
+            <state line="243" column="19" selection-start="10675" selection-end="10675" vertical-scroll-proportion="0.0">
               <folding>
-                <marker date="1257515255627" expanded="true" signature="27624:28054" placeholder="{...}" />
-                <marker date="1257515255627" expanded="true" signature="51615:51811" placeholder="UI Designer generated code" />
-                <marker date="1257515255627" expanded="true" signature="51615:51691" placeholder="{...}" />
-                <marker date="1257515255627" expanded="true" signature="51697:51733" placeholder="/**...*/" />
-                <marker date="1257515255627" expanded="true" signature="51781:51811" placeholder="{...}" />
+                <marker date="1257779476773" expanded="false" signature="29:1134" placeholder="..." />
+                <marker date="1257779476773" expanded="true" signature="52378:52387" placeholder="{...}" />
+                <marker date="1257779476773" expanded="true" signature="52393:52429" placeholder="/**...*/" />
+                <marker date="1257779476773" expanded="true" signature="52477:52507" placeholder="{...}" />
               </folding>
             </state>
           </provider>
@@ -297,9 +295,9 @@
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="dynamic.classpath" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RunManager" selected="Application.JFM">
     <tempConfiguration default="false" name="JFM" type="Application" factoryName="Application" enabled="false" merge="false" sample_coverage="true" runner="emma">
@@ -464,7 +462,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="-4" width="1288" height="1002" extended-state="7" />
+    <frame x="-4" y="-4" width="1288" height="1002" extended-state="6" />
     <editor active="false" />
     <layout>
       <window_info id="UI Designer" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20469256" sideWeight="0.6670547" order="2" side_tool="false" />
@@ -570,10 +568,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="474" column="36" selection-start="16725" selection-end="16725" vertical-scroll-proportion="0.0">
-          <folding>
-            <marker date="1257428492788" expanded="true" signature="18475:18550" placeholder="{...}" />
-          </folding>
+        <state line="475" column="36" selection-start="16801" selection-end="16801" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>
@@ -586,13 +582,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="13" selection-start="1244" selection-end="1244" vertical-scroll-proportion="0.0">
+        <state line="243" column="19" selection-start="10675" selection-end="10675" vertical-scroll-proportion="0.0">
           <folding>
-            <marker date="1257515255627" expanded="true" signature="27624:28054" placeholder="{...}" />
-            <marker date="1257515255627" expanded="true" signature="51615:51811" placeholder="UI Designer generated code" />
-            <marker date="1257515255627" expanded="true" signature="51615:51691" placeholder="{...}" />
-            <marker date="1257515255627" expanded="true" signature="51697:51733" placeholder="/**...*/" />
-            <marker date="1257515255627" expanded="true" signature="51781:51811" placeholder="{...}" />
+            <marker date="1257779476773" expanded="false" signature="29:1134" placeholder="..." />
+            <marker date="1257779476773" expanded="true" signature="52378:52387" placeholder="{...}" />
+            <marker date="1257779476773" expanded="true" signature="52393:52429" placeholder="/**...*/" />
+            <marker date="1257779476773" expanded="true" signature="52477:52507" placeholder="{...}" />
           </folding>
         </state>
       </provider>

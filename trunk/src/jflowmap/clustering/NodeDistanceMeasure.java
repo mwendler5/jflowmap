@@ -21,44 +21,71 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             return dist;
         }        
     },
-    COSINE_IN("Cosine: incoming", NodeFilter.IN) {
+    COSINE_IN("Cosine: in", NodeFilter.IN) {
         public double distance(VisualNode t1, VisualNode t2) {
             return Cosine.IN.distance(t1, t2);
         }        
     },
-    COSINE_OUT("Cosine: outgoing", NodeFilter.OUT) {
+    COSINE_OUT("Cosine: out", NodeFilter.OUT) {
         public double distance(VisualNode t1, VisualNode t2) {
             return Cosine.OUT.distance(t1, t2);
         }        
     },
-    COSINE_IN_OUT("Cosine: incoming and outgoing", NodeFilter.IN_OR_OUT) {
+    COSINE_IN_OUT("Cosine: in/out", NodeFilter.IN_OR_OUT) {
         public double distance(VisualNode t1, VisualNode t2) {
             return Cosine.IN_AND_OUT.distance(t1, t2);
         }        
     },
-    COSINE_WITH_NODE_PROXIMITY_IN("Cosine with node proximity: incoming", NodeFilter.IN) {
+    COSINE_WITH_NODE_PROXIMITY_IN("Cosine wth proximity: incoming", NodeFilter.IN) {
         public double distance(VisualNode t1, VisualNode t2) {
             return CosineWithNodeProximity.IN.distance(t1, t2);
         }        
     },
-    COSINE_WITH_NODE_PROXIMITY_OUT("Cosine with node proximity: outgoing", NodeFilter.OUT) {
+    COSINE_WITH_NODE_PROXIMITY_OUT("Cosine wth proximity: outgoing", NodeFilter.OUT) {
         public double distance(VisualNode t1, VisualNode t2) {
             return CosineWithNodeProximity.OUT.distance(t1, t2);
         }        
     },
-    COSINE_WITH_NODE_PROXIMITY_IN_OUT("Cosine with node proximity: incoming and outgoing", NodeFilter.IN_OR_OUT) {
+    COSINE_WITH_NODE_PROXIMITY_IN_OUT("Cosine wth proximity: in/out", NodeFilter.IN_OR_OUT) {
         public double distance(VisualNode t1, VisualNode t2) {
             return CosineWithNodeProximity.IN_AND_OUT.distance(t1, t2);
         }        
     },
-    COMMON_EDGES_IN("Common edges: incoming", NodeFilter.IN) {
+    COSINE_WITH_IN_OUT_COMBINATION("Cosine wth proximity: in/out combination", NodeFilter.IN_OR_OUT) {
+        public double distance(VisualNode t1, VisualNode t2) {
+            int numIncoming = t1.getIncomingEdges().size() + t2.getIncomingEdges().size();
+            int numOutgoing = t1.getOutgoingEdges().size() + t2.getOutgoingEdges().size();
+            double in = CosineWithNodeProximity.IN.distance(t1, t2);
+            double out = CosineWithNodeProximity.OUT.distance(t1, t2);
+            return (in * numIncoming + out * numOutgoing) / (numIncoming + numOutgoing);
+        }        
+    },
+    COSINE_WITH_NODE_PROXIMITY_IN_OUT_EUCLIDEAN("Cosine wth proximity * Euclidean: in and out", NodeFilter.IN_OR_OUT) {
+        public double distance(VisualNode t1, VisualNode t2) {
+            return CosineWithNodeProximity.IN_AND_OUT.distance(t1, t2) + EUCLIDEAN.distance(t1, t2);
+        }        
+    },
+    COMMON_EDGES_IN("Common edges: in", NodeFilter.IN) {
         public double distance(VisualNode t1, VisualNode t2) {
             return CommonEdges.IN.distance(t1, t2);
         }        
     },
-    COMMON_EDGES_OUT("Common edges: outgoing", NodeFilter.OUT) {
+    COMMON_EDGES_OUT("Common edges: out", NodeFilter.OUT) {
         public double distance(VisualNode t1, VisualNode t2) {
             return CommonEdges.OUT.distance(t1, t2);
+        }        
+    },
+    COMMON_EDGES_IN_OUT_AVG("Common edges: in/out avg", NodeFilter.IN_OR_OUT) {
+        public double distance(VisualNode t1, VisualNode t2) {
+            return (CommonEdges.IN.distance(t1, t2) + CommonEdges.OUT.distance(t1, t2)) / 2; 
+        }        
+    },
+    COMMON_EDGES_IN_OUT_COMB("Common edges: in/out combination", NodeFilter.IN_OR_OUT) {
+        public double distance(VisualNode t1, VisualNode t2) {
+            int numIncoming = t1.getIncomingEdges().size() + t2.getIncomingEdges().size();
+            int numOutgoing = t1.getOutgoingEdges().size() + t2.getOutgoingEdges().size();
+            return (CommonEdges.IN.distance(t1, t2) * numIncoming + CommonEdges.OUT.distance(t1, t2) * numOutgoing) 
+            / (numIncoming + numOutgoing);
         }        
     },
 //    COMMON_EDGES_WEIGHTED_IN("Common edges weighted: incoming", NodeFilter.IN) {
@@ -71,32 +98,32 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
 //            return CommonEdges.OUT_PRECISE.distance(t1, t2);
 //        }        
 //    },
-    INCOMING_AND_OUTGOING_EDGES_WITH_WEIGHTS("Edge barycenter: Incoming and outgoing with weights", NodeFilter.IN_OR_OUT) {
+    INCOMING_AND_OUTGOING_EDGES_WITH_WEIGHTS("Edge barycenter: in/out with weights", NodeFilter.IN_OR_OUT) {
         public double distance(VisualNode n1, VisualNode n2) {
             return (EdgeCombinations.IN_WITH_WEIGHTS.distance(n1, n2) + EdgeCombinations.OUT_WITH_WEIGHTS.distance(n1, n2)) / 2;
         }
     },
-    INCOMING_EDGES_WITH_WEIGHTS("Edge barycenter: Incoming with weights", NodeFilter.IN) {
+    INCOMING_EDGES_WITH_WEIGHTS("Edge barycenter: in with weights", NodeFilter.IN) {
         public double distance(VisualNode n1, VisualNode n2) {
             return EdgeCombinations.IN_WITH_WEIGHTS.distance(n1, n2);
         }
     },
-    OUTGOING_EDGES_WITH_WEIGHTS("Edge barycenter: Outgoing with weights", NodeFilter.OUT) {
+    OUTGOING_EDGES_WITH_WEIGHTS("Edge barycenter: out with weights", NodeFilter.OUT) {
         public double distance(VisualNode n1, VisualNode n2) {
             return EdgeCombinations.OUT_WITH_WEIGHTS.distance(n1, n2);
         }
     },
-    INCOMING_AND_OUTGOING_EDGES("Edge barycenter: Incoming and outgoing", NodeFilter.IN_OR_OUT) {
+    INCOMING_AND_OUTGOING_EDGES("Edge barycenter: in/out", NodeFilter.IN_OR_OUT) {
         public double distance(VisualNode n1, VisualNode n2) {
             return (EdgeCombinations.IN.distance(n1, n2) + EdgeCombinations.OUT.distance(n1, n2)) / 2;
         }
     },
-    INCOMING_EDGES("Edge barycenter: Incoming", NodeFilter.IN) {
+    INCOMING_EDGES("Edge barycenter: in", NodeFilter.IN) {
         public double distance(VisualNode n1, VisualNode n2) {
             return EdgeCombinations.IN.distance(n1, n2);
         }
     },
-    OUTGOING_EDGES("Edge barycenter: Outgoing", NodeFilter.OUT) {
+    OUTGOING_EDGES("Edge barycenter: out", NodeFilter.OUT) {
         public double distance(VisualNode n1, VisualNode n2) {
             return EdgeCombinations.OUT.distance(n1, n2);
         }
@@ -143,7 +170,11 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             }
             int unionSize = oppositeNodes1.size() + oppositeNodes2.size() - intersectionSize;
             
-            double dist = 1.0 - (double)intersectionSize / unionSize;
+            double similarity = (double)intersectionSize / unionSize;
+            if (Double.isNaN(similarity)) {
+                similarity = 0.0;
+            }
+            double dist = 1.0 - similarity;
             
 //            if (dist < .16) System.out.println(
 //                    node1.getLabel() + " - " + node2.getLabel() + ": common = " + intersectionSize + " of " +
@@ -174,7 +205,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
         private double valueSquareSum(VisualNode node, boolean incoming) {
             double sum = 0;
             for (VisualEdge e : node.getEdges(incoming)) {
-                double v = e.getValue();
+                double v = e.getEdgeAttrValue();
                 sum += v * v;
             }
             return sum;
@@ -212,7 +243,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             for (VisualEdge edge1 : edges1) {
                 VisualEdge matchingEdge = findMatchingEdge(edge1, node2, incoming);
                 if (matchingEdge != null) {
-                    sum += edge1.getValue() * matchingEdge.getValue();
+                    sum += edge1.getEdgeAttrValue() * matchingEdge.getEdgeAttrValue();
                 }
             }
             // it's enough to iterate through edges1, because we only take 
@@ -281,7 +312,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
         private double valueSquareSum(VisualNode node, boolean incoming) {
             double sum = 0;
             for (VisualEdge e : node.getEdges(incoming)) {
-                double v = e.getValue();
+                double v = e.getEdgeAttrValue();
                 sum += v * v;
             }
             return sum;
@@ -292,7 +323,10 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             double squareOfDenominator1 = 0;
             double squareOfDenominator2 = 0;
             double similarity() {
-                return numerator / (Math.sqrt(squareOfDenominator1) * Math.sqrt(squareOfDenominator2));
+                double sim = numerator / (Math.sqrt(squareOfDenominator1) * Math.sqrt(squareOfDenominator2));
+                if (Double.isNaN(sim))  // means that there are no common/similar edges -> minimum similarity
+                    return 0.0;
+                return sim;
             }
         }
 
@@ -325,11 +359,16 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
                 if (allowPerfectMatches  ||  nonPerfectMatch) {
                     if (matchingEdge != null) {
                         double mv = matchingValue(e1, matchingEdge, oppositeIsSource);
-                        double v = e1.getValue();
+                        double v = e1.getEdgeAttrValue();
                         sf.numerator += v * mv;
                         if (nonPerfectMatch) {
-                            sf.squareOfDenominator1 += v * v;
-                            sf.squareOfDenominator2 += mv * mv;
+                            if (allowPerfectMatches) {
+                                sf.squareOfDenominator1 += v * v;
+                                sf.squareOfDenominator2 += mv * mv;
+                            } else {
+                                sf.squareOfDenominator2 += v * v;
+                                sf.squareOfDenominator1 += mv * mv;
+                            }
                         }
                     }
                 }
@@ -341,7 +380,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             VisualNode n1 = oppositeIsSource ? edge.getSourceNode() : edge.getTargetNode();
             VisualNode n2 = oppositeIsSource ? matchingEdge.getSourceNode() : matchingEdge.getTargetNode();
             double l_avg = (edge.getEdgeLength() + matchingEdge.getEdgeLength())/2;
-            return matchingEdge.getValue() * l_avg / (l_avg + n1.distanceTo(n2));
+            return matchingEdge.getEdgeAttrValue() * l_avg / (l_avg + n1.distanceTo(n2));
         }
     }
 
@@ -371,7 +410,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
                 double d = GeomUtils.distance(
                         t1.getValueX(), t1.getValueY(), t2.getValueX(), t2.getValueY());
                 if (useEdgeWeights) {
-                    double w = e1.getValue() * e2.getValue();
+                    double w = e1.getEdgeAttrValue() * e2.getEdgeAttrValue();
                     numerator += d * w;
                     denominator += w;
                 } else {
