@@ -214,26 +214,7 @@ public abstract class VisualEdge extends PNode {
     
         return nv;
     }
-
-//    protected Color getValueColor(Color baseColor, boolean forMarker) {
-//        FlowMapParams model = getVisualFlowMap().getModel();
-//        final double normalizedValue = getNormalizedLogValue();
-//        int r = (int) Math.round(normalizedValue * baseColor.getRed());
-//        int g = (int) Math.round(normalizedValue * baseColor.getGreen());
-//        int b = (int) Math.round(normalizedValue * baseColor.getBlue());
-//        int alpha;
-//        if (baseColor.getAlpha() == 255) {
-//            if (forMarker) {
-//                alpha = model.getDirectionMarkerAlpha();
-//            } else {
-//                alpha = model.getEdgeAlpha();
-//            }
-//        } else {
-//            alpha = baseColor.getAlpha();
-//        }
-//        return new Color(r, g, b, alpha);
-//    }
-    
+   
     protected Paint createPaint() {
 		// TODO: use colors from color scheme
         FlowMapParams model = getVisualFlowMap().getModel();

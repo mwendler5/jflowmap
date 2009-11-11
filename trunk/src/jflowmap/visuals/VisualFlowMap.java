@@ -21,7 +21,7 @@ import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.bundling.ForceDirectedEdgeBundler;
 import jflowmap.clustering.NodeDistanceMeasure;
 import jflowmap.models.FlowMapParams;
-import jflowmap.util.ColorUtils;
+import jflowmap.util.GeomUtils;
 import jflowmap.util.GraphStats;
 import jflowmap.util.MinMax;
 
@@ -35,13 +35,16 @@ import at.fhj.utils.misc.TaskCompletionListener;
 import at.fhj.utils.swing.ProgressDialog;
 import at.fhj.utils.swing.ProgressWorker;
 import ch.unifr.dmlib.cluster.ClusterNode;
-import ch.unifr.dmlib.cluster.ClusterSetBuilder;
 import ch.unifr.dmlib.cluster.HierarchicalClusterer;
 import ch.unifr.dmlib.cluster.Linkage;
 import ch.unifr.dmlib.cluster.HierarchicalClusterer.DistanceMatrix;
+
+import com.google.common.collect.Iterators;
+
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 
 /**
@@ -54,7 +57,7 @@ public class VisualFlowMap extends PNode {
     public enum Attributes {
         NODE_SELECTION
     }
-    private static final Color SINGLE_ELEMENT_CLUSTER_COLOR = new Color(100, 100, 100, 150);
+//    private static final Color SINGLE_ELEMENT_CLUSTER_COLOR = new Color(100, 100, 100, 150);
     private final Tooltip tooltipBox;
     private PBounds nodeBounds;
 
@@ -475,34 +478,35 @@ public class VisualFlowMap extends PNode {
         updateClusters();
     }
     
+    private List<VisualNodeCluster> visualNodeClusters;
+    
     public void updateClusters() {
-        if (rootCluster != null) {
-            List<List<VisualNode>> clusters = ClusterSetBuilder.getClusters(rootCluster, clusterDistanceThreshold);
+        removeClusterTags();  // to remove cluster tags for those nodes which were excluded from clustering
+        
+        List<VisualNodeCluster> clusters;
+        if (rootCluster == null) {
+            clusters = Collections.emptyList();
+        } else {
+            clusters = VisualNodeCluster.createClusters(rootCluster, clusterDistanceThreshold);
             
-            removeClusterTags();  // to remove cluster tags for those nodes which were excluded from clustering 
-            int numClusters = 0;
-            for (List<VisualNode> cluster : clusters) {
-                if (cluster.size() > 1) {
-                    numClusters++; 
-                }
-            }
-            Color[] colors = ColorUtils.createCategoryColors(numClusters, 150);
-            int lastCluster = 0;
-            for (int i = 0, size = clusters.size(); i < size; i++) {
-                List<VisualNode> cluster = clusters.get(i);
-                for (VisualNode node : cluster) {
-                    if (cluster.size() > 1) {
-                        node.setClusterTag(ClusterTag.createFor(lastCluster + 1, colors[lastCluster]));
-                    } else {
-//                        ClusterTag.createFor(VisualNode.NO_CLUSTER, SINGLE_ELEMENT_CLUSTER_COLOR)
-                        node.setClusterTag(null);
-                    }
-                }
-                if (cluster.size() > 1) {
-                    lastCluster++;
-                }
-            }
+//            int lastCluster = 0;
+//            for (int i = 0, size = clusters.size(); i < size; i++) {
+//                List<VisualNode> cluster = clusters.get(i);
+//                ClusterTag clusterTag = ClusterTag.createFor(lastCluster + 1, colors[lastCluster]);
+//                for (VisualNode node : cluster) {
+//                    if (cluster.size() > 1) {
+//                        node.setClusterTag(clusterTag);
+//                    } else {
+////                        ClusterTag.createFor(VisualNode.NO_CLUSTER, SINGLE_ELEMENT_CLUSTER_COLOR)
+//                        node.setClusterTag(null);
+//                    }
+//                }
+//                if (cluster.size() > 1) {
+//                    lastCluster++;
+//                }
+//            }
         }
+        this.visualNodeClusters = clusters;
     }
 
     private void removeClusterTags() {
@@ -513,24 +517,35 @@ public class VisualFlowMap extends PNode {
 
     public void clusterNodes(NodeDistanceMeasure distanceMeasure, Linkage linkage) {
         logger.info("Clustering nodes");
-        doCluster(distanceMeasure, linkage, new ArrayList<VisualNode>(visualNodes), new ProgressTracker());
-//        if (logger.isDebugEnabled()) {
-//        	logger.debug("\n" + rootCluster.dumpToTreeString());
-//        }
-    }
-
-    private void doCluster(NodeDistanceMeasure distanceMeasure, Linkage linkage, 
-            List<VisualNode> items, ProgressTracker tracker) {
         HierarchicalClusterer<VisualNode> clusterer = 
 //            new HierarchicalClusterer<VisualNode>(distanceMeasure, Linkage.SINGLE);
             new HierarchicalClusterer<VisualNode>(distanceMeasure, linkage);
         
-        items = distanceMeasure.filterNodes(items);
+        List<VisualNode> items = distanceMeasure.filterNodes(visualNodes);
 
+        ProgressTracker tracker = new ProgressTracker();
         DistanceMatrix<VisualNode> distances = clusterer.makeDistanceMatrix(items, tracker);
         nodeDistanceList = VisualNodeDistance.makeDistanceList(items, distances);
         maxNodeDistance = Double.NaN;
         rootCluster = clusterer.cluster(items, distances, tracker);
+    }
+
+    public void joinEdgesToClusters() {
+        for (VisualNodeCluster cluster : visualNodeClusters) {
+            Point2D centroid = GeomUtils.centroid(
+                    Iterators.transform(
+                        cluster.iterator(), VisualNode.TRANSFORM_NODE_TO_POSITION
+                    )
+            );
+            PPath marker = new PPath(new Rectangle2D.Double(centroid.getX() - 4, centroid.getY() - 4, 8, 8));
+            marker.setPaint(Color.BLUE);
+            addChild(marker);
+        }
+        
+    }
+
+    public void resetClusters() {
+        removeClusterTags();
     }
 
 }

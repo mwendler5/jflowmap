@@ -99,27 +99,29 @@ public class JFlowMap extends JComponent {
 
     public VisualFlowMap loadFlowMap(DatasetSpec dataset) {
         logger.info("> Loading flow map \"" + dataset + "\"");
-        FlowMapParams model = null;
         try {
-            Graph graph = loadGraph(dataset.filename);
-            GraphStats stats = makeGraphStats(dataset, graph);
-            model = new FlowMapParams(stats, dataset.valueAttrName, 
-            		dataset.xNodeAttr, dataset.yNodeAttr, dataset.labelAttrName);
-            if (!Double.isNaN(dataset.valueFilterMin)) {
-                model.setValueFilterMin(dataset.valueFilterMin);
-            }
-            VisualFlowMap visualFlowMap = new VisualFlowMap(this, canvas, graph, stats, model);
-            if (dataset.areaMapFilename != null) {
-                VisualAreaMap map = loadAreaMap(dataset.areaMapFilename);
-                visualFlowMap.addChild(map);
-                map.moveToBack();
-            }
-            return visualFlowMap;
+            return createVisualFlowMap(dataset, loadGraph(dataset.filename));
         } catch (DataIOException e) {
             logger.error("Couldn't load flow map " + dataset, e);
             JOptionPane.showMessageDialog(this,  "Couldn't load flow map: [" + e.getClass().getSimpleName()+ "] " + e.getMessage());
         }
         return null;
+    }
+
+    private VisualFlowMap createVisualFlowMap(DatasetSpec dataset, Graph graph) {
+        GraphStats stats = makeGraphStats(dataset, graph);
+        FlowMapParams model = new FlowMapParams(stats, dataset.valueAttrName, 
+        		dataset.xNodeAttr, dataset.yNodeAttr, dataset.labelAttrName);
+        if (!Double.isNaN(dataset.valueFilterMin)) {
+            model.setValueFilterMin(dataset.valueFilterMin);
+        }
+        VisualFlowMap visualFlowMap = new VisualFlowMap(this, canvas, graph, stats, model);
+        if (dataset.areaMapFilename != null) {
+            VisualAreaMap map = loadAreaMap(dataset.areaMapFilename);
+            visualFlowMap.addChild(map);
+            map.moveToBack();
+        }
+        return visualFlowMap;
     }
 
 	private GraphStats makeGraphStats(DatasetSpec dataset, Graph graph) {

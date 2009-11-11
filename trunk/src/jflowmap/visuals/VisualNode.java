@@ -3,6 +3,7 @@ package jflowmap.visuals;
 import java.awt.Color;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,6 +14,9 @@ import jflowmap.util.GeomUtils;
 import org.apache.log4j.Logger;
 
 import prefuse.data.Node;
+
+import com.google.common.base.Function;
+
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -304,7 +308,7 @@ public class VisualNode extends PPath {
                 addChild(clusterMarker);
                 clusterMarker.moveToBack();
             }
-            clusterMarker.setPaint(clusterTag.getClusterColor());
+            clusterMarker.setPaint(clusterTag.getClusterPaint());
         }
     }
     
@@ -356,4 +360,9 @@ public class VisualNode extends PPath {
         }
     };
 
+    public static final Function<VisualNode, Point2D> TRANSFORM_NODE_TO_POSITION = new Function<VisualNode, Point2D>() {
+        public Point2D apply(VisualNode node) {
+            return new Point2D.Double(node.getX(), node.getY());
+        }
+    };
 }

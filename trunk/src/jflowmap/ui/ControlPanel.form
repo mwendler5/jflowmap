@@ -888,7 +888,9 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
-            <rowspec value="top:5dlu:noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:20px:noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:91px:grow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
@@ -913,7 +915,7 @@
             <children>
               <component id="b4906" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="2" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="2" row-span="9" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -947,7 +949,7 @@
               </component>
               <tabbedpane id="86023" binding="tabbedPane2" default-binding="true">
                 <constraints>
-                  <grid row="0" column="12" row-span="7" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                  <grid row="0" column="12" row-span="9" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
                     <preferred-size width="200" height="200"/>
                   </grid>
                   <forms defaultalign-vert="false"/>
@@ -991,28 +993,12 @@
               </tabbedpane>
               <component id="1ba28" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="10" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="10" row-span="9" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
                   <orientation value="1"/>
                 </properties>
-              </component>
-              <component id="f4fce" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Max cluster distance:"/>
-                </properties>
-              </component>
-              <component id="98146" class="javax.swing.JSlider" binding="maxClusterDistanceSlider">
-                <constraints>
-                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
               </component>
               <component id="dafd2" class="javax.swing.JLabel">
                 <constraints>
@@ -1030,12 +1016,60 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="6f87" class="javax.swing.JSpinner" binding="maxClusterDistanceSpinner">
+              <component id="f578c" class="javax.swing.JButton" binding="joinEdgesButton" default-binding="true">
                 <constraints>
-                  <grid row="4" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <enabled value="false"/>
+                  <text value="Join edges"/>
+                </properties>
+              </component>
+              <component id="912ef" class="javax.swing.JButton" binding="resetClustersButton">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <enabled value="false"/>
+                  <text value="Reset"/>
+                </properties>
+              </component>
+              <component id="a4edb" class="javax.swing.JSeparator">
+                <constraints>
+                  <grid row="4" column="4" row-span="1" col-span="5" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties/>
+              </component>
+              <component id="f4fce" class="javax.swing.JLabel" binding="maxClusterDistanceLabel">
+                <constraints>
+                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <enabled value="false"/>
+                  <text value="Max cluster distance:"/>
+                </properties>
+              </component>
+              <component id="98146" class="javax.swing.JSlider" binding="maxClusterDistanceSlider">
+                <constraints>
+                  <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="false"/>
+                </properties>
+              </component>
+              <component id="6f87" class="javax.swing.JSpinner" binding="maxClusterDistanceSpinner">
+                <constraints>
+                  <grid row="6" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="false"/>
+                </properties>
               </component>
             </children>
           </grid>

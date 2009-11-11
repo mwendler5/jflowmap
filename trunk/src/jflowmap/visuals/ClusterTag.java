@@ -1,6 +1,6 @@
 package jflowmap.visuals;
 
-import java.awt.Color;
+import java.awt.Paint;
 
 /**
  * @author Ilya Boyandin
@@ -8,22 +8,22 @@ import java.awt.Color;
 public class ClusterTag {
 
     private final int clusterId;
-    private final Color clusterColor;
+    private final Paint clusterPaint;
     
-    public ClusterTag(int clusterId, Color clusterColor) {
+    public ClusterTag(int clusterId, Paint clusterPaint) {
         this.clusterId = clusterId;
-        this.clusterColor = clusterColor;
+        this.clusterPaint = clusterPaint;
     }
 
     public int getClusterId() {
         return clusterId;
     }
 
-    public Color getClusterColor() {
-        return clusterColor;
+    public Paint getClusterPaint() {
+        return clusterPaint;
     }
     
-    public static ClusterTag createFor(int clusterId, Color clusterColor) {
+    public static ClusterTag createFor(int clusterId, Paint clusterColor) {
         return new ClusterTag(clusterId, clusterColor);
         
     }

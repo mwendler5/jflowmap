@@ -1,6 +1,7 @@
 package jflowmap.util;
 
 import java.awt.geom.Point2D;
+import java.util.Iterator;
 
 /**
  * @author Ilya Boyandin
@@ -8,6 +9,20 @@ import java.awt.geom.Point2D;
 public final class GeomUtils {
     
     private GeomUtils() {
+    }
+    
+    public static Point2D centroid(Iterator<Point2D> points) {
+        Point2D.Double centroid = new Point2D.Double(0, 0);
+        int count = 0;
+        while (points.hasNext()) {
+            Point2D p = points.next();
+            centroid.x += p.getX();
+            centroid.y += p.getY();
+            count++;
+        }
+        centroid.x /= (double)count;
+        centroid.y /= (double)count;
+        return centroid;
     }
 
     public static double distance(double x1, double y1, double x2, double y2) {
@@ -21,6 +36,7 @@ public final class GeomUtils {
                 line1.getX(), line1.getY(), line2.getX(), line2.getY(),
                 point.getX(), point.getY());
     }
+    
     /**
      * See http://www.exaflop.org/docs/cgafaq/cga1.html
      */

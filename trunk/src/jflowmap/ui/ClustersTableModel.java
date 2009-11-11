@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.util.Collections;
@@ -64,7 +65,7 @@ class ClustersTableModel extends AbstractTableModel {
             ClusterTag tag = node.getClusterTag();
             int clusterId = tag.getClusterId();
             if (!clusterIcons.containsKey(clusterId)) {
-                clusterIcons.put(clusterId, new ClusterIcon(clusterId, tag.getClusterColor()));
+                clusterIcons.put(clusterId, new ClusterIcon(clusterId, tag.getClusterPaint()));
             }
         }
     }
@@ -118,12 +119,12 @@ class ClustersTableModel extends AbstractTableModel {
     static class ClusterIcon implements Icon, Comparable<ClusterIcon> {
 
         final int r = 8;
-        private Color clusterColor;
+        private Paint clusterPaint;
         private int clusterId;
 
-        public ClusterIcon(int clusterId, Color clusterColor) {
+        public ClusterIcon(int clusterId, Paint clusterPaint) {
             this.clusterId = clusterId;
-            this.clusterColor = clusterColor;
+            this.clusterPaint = clusterPaint;
         }
 
         public int getIconHeight() {
@@ -142,7 +143,7 @@ class ClustersTableModel extends AbstractTableModel {
             int oy = y + 3;
             g2.setColor(Color.darkGray);
             g2.drawOval(ox, oy, r, r);
-            g2.setColor(clusterColor);
+            g2.setPaint(clusterPaint);
             g2.fillOval(ox, oy, r, r);
             g2.setColor(Color.black);
             Font f = g2.getFont();
