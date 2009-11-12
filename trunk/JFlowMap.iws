@@ -94,11 +94,8 @@
       <file leaf-file-name="VisualFlowMap.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="495" column="36" selection-start="17750" selection-end="17750" vertical-scroll-proportion="0.0">
-              <folding>
-                <marker date="1257939315523" expanded="true" signature="18187:18205" placeholder="{...}" />
-                <marker date="1257939315523" expanded="true" signature="19112:19118" placeholder="{...}" />
-              </folding>
+            <state line="498" column="36" selection-start="17728" selection-end="17728" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -115,24 +112,15 @@
       <file leaf-file-name="ControlPanel.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="284" column="0" selection-start="12912" selection-end="12912" vertical-scroll-proportion="0.0">
+            <state line="283" column="0" selection-start="12850" selection-end="12850" vertical-scroll-proportion="0.0">
               <folding>
-                <marker date="1257945417584" expanded="false" signature="29:152" placeholder="..." />
-                <marker date="1257945417584" expanded="true" signature="4691:5017" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="5081:5359" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="5403:5484" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="5546:5829" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="5894:6237" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="6278:6761" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="6797:6884" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="6945:8495" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="8527:11049" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="55967:55976" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="55967:55976" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="55982:56018" placeholder="/**...*/" />
-                <marker date="1257945417584" expanded="true" signature="55982:56018" placeholder="/**...*/" />
-                <marker date="1257945417584" expanded="true" signature="56066:56096" placeholder="{...}" />
-                <marker date="1257945417584" expanded="true" signature="56066:56096" placeholder="{...}" />
+                <marker date="1257945436912" expanded="false" signature="29:152" placeholder="..." />
+                <marker date="1257945436912" expanded="true" signature="55828:55837" placeholder="{...}" />
+                <marker date="1257945436912" expanded="true" signature="55828:55837" placeholder="{...}" />
+                <marker date="1257945436912" expanded="true" signature="55843:55879" placeholder="/**...*/" />
+                <marker date="1257945436912" expanded="true" signature="55843:55879" placeholder="/**...*/" />
+                <marker date="1257945436912" expanded="true" signature="55927:55957" placeholder="{...}" />
+                <marker date="1257945436912" expanded="true" signature="55927:55957" placeholder="{...}" />
               </folding>
             </state>
           </provider>
@@ -581,11 +569,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="495" column="36" selection-start="17750" selection-end="17750" vertical-scroll-proportion="0.0">
-          <folding>
-            <marker date="1257939315523" expanded="true" signature="18187:18205" placeholder="{...}" />
-            <marker date="1257939315523" expanded="true" signature="19112:19118" placeholder="{...}" />
-          </folding>
+        <state line="498" column="36" selection-start="17728" selection-end="17728" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>
@@ -598,24 +583,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="284" column="0" selection-start="12912" selection-end="12912" vertical-scroll-proportion="0.0">
+        <state line="283" column="0" selection-start="12850" selection-end="12850" vertical-scroll-proportion="0.0">
           <folding>
-            <marker date="1257945417584" expanded="false" signature="29:152" placeholder="..." />
-            <marker date="1257945417584" expanded="true" signature="4691:5017" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="5081:5359" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="5403:5484" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="5546:5829" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="5894:6237" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="6278:6761" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="6797:6884" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="6945:8495" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="8527:11049" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="55967:55976" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="55967:55976" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="55982:56018" placeholder="/**...*/" />
-            <marker date="1257945417584" expanded="true" signature="55982:56018" placeholder="/**...*/" />
-            <marker date="1257945417584" expanded="true" signature="56066:56096" placeholder="{...}" />
-            <marker date="1257945417584" expanded="true" signature="56066:56096" placeholder="{...}" />
+            <marker date="1257945436912" expanded="false" signature="29:152" placeholder="..." />
+            <marker date="1257945436912" expanded="true" signature="55828:55837" placeholder="{...}" />
+            <marker date="1257945436912" expanded="true" signature="55828:55837" placeholder="{...}" />
+            <marker date="1257945436912" expanded="true" signature="55843:55879" placeholder="/**...*/" />
+            <marker date="1257945436912" expanded="true" signature="55843:55879" placeholder="/**...*/" />
+            <marker date="1257945436912" expanded="true" signature="55927:55957" placeholder="{...}" />
+            <marker date="1257945436912" expanded="true" signature="55927:55957" placeholder="{...}" />
           </folding>
         </state>
       </provider>

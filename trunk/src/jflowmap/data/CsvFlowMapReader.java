@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import jflowmap.JFlowMap;
+
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
@@ -17,11 +19,11 @@ import prefuse.data.io.DataIOException;
 /**
  * @author Ilya Boyandin
  */
-public class CsvGraphReader extends AbstractGraphReader {
+public class CsvFlowMapReader extends AbstractGraphReader {
 
-    private static final String COLUMN_X = "x";
-    private static final String COLUMN_Y = "y";
-    private static final String COLUMN_VALUE = "value";
+    private static final String COLUMN_X = JFlowMap.DEFAULT_NODE_X_ATTR_NAME;
+    private static final String COLUMN_Y = JFlowMap.DEFAULT_NODE_Y_ATTR_NAME;
+    private static final String COLUMN_VALUE = JFlowMap.DEFAULT_EDGE_WEIGHT_ATTR_NAME;
     
     private Map<Point2D, Node> nodes;
     private Graph graph;
@@ -45,6 +47,7 @@ public class CsvGraphReader extends AbstractGraphReader {
             Point2D from = new Point2D.Double(tuple.getDouble(0), tuple.getDouble(1));
             Point2D to = new Point2D.Double(tuple.getDouble(2), tuple.getDouble(3)); 
             Edge edge = graph.addEdge(getNode(from), getNode(to));
+            
             if (tuple.getColumnCount() >= 4) {
                 edge.set(COLUMN_VALUE, tuple.getDouble(4));
             }

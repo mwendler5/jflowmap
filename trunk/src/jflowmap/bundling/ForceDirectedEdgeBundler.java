@@ -31,7 +31,7 @@ public class ForceDirectedEdgeBundler {
     private double[] edgeLengths;
     private final String xNodeAttr;
     private final String yNodeAttr;
-    private final String edgeAttrName;
+    private final String edgeWeightAttr;
     private final Graph graph;
 
     private List<CompatibleEdge>[] compatibleEdgeLists;
@@ -53,12 +53,12 @@ public class ForceDirectedEdgeBundler {
     
     public ForceDirectedEdgeBundler(
             Graph graph, 
-            String xNodeAttr, String yNodeAttr, String edgeAttrName,
+            String xNodeAttr, String yNodeAttr, String edgeWeightAttr,
             ForceDirectedBundlerParameters params) {
         this.graph = graph;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
-        this.edgeAttrName = edgeAttrName;
+        this.edgeWeightAttr = edgeWeightAttr;
         this.params = params;
     }
 
@@ -115,13 +115,13 @@ public class ForceDirectedEdgeBundler {
         }
         for (int i = 0; i < numEdges; i++) {
             Edge edge = graph.getEdge(i);
-            edgeStarts[i] = new Point2D.Double(getStartX(edge), getStartY(edge));
-            edgeEnds[i] = new Point2D.Double(getEndX(edge), getEndY(edge));
+            edgeStarts[i] = new Point2D.Double(getSourceX(edge), getSourceY(edge));
+            edgeEnds[i] = new Point2D.Double(getTargetX(edge), getTargetY(edge));
             double length = edgeStarts[i].distance(edgeEnds[i]);
             if (Math.abs(length) < EPS) length = 0.0;
             edgeLengths[i] = length;
             if (params.getEdgeValueAffectsAttraction()) {
-                double value = getValue(edge);
+                double value = getWeight(edge);
                 edgeValues[i] = value;
                 if (value > evMax) {
                     evMax = value;
@@ -501,23 +501,23 @@ public class ForceDirectedEdgeBundler {
         }
     }
     
-    private double getValue(Edge edge) {
-        return edge.getDouble(edgeAttrName);
+    private double getWeight(Edge edge) {
+        return edge.getDouble(edgeWeightAttr);
     }
 
-    private double getStartX(Edge edge) {
+    private double getSourceX(Edge edge) {
         return edge.getSourceNode().getDouble(xNodeAttr);
     }
     
-    private double getStartY(Edge edge) {
+    private double getSourceY(Edge edge) {
         return edge.getSourceNode().getDouble(yNodeAttr);
     }
     
-    private double getEndX(Edge edge) {
+    private double getTargetX(Edge edge) {
         return edge.getTargetNode().getDouble(xNodeAttr);
     }
 
-    private double getEndY(Edge edge) {
+    private double getTargetY(Edge edge) {
         return edge.getTargetNode().getDouble(yNodeAttr);
     }
 }

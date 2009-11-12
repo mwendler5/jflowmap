@@ -24,7 +24,7 @@ public enum GraphFileFormats {
     CSV("csv") {
         @Override
         public GraphReader createReader() {
-            return new CsvGraphReader();
+            return new CsvFlowMapReader();
         }
     }
     ;

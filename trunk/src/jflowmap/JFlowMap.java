@@ -33,7 +33,13 @@ import edu.umd.cs.piccolo.PCanvas;
  */
 public class JFlowMap extends JComponent {
 
+    private static final long serialVersionUID = -1898747650184999568L;
+
     private static Logger logger = Logger.getLogger(JFlowMap.class);
+
+    public static final String DEFAULT_NODE_X_ATTR_NAME = "x";
+    public static final String DEFAULT_NODE_Y_ATTR_NAME = "y";
+    public static final String DEFAULT_EDGE_WEIGHT_ATTR_NAME = "value";
 
     private final PCanvas canvas;
     private final ControlPanel controlPanel;
@@ -66,6 +72,14 @@ public class JFlowMap extends JComponent {
         add(controlPanel.getPanel(), BorderLayout.SOUTH);
         
         fitFlowMapInView();
+    }
+    
+    public ControlPanel getControlPanel() {
+        return controlPanel;
+    }
+    
+    public PCanvas getCanvas() {
+        return canvas;
     }
 
     public void resetBundling() {
@@ -100,7 +114,11 @@ public class JFlowMap extends JComponent {
     public VisualFlowMap loadFlowMap(DatasetSpec dataset) {
         logger.info("> Loading flow map \"" + dataset + "\"");
         try {
-            return createVisualFlowMap(dataset, loadGraph(dataset.filename));
+            VisualAreaMap areaMap = null;
+            if (dataset.areaMapFilename != null) {
+                areaMap = loadAreaMap(dataset.areaMapFilename);
+            }
+            return createVisualFlowMap(dataset.getAttrsSpec(), loadGraph(dataset.filename), areaMap);
         } catch (DataIOException e) {
             logger.error("Couldn't load flow map " + dataset, e);
             JOptionPane.showMessageDialog(this,  "Couldn't load flow map: [" + e.getClass().getSimpleName()+ "] " + e.getMessage());
@@ -108,26 +126,24 @@ public class JFlowMap extends JComponent {
         return null;
     }
 
-    private VisualFlowMap createVisualFlowMap(DatasetSpec dataset, Graph graph) {
-        GraphStats stats = makeGraphStats(dataset, graph);
-        FlowMapParams model = new FlowMapParams(stats, dataset.valueAttrName, 
-        		dataset.xNodeAttr, dataset.yNodeAttr, dataset.labelAttrName);
-        if (!Double.isNaN(dataset.valueFilterMin)) {
-            model.setValueFilterMin(dataset.valueFilterMin);
+    public VisualFlowMap createVisualFlowMap(FlowMapAttrsSpec attrs, Graph graph, VisualAreaMap areaMap) {
+        return createVisualFlowMap(attrs.getWeightAttrName(), attrs.getLabelAttrName(), 
+                attrs.getXNodeAttr(), attrs.getYNodeAttr(), attrs.getWeightFilterMin(), graph, areaMap);
+    }
+    
+    public VisualFlowMap createVisualFlowMap(String weightAttrName, String labelAttrName,
+            String xNodeAttr, String yNodeAttr, double weightFilterMin, Graph graph, VisualAreaMap areaMap) {
+        FlowMapParams params = new FlowMapParams(graph, weightAttrName, xNodeAttr, yNodeAttr, labelAttrName);
+        if (!Double.isNaN(weightFilterMin)) {
+            params.setValueFilterMin(weightFilterMin);
         }
-        VisualFlowMap visualFlowMap = new VisualFlowMap(this, canvas, graph, stats, model);
-        if (dataset.areaMapFilename != null) {
-            VisualAreaMap map = loadAreaMap(dataset.areaMapFilename);
-            visualFlowMap.addChild(map);
-            map.moveToBack();
+        VisualFlowMap visualFlowMap = new VisualFlowMap(this, graph, params.getGraphStats(), params);
+        if (areaMap != null) {
+            visualFlowMap.addChild(areaMap);
+            areaMap.moveToBack();
         }
         return visualFlowMap;
     }
-
-	private GraphStats makeGraphStats(DatasetSpec dataset, Graph graph) {
-		return GraphStats.createFor(
-				graph, dataset.valueAttrName, dataset.xNodeAttr, dataset.yNodeAttr);
-	}
 
     private Graph loadGraph(String filename) throws DataIOException {
         logger.info("Loading graph \"" + filename + "\"");
@@ -154,28 +170,61 @@ public class JFlowMap extends JComponent {
             this(filename, valueAttrName, xNodeAttr, yNodeAttr, 
             		labelAttrName, areaMapFilename, Double.NaN);
         }
-        
+
+        public FlowMapAttrsSpec getAttrsSpec() {
+            return attrsSpec;
+        }
+
         public DatasetSpec(String filename, String valueAttrName,
         		String xNodeAttr, String yNodeAttr, 
         		String labelAttrName, String areaMapFilename, double valueFilterMin) {
             this.filename = filename;
-            this.valueAttrName = valueAttrName;
-            this.xNodeAttr = xNodeAttr;
-            this.yNodeAttr = yNodeAttr;
-            this.labelAttrName = labelAttrName;
             this.areaMapFilename = areaMapFilename;
-            this.valueFilterMin = valueFilterMin;
+            this.attrsSpec = new FlowMapAttrsSpec(
+                    valueAttrName,
+                    labelAttrName,
+                    xNodeAttr,
+                    yNodeAttr,
+                    valueFilterMin
+            );
         }
         public final String filename;
         public final String areaMapFilename;
-        public final String valueAttrName;
-        public final String labelAttrName;
-        public final String xNodeAttr, yNodeAttr;
-        public final double valueFilterMin;
+        public final FlowMapAttrsSpec attrsSpec;
 
         @Override
         public String toString() {
             return filename;
+        }
+    }
+    
+    public static class FlowMapAttrsSpec {
+        public final String weightAttrName;
+        public final String labelAttrName;
+        public final String xNodeAttr, yNodeAttr;
+        public final double weightFilterMin;
+        public FlowMapAttrsSpec(String weightAttrName, String labelAttrName,
+                String xNodeAttr, String yNodeAttr, double weightFilterMin) {
+            this.weightAttrName = weightAttrName;
+            this.labelAttrName = labelAttrName;
+            this.xNodeAttr = xNodeAttr;
+            this.yNodeAttr = yNodeAttr;
+            this.weightFilterMin = weightFilterMin;
+        }
+        public String getWeightAttrName() {
+            return weightAttrName;
+        }
+        public String getLabelAttrName() {
+            return labelAttrName;
+        }
+        public String getXNodeAttr() {
+            return xNodeAttr;
+        }
+        public String getYNodeAttr() {
+            return yNodeAttr;
+        }
+        public double getWeightFilterMin() {
+            return weightFilterMin;
         }
     }
     

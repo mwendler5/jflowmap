@@ -17,25 +17,25 @@ public class GraphStats {
     private Graph graph;
 
     private final Map<String, MinMax> statsCache = new HashMap<String, MinMax>();
-    private String edgeAttrName;
+    private String edgeWeightAttr;
     private String xNodeAttr;
     private String yNodeAttr;
     private MinMax edgeLengthStats;
 
-    private GraphStats(Graph graph, String edgeAttrName, String xNodeAttr, String yNodeAttr) {
+    private GraphStats(Graph graph, String edgeWeightAttr, String xNodeAttr, String yNodeAttr) {
         this.graph = graph;
-        this.edgeAttrName = edgeAttrName;
+        this.edgeWeightAttr = edgeWeightAttr;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
     }
 
-    public static GraphStats createFor(Graph graph, String edgeAttrName, String xNodeAttr, String yNodeAttr) {
-        return new GraphStats(graph, edgeAttrName, xNodeAttr, yNodeAttr);
+    public static GraphStats createFor(Graph graph, String edgeWeightAttr, String xNodeAttr, String yNodeAttr) {
+        return new GraphStats(graph, edgeWeightAttr, xNodeAttr, yNodeAttr);
     }
 
     
-    public MinMax getEdgeAttrStats() {
-        return getEdgeAttrStats(edgeAttrName);
+    public MinMax getEdgeWeightStats() {
+        return getEdgeWeightStats(edgeWeightAttr);
     }
 
     private double[] getEdgeLengths() {
@@ -74,7 +74,7 @@ public class GraphStats {
         return edgeLengthStats;
     }
 
-    public MinMax getEdgeAttrStats(String attrName) {
+    public MinMax getEdgeWeightStats(String attrName) {
         String key = "edge-" + attrName;
         MinMax stats = statsCache.get(key);
         if (stats == null) {
@@ -119,7 +119,7 @@ public class GraphStats {
             + super.toString() + TAB
             + "graph = " + this.graph + TAB
             + "statsCache = " + this.statsCache + TAB
-            + "edgeAttrName = " + this.edgeAttrName + TAB
+            + "edgeWeightAttr = " + this.edgeWeightAttr + TAB
             + "xNodeAttr = " + this.xNodeAttr + TAB
             + "yNodeAttr = " + this.yNodeAttr + TAB
             + "edgeLengthStats = " + this.edgeLengthStats + TAB

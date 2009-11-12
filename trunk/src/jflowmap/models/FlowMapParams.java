@@ -3,6 +3,8 @@ package jflowmap.models;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import prefuse.data.Graph;
+
 import jflowmap.util.GraphStats;
 import jflowmap.util.MinMax;
 
@@ -19,7 +21,7 @@ public class FlowMapParams {
     private boolean fillEdgesWithGradient = true;
     private boolean useProportionalDirectionMarkers = true;
 
-    private String edgeAttrName;
+    private String edgeWeightAttr;
     private String xNodeAttr;
     private String yNodeAttr;
     private String labelAttr = "tooltip";
@@ -38,15 +40,17 @@ public class FlowMapParams {
     private double directionMarkerSize = 0.1; 
 
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
+    private GraphStats graphStats;
 
-    public FlowMapParams(GraphStats graphStats, String edgeAttrName, 
-    		String xNodeAttr, String yNodeAttr, String labelAttrName) {
-        this.edgeAttrName = edgeAttrName;
+    public FlowMapParams(Graph graph, String edgeWeightAttr, 
+    		String xNodeAttr, String yNodeAttr, String labelAttr) {
+        this.graphStats = GraphStats.createFor(graph, edgeWeightAttr, xNodeAttr, yNodeAttr);
+        this.edgeWeightAttr = edgeWeightAttr;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
-        this.labelAttr = labelAttrName;
+        this.labelAttr = labelAttr;
 
-        MinMax minMax = graphStats.getEdgeAttrStats();
+        MinMax minMax = graphStats.getEdgeWeightStats();
         this.valueFilterMin = minMax.getMin();
         this.valueFilterMax = minMax.getMax();
 
@@ -58,7 +62,10 @@ public class FlowMapParams {
         MinMax lengthStats = graphStats.getEdgeLengthStats();
         this.edgeLengthFilterMin = lengthStats.getMin();
         this.edgeLengthFilterMax = lengthStats.getMax();
-
+    }
+    
+    public GraphStats getGraphStats() {
+        return graphStats;
     }
 
     public boolean getAutoAdjustColorScale() {
@@ -99,8 +106,8 @@ public class FlowMapParams {
         return yNodeAttr;
     }
 
-    public String getEdgeAttrName() {
-        return edgeAttrName;
+    public String getEdgeWeightAttr() {
+        return edgeWeightAttr;
     }
 
     public String getLabelAttr() {
@@ -268,7 +275,7 @@ public class FlowMapParams {
     public static final String PROPERTY_USE_LOG_WIDTH_SCALE = "useLogWidthScale";
     public static final String PROPERTY_MAX_LENGTH_FILTER = "lengthFilterMax";
     public static final String PROPERTY_MIN_LENGTH_FILTER = "lengthFilterMin";
-    public static final String PROPERTY_VALUE_FILTER_MIN = "valueFilterMin";
+    public static final String PROPERTY_VALUE_FILTER_MIN = "weightFilterMin";
     public static final String PROPERTY_VALUE_FILTER_MAX = "valueFilterMax";
     public static final String PROPERTY_DIRECTION_MARKER_ALPHA = "directionMarkerAlpha";
     public static final String PROPERTY_DIRECTION_MARKER_SIZE = "directionMarkerSize";

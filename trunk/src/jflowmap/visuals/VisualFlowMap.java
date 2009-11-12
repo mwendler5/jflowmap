@@ -1,7 +1,5 @@
 package jflowmap.visuals;
 
-import java.awt.Color;
-import java.awt.Insets;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
@@ -21,7 +19,6 @@ import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.bundling.ForceDirectedEdgeBundler;
 import jflowmap.clustering.NodeDistanceMeasure;
 import jflowmap.models.FlowMapParams;
-import jflowmap.util.GeomUtils;
 import jflowmap.util.GraphStats;
 import jflowmap.util.MinMax;
 
@@ -38,13 +35,8 @@ import ch.unifr.dmlib.cluster.ClusterNode;
 import ch.unifr.dmlib.cluster.HierarchicalClusterer;
 import ch.unifr.dmlib.cluster.Linkage;
 import ch.unifr.dmlib.cluster.HierarchicalClusterer.DistanceMatrix;
-
-import com.google.common.collect.Iterators;
-
 import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 
 /**
@@ -69,17 +61,15 @@ public class VisualFlowMap extends PNode {
     private List<VisualEdge> visualEdges;
     private Map<Node, VisualNode> nodesToVisuals;
     private Map<Edge, VisualEdge> edgesToVisuals;
-    private final PCanvas canvas;
     private final Graph graph; 
     private GraphStats graphStats;
     private final JFlowMap jFlowMap;
 
-    public VisualFlowMap(JFlowMap jFlowMap, PCanvas canvas, Graph graph,
-    		GraphStats stats, FlowMapParams model) {
+    public VisualFlowMap(JFlowMap jFlowMap, Graph graph, GraphStats stats,
+    		FlowMapParams model) {
         this.jFlowMap = jFlowMap;
         this.graph = graph;
         this.graphStats = stats;
-        this.canvas = canvas;
     	this.model = model;
 
         nodeLayer = new PNode();
@@ -145,6 +135,17 @@ public class VisualFlowMap extends PNode {
         createEdges(null, false);
     }
     
+    public String getLabel(Edge edge) {
+        String labelAttr = model.getLabelAttr();
+        Node src = edge.getSourceNode();
+        Node target = edge.getTargetNode();
+        if (labelAttr == null) {
+            return src.toString() + " -> " + target.toString();
+        } else {
+            return src.getString(labelAttr) + " -> " + target.getString(labelAttr);
+        }
+    }
+    
     private void createEdges(Point2D[][] edgeSplinePoints, boolean showPoints) {
         edgeLayer.removeAllChildren();
         
@@ -157,7 +158,7 @@ public class VisualFlowMap extends PNode {
         @SuppressWarnings("unchecked")
         
 //        Iterator<Integer> it = graph.getEdgeTable().rows();
-        Iterator<Integer> it = graph.getEdgeTable().rowsSortedBy(model.getEdgeAttrName(), true);
+        Iterator<Integer> it = graph.getEdgeTable().rowsSortedBy(model.getEdgeWeightAttr(), true);
 
         while (it.hasNext()) {
             Edge edge = graph.getEdge(it.next());
@@ -165,13 +166,11 @@ public class VisualFlowMap extends PNode {
             if (edge.getSourceNode().equals(edge.getTargetNode())) {
                 logger.warn(
                         "Self-loop edge: " +
-                        edge.getSourceNode().getString(model.getLabelAttr()) + " -> " +
-                        edge.getTargetNode().getString(model.getLabelAttr()) + 
                         " [" + edge + "]"
                 );
             }
             
-            double value = edge.getDouble(model.getEdgeAttrName());
+            double value = edge.getDouble(model.getEdgeWeightAttr());
             if (Double.isNaN(value)) {
                 logger.warn(
                     "Omitting NaN value for edge: " +
@@ -228,11 +227,11 @@ public class VisualFlowMap extends PNode {
         return model.getMaxEdgeWidth();
     }
 
-    private static final Insets contentInsets = new Insets(10, 10, 10, 10);
+//    private static final Insets contentInsets = new Insets(10, 10, 10, 10);
     
-    private Insets getContentInsets() {
-        return contentInsets;
-    }
+//    private Insets getContentInsets() {
+//        return contentInsets;
+//    }
     
 //    public void fitInCameraView(boolean animate) {
 //        if (nodeBounds != null) {
@@ -280,7 +279,7 @@ public class VisualFlowMap extends PNode {
             tooltipBox.setText(
 //                    flow.getStartNodeId() + " - " + flow.getEndNodeId(), 
                     edge.getLabel(),
-                    model.getEdgeAttrName() + ": ", Double.toString(edge.getEdgeAttrValue()));
+                    model.getEdgeWeightAttr() + ": ", Double.toString(edge.getEdgeWeight()));
         } else {
             return;
         }
@@ -390,7 +389,7 @@ public class VisualFlowMap extends PNode {
     }
 
     public PCamera getCamera() {
-        return canvas.getCamera();
+        return jFlowMap.getCanvas().getCamera();
     }
     
     public void resetBundling() {
@@ -403,7 +402,7 @@ public class VisualFlowMap extends PNode {
         final ForceDirectedEdgeBundler bundler =
                 new ForceDirectedEdgeBundler(graph, 
                         model.getXNodeAttr(), model.getYNodeAttr(), 
-                        model.getEdgeAttrName(), 
+                        model.getEdgeWeightAttr(), 
                         params);
         EdgeBundlerWorker worker = new EdgeBundlerWorker(pt, bundler);
         ProgressDialog dialog = new ProgressDialog(jFlowMap.getApp(), "Edge Bundling", worker, true);
@@ -531,17 +530,29 @@ public class VisualFlowMap extends PNode {
     }
 
     public void joinEdgesToClusters() {
-        for (VisualNodeCluster cluster : visualNodeClusters) {
-            Point2D centroid = GeomUtils.centroid(
-                    Iterators.transform(
-                        cluster.iterator(), VisualNode.TRANSFORM_NODE_TO_POSITION
-                    )
-            );
-            PPath marker = new PPath(new Rectangle2D.Double(centroid.getX() - 4, centroid.getY() - 4, 8, 8));
-            marker.setPaint(Color.BLUE);
-            addChild(marker);
-        }
+//        for (VisualNodeCluster cluster : visualNodeClusters) {
+//            Point2D centroid = GeomUtils.centroid(
+//                    Iterators.transform(
+//                        cluster.iterator(), VisualNode.TRANSFORM_NODE_TO_POSITION
+//                    )
+//            );
+//            PPath marker = new PPath(new Rectangle2D.Double(centroid.getX() - 4, centroid.getY() - 4, 8, 8));
+//            marker.setPaint(Color.BLUE);
+//            addChild(marker);
+//        }
         
+        Graph clusteredGraph = VisualNodeCluster.createClusteredFlowMap(visualNodeClusters);
+        VisualFlowMap clusteredFlowMap = jFlowMap.createVisualFlowMap(
+                JFlowMap.DEFAULT_EDGE_WEIGHT_ATTR_NAME,
+                null,
+                JFlowMap.DEFAULT_NODE_X_ATTR_NAME,
+                JFlowMap.DEFAULT_NODE_Y_ATTR_NAME,
+                0,
+                clusteredGraph,
+                null
+        );
+        jFlowMap.setVisualFlowMap(clusteredFlowMap);
+        jFlowMap.getControlPanel().loadFlowMapData(clusteredFlowMap);
     }
 
     public void resetClusters() {

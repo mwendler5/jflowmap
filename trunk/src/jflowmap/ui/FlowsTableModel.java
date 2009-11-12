@@ -72,7 +72,7 @@ class FlowsTableModel extends AbstractTableModel {
         switch (column) {
             case 0: return visualEdge.getSourceNode().getLabel();
             case 1: return visualEdge.getTargetNode().getLabel();
-            case 2: return visualEdge.getEdgeAttrValue();
+            case 2: return visualEdge.getEdgeWeight();
         }
         return "";
     }

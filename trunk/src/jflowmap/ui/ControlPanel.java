@@ -132,7 +132,7 @@ public class ControlPanel {
         updateMarkersInputs();
     }
 
-    private void loadFlowMapData(VisualFlowMap visualFlowMap) {
+    public void loadFlowMapData(VisualFlowMap visualFlowMap) {
         fdBundlingParams = new ForceDirectedBundlerParameters(visualFlowMap.getGraphStats());
         if (!modelsInitialized) {
             initModelsOnce();
@@ -206,7 +206,7 @@ public class ControlPanel {
         initializing = true;
         GraphStats stats = getGraphStats();
 
-        MinMax valueStats = stats.getEdgeAttrStats();
+        MinMax valueStats = stats.getEdgeWeightStats();
 
         minValueFilterSpinner.setModel(new SpinnerNumberModel(valueStats.getMin(), valueStats.getMin(), valueStats.getMax(), 1));
         maxValueFilterSpinner.setModel(new SpinnerNumberModel(valueStats.getMax(), valueStats.getMin(), valueStats.getMax(), 1));
@@ -573,7 +573,7 @@ public class ControlPanel {
     }
 
     private double fromValueEdgeFilterSliderValue(final int logValue) {
-        MinMax stats = getGraphStats().getEdgeAttrStats();
+        MinMax stats = getGraphStats().getEdgeWeightStats();
         double value = Math.round(Math.pow(Math.E, logValue));
         if (value < stats.getMin()) {
             value = stats.getMin();

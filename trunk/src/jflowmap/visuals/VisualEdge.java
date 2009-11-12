@@ -109,13 +109,13 @@ public abstract class VisualEdge extends PNode {
 
         double edgeLengthFilterMin = model.getEdgeLengthFilterMin();
         double edgeLengthFilterMax = model.getEdgeLengthFilterMax();
-        final double value = getEdgeAttrValue();
+        final double value = getEdgeWeight();
         double length = getEdgeLength();
         final boolean visible =
                 valueFilterMin <= value && value <= valueFilterMax    &&
                 edgeLengthFilterMin <= length && length <= edgeLengthFilterMax
         ;
-//        System.out.println(this + "  " + visible  + "  filter:[" + valueFilterMin + "-" + valueFilterMax + "] value = " + value);
+//        System.out.println(this + "  " + visible  + "  filter:[" + weightFilterMin + "-" + valueFilterMax + "] value = " + value);
         setVisible(visible);
         setPickable(visible);
         setChildrenPickable(visible);
@@ -134,8 +134,8 @@ public abstract class VisualEdge extends PNode {
                targetNode.getLabel();
     }
 
-    public double getEdgeAttrValue() {
-        return edge.getDouble(visualFlowMap.getModel().getEdgeAttrName());
+    public double getEdgeWeight() {
+        return edge.getDouble(visualFlowMap.getModel().getEdgeWeightAttr());
     }
 
     public double getEdgeLength() {
@@ -176,13 +176,13 @@ public abstract class VisualEdge extends PNode {
     public String toString() {
         return "VisualEdge{" +
                 "label='" + getLabel() + "', " +
-                "value=" + getEdgeAttrValue() +
+                "value=" + getEdgeWeight() +
         '}';
     }
 
     public double getNormalizedLogValue() {
         FlowMapParams model = getVisualFlowMap().getModel();
-        double value = getEdgeAttrValue();
+        double value = getEdgeWeight();
         double nv;
         if (model.getAutoAdjustEdgeColorScale()) {
             double minLog = 1.0;
@@ -193,7 +193,7 @@ public abstract class VisualEdge extends PNode {
                 nv = (Math.log(value - model.getValueFilterMin()) - minLog) / (maxLog - minLog);
             }
         } else {
-            MinMax stats = visualFlowMap.getGraphStats().getEdgeAttrStats();
+            MinMax stats = visualFlowMap.getGraphStats().getEdgeWeightStats();
             nv = stats.normalizeLog(value);
         }
         if (Double.isNaN(nv)) {
@@ -205,8 +205,8 @@ public abstract class VisualEdge extends PNode {
     public double getNormalizedValue() {
         double nv;
     
-        MinMax stats = visualFlowMap.getGraphStats().getEdgeAttrStats();
-        nv = stats.normalize(getEdgeAttrValue());
+        MinMax stats = visualFlowMap.getGraphStats().getEdgeWeightStats();
+        nv = stats.normalize(getEdgeWeight());
 
         if (Double.isNaN(nv)) {
             logger.error("NaN normalized value for edge: " + this);

@@ -205,7 +205,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
         private double valueSquareSum(VisualNode node, boolean incoming) {
             double sum = 0;
             for (VisualEdge e : node.getEdges(incoming)) {
-                double v = e.getEdgeAttrValue();
+                double v = e.getEdgeWeight();
                 sum += v * v;
             }
             return sum;
@@ -243,7 +243,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             for (VisualEdge edge1 : edges1) {
                 VisualEdge matchingEdge = findMatchingEdge(edge1, node2, incoming);
                 if (matchingEdge != null) {
-                    sum += edge1.getEdgeAttrValue() * matchingEdge.getEdgeAttrValue();
+                    sum += edge1.getEdgeWeight() * matchingEdge.getEdgeWeight();
                 }
             }
             // it's enough to iterate through edges1, because we only take 
@@ -312,7 +312,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
         private double valueSquareSum(VisualNode node, boolean incoming) {
             double sum = 0;
             for (VisualEdge e : node.getEdges(incoming)) {
-                double v = e.getEdgeAttrValue();
+                double v = e.getEdgeWeight();
                 sum += v * v;
             }
             return sum;
@@ -359,7 +359,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
                 if (allowPerfectMatches  ||  nonPerfectMatch) {
                     if (matchingEdge != null) {
                         double mv = matchingValue(e1, matchingEdge, oppositeIsSource);
-                        double v = e1.getEdgeAttrValue();
+                        double v = e1.getEdgeWeight();
                         sf.numerator += v * mv;
                         if (nonPerfectMatch) {
                             if (allowPerfectMatches) {
@@ -380,7 +380,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             VisualNode n1 = oppositeIsSource ? edge.getSourceNode() : edge.getTargetNode();
             VisualNode n2 = oppositeIsSource ? matchingEdge.getSourceNode() : matchingEdge.getTargetNode();
             double l_avg = (edge.getEdgeLength() + matchingEdge.getEdgeLength())/2;
-            return matchingEdge.getEdgeAttrValue() * l_avg / (l_avg + n1.distanceTo(n2));
+            return matchingEdge.getEdgeWeight() * l_avg / (l_avg + n1.distanceTo(n2));
         }
     }
 
@@ -410,7 +410,7 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
                 double d = GeomUtils.distance(
                         t1.getValueX(), t1.getValueY(), t2.getValueX(), t2.getValueY());
                 if (useEdgeWeights) {
-                    double w = e1.getEdgeAttrValue() * e2.getEdgeAttrValue();
+                    double w = e1.getEdgeWeight() * e2.getEdgeWeight();
                     numerator += d * w;
                     denominator += w;
                 } else {
