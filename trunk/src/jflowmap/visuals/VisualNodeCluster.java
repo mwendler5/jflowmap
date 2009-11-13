@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Paint;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -12,19 +14,24 @@ import java.util.Map;
 import jflowmap.models.FlowMapGraphBuilder;
 import jflowmap.util.ColorUtils;
 import jflowmap.util.GeomUtils;
-import prefuse.data.Edge;
+import jflowmap.util.Pair;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import ch.unifr.dmlib.cluster.ClusterNode;
 import ch.unifr.dmlib.cluster.ClusterSetBuilder;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 
 /**
  * @author Ilya Boyandin
  */
 public class VisualNodeCluster implements Iterable<VisualNode> {
     
+    private static final String LABEL_SEPARATOR = ", ";
     private ClusterTag tag;
     private List<VisualNode> nodes;
     
@@ -73,10 +80,7 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
         return new VisualNodeCluster(id, color, it);
     }
 
-    public static List<VisualNodeCluster> createClusters(
-            ClusterNode<VisualNode> rootCluster, double clusterDistanceThreshold) {
-        
-        List<List<VisualNode>> nodeClusterLists = ClusterSetBuilder.getClusters(rootCluster, clusterDistanceThreshold);
+    public static List<VisualNodeCluster> createClusters(List<List<VisualNode>> nodeClusterLists, double clusterDistanceThreshold) {
 //        List<List<VisualNode>> clusters = Lists.newArrayList(Iterators.filter(
 //                ClusterSetBuilder.getClusters(rootCluster, clusterDistanceThreshold).iterator(),
 //                new Predicate<List<VisualNode>>() {
@@ -85,21 +89,50 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
 //                    }
 //                }
 //        ));
-        
         final int numClusters = nodeClusterLists.size();
         
         Color[] colors = ColorUtils.createCategoryColors(numClusters, 150);
         List<VisualNodeCluster> nodeClusters = new ArrayList<VisualNodeCluster>(numClusters);
-        for (int i = 0; i < numClusters; i++) {
-            List<VisualNode> nodes = nodeClusterLists.get(i);
-            nodeClusters.add(VisualNodeCluster.createFor(i + 1, colors[i], nodes.iterator()));
+        int cnt = 0;
+        for (Collection<VisualNode> nodes : nodeClusterLists) {
+            nodeClusters.add(VisualNodeCluster.createFor(cnt + 1, colors[cnt], nodes.iterator()));
+            cnt++;
         }
         return nodeClusters;
+    }
+
+    public static List<List<VisualNode>> combineClusters(List<List<VisualNode>> clusters1, List<List<VisualNode>> clusters2) {
+        Map<VisualNode, Integer> map1 = createNodeToClusterIndexMap(clusters1);
+        Map<VisualNode, Integer> map2 = createNodeToClusterIndexMap(clusters2);
+        
+        Multimap<Pair<Integer, Integer>, VisualNode> newClusters = LinkedHashMultimap.create();
+        for (List<VisualNode> cluster : clusters1) {
+            for (VisualNode node : cluster) {
+                newClusters.put(Pair.of(map1.get(node), map2.get(node)), node);
+            }
+        }
+
+        List<List<VisualNode>> newClustersList = new ArrayList<List<VisualNode>>();
+        for (Pair<Integer, Integer> key : newClusters.asMap().keySet()) {
+            newClustersList.add(ImmutableList.copyOf(newClusters.get(key)));
+        }
+        
+        return newClustersList;
+    }
+    
+    private static Map<VisualNode, Integer> createNodeToClusterIndexMap(
+            List<List<VisualNode>> nodeClusterLists) {
+        Map<VisualNode, Integer> map = new HashMap<VisualNode, Integer>();
+        for (int clusterIndex = 0, size = nodeClusterLists.size(); clusterIndex < size; clusterIndex++) {
+            for (VisualNode node : nodeClusterLists.get(clusterIndex)) {
+                map.put(node, clusterIndex);
+            }
+        }
+        return map;
     }
     
     
     public static Graph createClusteredFlowMap(List<VisualNodeCluster> clusters) {
-        
         FlowMapGraphBuilder builder =
             new FlowMapGraphBuilder().withCumulativeEdges();
         
@@ -111,9 +144,9 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
                         cluster.iterator(), VisualNode.TRANSFORM_NODE_TO_POSITION
                     )
             );
-            Node node = builder.addNode(centroid);
+            Node node = builder.addNode(centroid, makeCumulatedLabel(cluster));
             for (VisualNode visualNode : cluster) {
-                visualToNode.put(visualNode, node);
+                visualToNode.put(visualNode, node);  
             }
         }
 
@@ -125,12 +158,26 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
                             visualToNode.get(visualEdge.getSourceNode()),
                             visualToNode.get(visualEdge.getTargetNode()),
                             visualEdge.getEdgeWeight());
-                    
                 }
             }
         }
         
         return builder.build();
+    }
+
+    private static String makeCumulatedLabel(VisualNodeCluster cluster) {
+        ArrayList<VisualNode> nodes = Lists.newArrayList(cluster);
+        Collections.sort(nodes, VisualNode.LABEL_COMPARATOR);
+        StringBuilder label = new StringBuilder();
+        label.append("[");
+        for (VisualNode visualNode : nodes) {
+            label.append(visualNode.getLabel()).append(LABEL_SEPARATOR);
+        }
+        if (label.length() > 0) {
+            label.setLength(label.length() - LABEL_SEPARATOR.length()); // remove the last separator
+        }
+        label.append("]");
+        return label.toString();
     }
     
 

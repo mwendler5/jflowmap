@@ -13,12 +13,9 @@ import ch.unifr.dmlib.cluster.DistanceMeasure;
  */
 public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
 
-    EUCLIDEAN("Euclidean", NodeFilter.ALL) {
+    COSINE_IN_OUT("Cosine: in/out", NodeFilter.IN_OR_OUT) {
         public double distance(VisualNode t1, VisualNode t2) {
-            double dx = t1.getValueX() - t2.getValueX();
-            double dy = t1.getValueY() - t2.getValueY();
-            double dist = Math.sqrt(dx * dx + dy * dy);
-            return dist;
+            return Cosine.IN_AND_OUT.distance(t1, t2);
         }        
     },
     COSINE_IN("Cosine: in", NodeFilter.IN) {
@@ -31,9 +28,12 @@ public enum NodeDistanceMeasure implements DistanceMeasure<VisualNode> {
             return Cosine.OUT.distance(t1, t2);
         }        
     },
-    COSINE_IN_OUT("Cosine: in/out", NodeFilter.IN_OR_OUT) {
+    EUCLIDEAN("Euclidean", NodeFilter.ALL) {
         public double distance(VisualNode t1, VisualNode t2) {
-            return Cosine.IN_AND_OUT.distance(t1, t2);
+            double dx = t1.getValueX() - t2.getValueX();
+            double dy = t1.getValueY() - t2.getValueY();
+            double dist = Math.sqrt(dx * dx + dy * dy);
+            return dist;
         }        
     },
     COSINE_WITH_NODE_PROXIMITY_IN("Cosine wth proximity: incoming", NodeFilter.IN) {

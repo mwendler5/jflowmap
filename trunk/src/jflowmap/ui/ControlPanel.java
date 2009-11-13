@@ -107,6 +107,9 @@ public class ControlPanel {
     private JButton joinEdgesButton;
     private JButton resetClustersButton;
     private JLabel maxClusterDistanceLabel;
+    private JSlider euclideanMaxClusterDistanceSlider;
+    private JSpinner spinner1;
+    private JCheckBox euclideanClusterDistanceCheckBox;
     private final JFlowMap jFlowMap;
     private boolean initializing;
     private ForceDirectedBundlerParameters fdBundlingParams;
@@ -507,12 +510,12 @@ public class ControlPanel {
                 similarNodesTableSorter.setSortingStatus(2, TableSorter.ASCENDING);
                 clustersTableModel.setVisualNodes(getVisualFlowMap().getVisualNodes());     // to re-filter
                 clustersTableSorter.setSortingStatus(1, TableSorter.ASCENDING);   // to re-sort
-                joinEdgesButton.setEnabled(true);
+//                joinEdgesButton.setEnabled(true);
 
-                maxClusterDistanceSlider.setEnabled(true);
-                maxClusterDistanceSpinner.setEnabled(true);
-                maxClusterDistanceLabel.setEnabled(true);
-                resetClustersButton.setEnabled(true);
+//                maxClusterDistanceSlider.setEnabled(true);
+//                maxClusterDistanceSpinner.setEnabled(true);
+//                maxClusterDistanceLabel.setEnabled(true);
+//                resetClustersButton.setEnabled(true);
             }
         });
         joinEdgesButton.addActionListener(new ActionListener() {
@@ -525,13 +528,13 @@ public class ControlPanel {
                 getVisualFlowMap().resetClusters();
                 similarNodesTableModel.clearData();
                 clustersTableModel.clearData();
-                joinEdgesButton.setEnabled(false);
-
-                maxClusterDistanceSlider.setEnabled(false);
-                maxClusterDistanceSpinner.setModel(new SpinnerNumberModel());
-                maxClusterDistanceSpinner.setEnabled(false);
-                maxClusterDistanceLabel.setEnabled(false);
-                resetClustersButton.setEnabled(false);
+//                joinEdgesButton.setEnabled(false);
+//
+//                maxClusterDistanceSlider.setEnabled(false);
+//                maxClusterDistanceSpinner.setModel(new SpinnerNumberModel());
+//                maxClusterDistanceSpinner.setEnabled(false);
+//                maxClusterDistanceLabel.setEnabled(false);
+//                resetClustersButton.setEnabled(false);
             }
         }
         );
@@ -557,6 +560,7 @@ public class ControlPanel {
     private void loadFlowMap(JFlowMap.DatasetSpec dataset) {
         VisualFlowMap visualFlowMap = jFlowMap.loadFlowMap(dataset);
         jFlowMap.setVisualFlowMap(visualFlowMap);
+        jFlowMap.fitFlowMapInView();
         loadFlowMapData(visualFlowMap);
     }
 
@@ -742,7 +746,7 @@ public class ControlPanel {
         tcm2.getColumn(1).setMaxWidth(150);
 
         distanceMeasureCombo = new JComboBox(NodeDistanceMeasure.values());
-        linkageComboBox = new JComboBox(Linkage.values());
+        linkageComboBox = new JComboBox(new Linkage[]{Linkage.AVERAGE, Linkage.COMPLETE, Linkage.SINGLE});
     }
 
     /**
@@ -1020,12 +1024,12 @@ public class ControlPanel {
         edgeValueAffectsAttractionCheckBox.setText("Edge value affects attraction");
         panel7.add(edgeValueAffectsAttractionCheckBox, cc.xy(17, 3));
         final JPanel panel8 = new JPanel();
-        panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(p;75px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(p;300px):noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:20px:noGrow,top:4dlu:noGrow,center:91px:grow"));
+        panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(p;75px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(p;300px):noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:20px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:91px:grow"));
         tabbedPane1.addTab("Node clustering", panel8);
         panel8.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         final JSeparator separator12 = new JSeparator();
         separator12.setOrientation(1);
-        panel8.add(separator12, cc.xywh(3, 1, 1, 9, CellConstraints.CENTER, CellConstraints.FILL));
+        panel8.add(separator12, cc.xywh(3, 1, 1, 11, CellConstraints.CENTER, CellConstraints.FILL));
         panel8.add(distanceMeasureCombo, cc.xyw(7, 1, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JLabel label19 = new JLabel();
         label19.setText("Distance measure:");
@@ -1035,7 +1039,7 @@ public class ControlPanel {
         panel8.add(clusterButton, cc.xy(1, 1));
         tabbedPane2 = new JTabbedPane();
         tabbedPane2.setTabPlacement(3);
-        panel8.add(tabbedPane2, cc.xywh(13, 1, 1, 9, CellConstraints.DEFAULT, CellConstraints.FILL));
+        panel8.add(tabbedPane2, cc.xywh(13, 1, 1, 11, CellConstraints.DEFAULT, CellConstraints.FILL));
         final JScrollPane scrollPane2 = new JScrollPane();
         tabbedPane2.addTab("Clusters", scrollPane2);
         scrollPane2.setBorder(BorderFactory.createTitledBorder(""));
@@ -1048,13 +1052,13 @@ public class ControlPanel {
         scrollPane3.setViewportView(similarNodesTable);
         final JSeparator separator13 = new JSeparator();
         separator13.setOrientation(1);
-        panel8.add(separator13, cc.xywh(11, 1, 1, 9, CellConstraints.CENTER, CellConstraints.FILL));
+        panel8.add(separator13, cc.xywh(11, 1, 1, 11, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label20 = new JLabel();
         label20.setText("Linkage:");
         panel8.add(label20, cc.xy(5, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         panel8.add(linkageComboBox, cc.xyw(7, 3, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         joinEdgesButton = new JButton();
-        joinEdgesButton.setEnabled(false);
+        joinEdgesButton.setEnabled(true);
         joinEdgesButton.setText("Join edges");
         panel8.add(joinEdgesButton, cc.xy(1, 3));
         resetClustersButton = new JButton();
@@ -1064,15 +1068,25 @@ public class ControlPanel {
         final JSeparator separator14 = new JSeparator();
         panel8.add(separator14, cc.xyw(5, 5, 5, CellConstraints.FILL, CellConstraints.FILL));
         maxClusterDistanceLabel = new JLabel();
-        maxClusterDistanceLabel.setEnabled(false);
+        maxClusterDistanceLabel.setEnabled(true);
         maxClusterDistanceLabel.setText("Max cluster distance:");
-        panel8.add(maxClusterDistanceLabel, cc.xy(5, 7));
+        panel8.add(maxClusterDistanceLabel, cc.xy(5, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         maxClusterDistanceSlider = new JSlider();
-        maxClusterDistanceSlider.setEnabled(false);
+        maxClusterDistanceSlider.setEnabled(true);
         panel8.add(maxClusterDistanceSlider, cc.xy(7, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
         maxClusterDistanceSpinner = new JSpinner();
-        maxClusterDistanceSpinner.setEnabled(false);
+        maxClusterDistanceSpinner.setEnabled(true);
         panel8.add(maxClusterDistanceSpinner, cc.xy(9, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
+        euclideanMaxClusterDistanceSlider = new JSlider();
+        euclideanMaxClusterDistanceSlider.setEnabled(false);
+        panel8.add(euclideanMaxClusterDistanceSlider, cc.xy(7, 9, CellConstraints.FILL, CellConstraints.DEFAULT));
+        spinner1 = new JSpinner();
+        spinner1.setEnabled(false);
+        panel8.add(spinner1, cc.xy(9, 9, CellConstraints.FILL, CellConstraints.DEFAULT));
+        euclideanClusterDistanceCheckBox = new JCheckBox();
+        euclideanClusterDistanceCheckBox.setEnabled(false);
+        euclideanClusterDistanceCheckBox.setText("Euclidean cluster distance:");
+        panel8.add(euclideanClusterDistanceCheckBox, cc.xy(5, 9));
     }
 
     /**

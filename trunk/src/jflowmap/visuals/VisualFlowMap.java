@@ -5,6 +5,7 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -32,6 +33,7 @@ import at.fhj.utils.misc.TaskCompletionListener;
 import at.fhj.utils.swing.ProgressDialog;
 import at.fhj.utils.swing.ProgressWorker;
 import ch.unifr.dmlib.cluster.ClusterNode;
+import ch.unifr.dmlib.cluster.ClusterSetBuilder;
 import ch.unifr.dmlib.cluster.HierarchicalClusterer;
 import ch.unifr.dmlib.cluster.Linkage;
 import ch.unifr.dmlib.cluster.HierarchicalClusterer.DistanceMatrix;
@@ -64,6 +66,16 @@ public class VisualFlowMap extends PNode {
     private final Graph graph; 
     private GraphStats graphStats;
     private final JFlowMap jFlowMap;
+
+    // clustering fields
+    private ClusterNode<VisualNode> rootCluster = null;
+    private ClusterNode<VisualNode> euclideanRootCluster = null;
+    private List<VisualNodeDistance> nodeDistanceList;
+    private double maxNodeDistance;
+    private double clusterDistanceThreshold;
+    private List<VisualNodeCluster> visualNodeClusters;
+    private VisualAreaMap areaMap;
+    // endOf clustering fields
 
     public VisualFlowMap(JFlowMap jFlowMap, Graph graph, GraphStats stats,
     		FlowMapParams model) {
@@ -123,6 +135,12 @@ public class VisualFlowMap extends PNode {
         }
     }
 
+    public void setAreaMap(VisualAreaMap areaMap) {
+        this.areaMap = areaMap;
+        addChild(areaMap);
+        areaMap.moveToBack();
+    }
+
     public List<VisualNode> getVisualNodes() {
         return Collections.unmodifiableList(visualNodes);
     }
@@ -136,7 +154,7 @@ public class VisualFlowMap extends PNode {
     }
     
     public String getLabel(Edge edge) {
-        String labelAttr = model.getLabelAttr();
+        String labelAttr = model.getNodeLabelAttr();
         Node src = edge.getSourceNode();
         Node target = edge.getTargetNode();
         if (labelAttr == null) {
@@ -174,8 +192,8 @@ public class VisualFlowMap extends PNode {
             if (Double.isNaN(value)) {
                 logger.warn(
                     "Omitting NaN value for edge: " +
-                    edge.getSourceNode().getString(model.getLabelAttr()) + " -> " +
-                    edge.getTargetNode().getString(model.getLabelAttr()) + 
+                    edge.getSourceNode().getString(model.getNodeLabelAttr()) + " -> " +
+                    edge.getTargetNode().getString(model.getNodeLabelAttr()) + 
                     " [" + edge + "]"
                 );
             } else {
@@ -260,7 +278,7 @@ public class VisualFlowMap extends PNode {
     }
 
     public String getLabelAttr() {
-        return model.getLabelAttr();
+        return model.getNodeLabelAttr();
     }
 
     public void showTooltip(PNode component, Point2D pos) {
@@ -444,11 +462,6 @@ public class VisualFlowMap extends PNode {
         }
     }
 
-    private ClusterNode<VisualNode> rootCluster = null;
-    private List<VisualNodeDistance> nodeDistanceList;
-    private double maxNodeDistance;
-    private double clusterDistanceThreshold;
-
     public ClusterNode<VisualNode> getRootCluster() {
         return rootCluster;
     }
@@ -477,8 +490,6 @@ public class VisualFlowMap extends PNode {
         updateClusters();
     }
     
-    private List<VisualNodeCluster> visualNodeClusters;
-    
     public void updateClusters() {
         removeClusterTags();  // to remove cluster tags for those nodes which were excluded from clustering
         
@@ -486,24 +497,15 @@ public class VisualFlowMap extends PNode {
         if (rootCluster == null) {
             clusters = Collections.emptyList();
         } else {
-            clusters = VisualNodeCluster.createClusters(rootCluster, clusterDistanceThreshold);
-            
-//            int lastCluster = 0;
-//            for (int i = 0, size = clusters.size(); i < size; i++) {
-//                List<VisualNode> cluster = clusters.get(i);
-//                ClusterTag clusterTag = ClusterTag.createFor(lastCluster + 1, colors[lastCluster]);
-//                for (VisualNode node : cluster) {
-//                    if (cluster.size() > 1) {
-//                        node.setClusterTag(clusterTag);
-//                    } else {
-////                        ClusterTag.createFor(VisualNode.NO_CLUSTER, SINGLE_ELEMENT_CLUSTER_COLOR)
-//                        node.setClusterTag(null);
-//                    }
-//                }
-//                if (cluster.size() > 1) {
-//                    lastCluster++;
-//                }
-//            }
+            List<List<VisualNode>> nodeClusterLists =
+                ClusterSetBuilder.getClusters(rootCluster, clusterDistanceThreshold);
+            if (combineWithEuclidean) {
+                nodeClusterLists = VisualNodeCluster.combineClusters( 
+                        nodeClusterLists,
+                        ClusterSetBuilder.getClusters(euclideanRootCluster, 300)
+                );
+            }
+            clusters = VisualNodeCluster.createClusters(nodeClusterLists, clusterDistanceThreshold);
         }
         this.visualNodeClusters = clusters;
     }
@@ -513,6 +515,8 @@ public class VisualFlowMap extends PNode {
             node.setClusterTag(null);
         }
     }
+
+    private static final boolean combineWithEuclidean = true;
 
     public void clusterNodes(NodeDistanceMeasure distanceMeasure, Linkage linkage) {
         logger.info("Clustering nodes");
@@ -527,6 +531,18 @@ public class VisualFlowMap extends PNode {
         nodeDistanceList = VisualNodeDistance.makeDistanceList(items, distances);
         maxNodeDistance = Double.NaN;
         rootCluster = clusterer.cluster(items, distances, tracker);
+
+        if (combineWithEuclidean) {
+            euclideanRootCluster = HierarchicalClusterer.cluster(
+                    items, NodeDistanceMeasure.EUCLIDEAN, Linkage.COMPLETE, new ProgressTracker()
+            );
+        }
+    }
+
+    private VisualFlowMap originalVisualFlowMap = null;
+    
+    public void setOriginalVisualFlowMap(VisualFlowMap originalVisualFlowMap) {
+        this.originalVisualFlowMap = originalVisualFlowMap;
     }
 
     public void joinEdgesToClusters() {
@@ -544,19 +560,24 @@ public class VisualFlowMap extends PNode {
         Graph clusteredGraph = VisualNodeCluster.createClusteredFlowMap(visualNodeClusters);
         VisualFlowMap clusteredFlowMap = jFlowMap.createVisualFlowMap(
                 JFlowMap.DEFAULT_EDGE_WEIGHT_ATTR_NAME,
-                null,
+                JFlowMap.DEFAULT_NODE_LABEL_ATTR_NAME,
                 JFlowMap.DEFAULT_NODE_X_ATTR_NAME,
                 JFlowMap.DEFAULT_NODE_Y_ATTR_NAME,
                 0,
                 clusteredGraph,
-                null
+                areaMap == null ? null : (VisualAreaMap)areaMap.clone()
         );
+        clusteredFlowMap.setOriginalVisualFlowMap(this);
         jFlowMap.setVisualFlowMap(clusteredFlowMap);
         jFlowMap.getControlPanel().loadFlowMapData(clusteredFlowMap);
     }
 
     public void resetClusters() {
         removeClusterTags();
+        if (originalVisualFlowMap != null) {
+            jFlowMap.setVisualFlowMap(originalVisualFlowMap);
+            jFlowMap.getControlPanel().loadFlowMapData(originalVisualFlowMap);
+        }
     }
 
 }

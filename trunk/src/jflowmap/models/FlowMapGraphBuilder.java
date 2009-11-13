@@ -2,7 +2,6 @@ package jflowmap.models;
 
 import java.awt.geom.Point2D;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import jflowmap.JFlowMap;
 import prefuse.data.Edge;
@@ -17,6 +16,7 @@ public class FlowMapGraphBuilder {
     private String nodeXAttr = JFlowMap.DEFAULT_NODE_X_ATTR_NAME;
     private String nodeYAttr = JFlowMap.DEFAULT_NODE_Y_ATTR_NAME;
     private String edgeWeightAttr = JFlowMap.DEFAULT_EDGE_WEIGHT_ATTR_NAME;
+    private String nodeLabelAttr = JFlowMap.DEFAULT_NODE_LABEL_ATTR_NAME;
 
     private Graph graph;
     private HashMap<EdgeKey, Edge> cumulatedEdges;
@@ -26,6 +26,7 @@ public class FlowMapGraphBuilder {
         graph.addColumn(nodeXAttr, double.class);
         graph.addColumn(nodeYAttr, double.class);
         graph.addColumn(edgeWeightAttr, double.class);
+        graph.addColumn(nodeLabelAttr, String.class);
     }
 
     public FlowMapGraphBuilder withCumulativeEdges() {
@@ -42,16 +43,22 @@ public class FlowMapGraphBuilder {
         this.nodeYAttr = attrName;
         return this;
     }
-
+    
     public FlowMapGraphBuilder withEdgeWeightAttr(String attrName) {
         this.edgeWeightAttr = attrName;
         return this;
     }
+
+    public FlowMapGraphBuilder withNodeLabelAttr(String attrName) {
+        this.nodeLabelAttr = attrName;
+        return this;
+    }
     
-    public Node addNode(Point2D position) {
+    public Node addNode(Point2D position, String label) {
         Node node = graph.addNode();
         node.setDouble(nodeXAttr, position.getX());
         node.setDouble(nodeYAttr, position.getY());
+        node.set(nodeLabelAttr, label);
         return node;
     }
 
@@ -70,7 +77,7 @@ public class FlowMapGraphBuilder {
                 sumWeight += edge.getDouble(edgeWeightAttr);
             }
         }
-        edge.setDouble(edgeWeightAttr, weight);
+        edge.setDouble(edgeWeightAttr, sumWeight);
         return edge;
     }
 

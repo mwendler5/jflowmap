@@ -15,7 +15,6 @@ import jflowmap.data.GraphFileFormats;
 import jflowmap.models.FlowMapParams;
 import jflowmap.models.map.AreaMap;
 import jflowmap.ui.ControlPanel;
-import jflowmap.util.GraphStats;
 import jflowmap.util.PanHandler;
 import jflowmap.util.ZoomHandler;
 import jflowmap.visuals.VisualAreaMap;
@@ -40,6 +39,7 @@ public class JFlowMap extends JComponent {
     public static final String DEFAULT_NODE_X_ATTR_NAME = "x";
     public static final String DEFAULT_NODE_Y_ATTR_NAME = "y";
     public static final String DEFAULT_EDGE_WEIGHT_ATTR_NAME = "value";
+    public static final String DEFAULT_NODE_LABEL_ATTR_NAME = "label";
 
     private final PCanvas canvas;
     private final ControlPanel controlPanel;
@@ -100,7 +100,6 @@ public class JFlowMap extends JComponent {
         }
         canvas.getLayer().addChild(newFlowMap);
         visualFlowMap = newFlowMap;
-        fitFlowMapInView();
     }
 
 	public void fitFlowMapInView() {
@@ -131,16 +130,15 @@ public class JFlowMap extends JComponent {
                 attrs.getXNodeAttr(), attrs.getYNodeAttr(), attrs.getWeightFilterMin(), graph, areaMap);
     }
     
-    public VisualFlowMap createVisualFlowMap(String weightAttrName, String labelAttrName,
+    public VisualFlowMap createVisualFlowMap(String weightAttrName, String nodeLabelAttrName,
             String xNodeAttr, String yNodeAttr, double weightFilterMin, Graph graph, VisualAreaMap areaMap) {
-        FlowMapParams params = new FlowMapParams(graph, weightAttrName, xNodeAttr, yNodeAttr, labelAttrName);
+        FlowMapParams params = new FlowMapParams(graph, weightAttrName, xNodeAttr, yNodeAttr, nodeLabelAttrName);
         if (!Double.isNaN(weightFilterMin)) {
             params.setValueFilterMin(weightFilterMin);
         }
         VisualFlowMap visualFlowMap = new VisualFlowMap(this, graph, params.getGraphStats(), params);
         if (areaMap != null) {
-            visualFlowMap.addChild(areaMap);
-            areaMap.moveToBack();
+            visualFlowMap.setAreaMap(areaMap);
         }
         return visualFlowMap;
     }

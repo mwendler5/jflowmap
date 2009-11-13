@@ -24,7 +24,7 @@ public class FlowMapParams {
     private String edgeWeightAttr;
     private String xNodeAttr;
     private String yNodeAttr;
-    private String labelAttr = "tooltip";
+    private String nodeLabelAttr = "tooltip";
 
     private int edgeAlpha = 40;
     private int directionMarkerAlpha = 200;
@@ -43,12 +43,12 @@ public class FlowMapParams {
     private GraphStats graphStats;
 
     public FlowMapParams(Graph graph, String edgeWeightAttr, 
-    		String xNodeAttr, String yNodeAttr, String labelAttr) {
+    		String xNodeAttr, String yNodeAttr, String nodeLabelAttr) {
         this.graphStats = GraphStats.createFor(graph, edgeWeightAttr, xNodeAttr, yNodeAttr);
         this.edgeWeightAttr = edgeWeightAttr;
         this.xNodeAttr = xNodeAttr;
         this.yNodeAttr = yNodeAttr;
-        this.labelAttr = labelAttr;
+        this.nodeLabelAttr = nodeLabelAttr;
 
         MinMax minMax = graphStats.getEdgeWeightStats();
         this.valueFilterMin = minMax.getMin();
@@ -110,8 +110,8 @@ public class FlowMapParams {
         return edgeWeightAttr;
     }
 
-    public String getLabelAttr() {
-        return labelAttr;
+    public String getNodeLabelAttr() {
+        return nodeLabelAttr;
     }
 
     public int getEdgeAlpha() {
