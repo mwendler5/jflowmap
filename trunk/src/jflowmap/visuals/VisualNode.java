@@ -27,7 +27,7 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 /**
  * @author Ilya Boyandin
  */
-public class VisualNode extends PPath {
+public class VisualNode extends PNode {
 
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(VisualNode.class);
@@ -54,28 +54,39 @@ public class VisualNode extends PPath {
     private PPath clusterMarker;
 
     private double markerSize;
+    private PPath marker;
 
     public VisualNode(VisualFlowMap visualFlowMap, Node node, double x, double y, double size) {
-        super(new Ellipse2D.Double(x - size/2, y - size/2, size, size));
+//        super();
         this.markerSize = size;
         if (Double.isNaN(x)  ||  Double.isNaN(y)) {
             logger.error("NaN coordinates passed in for node: " + node);
             throw new IllegalArgumentException("NaN coordinates passed in for node " + node);
         }
+        setX(x);
+        setY(y);
         this.valueX = x;
         this.valueY = y;
-//        setStrokePaint(STROKE_PAINT);
-        setPaint(PAINT);
-//        setStroke(STROKE);
-        setStroke(null);
+        this.marker = new PPath(new Ellipse2D.Double(x - size/2, y - size/2, size, size));
+//        marker.setStrokePaint(STROKE_PAINT);
+//        marker.setStroke(STROKE);
+        marker.setPaint(PAINT);
+        marker.setStroke(null);
 //    	this.x = x;
 //    	this.y = y;
         this.node = node;
         this.visualFlowMap = visualFlowMap;
         addInputEventListener(INPUT_EVENT_HANDLER);
 //        setVisible(false);
-        setVisible(true);
+//        setVisible(true);
+        addChild(marker);
+        updateVisibility();
 	}
+
+    public void updateVisibility() {
+        boolean visibility = visualFlowMap.getParams().getShowNodes()  ||  isHighlighted();
+        marker.setVisible(visibility);
+    }
 
     public double getValueX() {
     	return valueX;
@@ -230,6 +241,7 @@ public class VisualNode extends PPath {
 
     public void setHighlighted(boolean highlighted) {
         addAttribute(Attributes.HIGHLIGHTED.name(), highlighted);
+        updateVisibility();
         updateColorsAndStroke();
         updateEdgeColors();
     }
@@ -238,11 +250,11 @@ public class VisualNode extends PPath {
         boolean selected = isSelected();
         boolean highlighted = isHighlighted();
         if (selected) {
-            setStrokePaint(SELECTED_STROKE_PAINT);
-            setStroke(STROKE);
-            setPaint(SELECTED_PAINT);
+            marker.setStrokePaint(SELECTED_STROKE_PAINT);
+            marker.setStroke(STROKE);
+            marker.setPaint(SELECTED_PAINT);
         } else {
-            setStroke(null);
+            marker.setStroke(null);
             if (!highlighted) setPaint(PAINT);
         }
         if (highlighted) {

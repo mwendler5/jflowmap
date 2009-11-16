@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import at.fhj.utils.swing.TableSorter;
+
 import jflowmap.visuals.VisualEdge;
 import jflowmap.visuals.VisualFlowMap;
 
@@ -52,7 +54,7 @@ class FlowsTableModel extends AbstractTableModel {
         switch (column) {
             case 0: return "Source node";
             case 1: return "Target node";
-            case 2: return "Volume";
+            case 2: return "Weight";
         }
         return "";
     }

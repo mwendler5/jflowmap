@@ -103,7 +103,7 @@ public abstract class VisualEdge extends PNode {
 //    public abstract void updateEdgeMarkerColors();
 
     public void updateVisibiliy() {
-        final FlowMapParams model = visualFlowMap.getModel();
+        final FlowMapParams model = visualFlowMap.getParams();
         double weightFilterMin = model.getEdgeWeightFilterMin();
         double weightFilterMax = model.getEdgeWeightFilterMax();
 
@@ -138,7 +138,7 @@ public abstract class VisualEdge extends PNode {
     }
 
     public double getEdgeWeight() {
-        return edge.getDouble(visualFlowMap.getModel().getEdgeWeightAttr());
+        return edge.getDouble(visualFlowMap.getParams().getEdgeWeightAttr());
     }
 
     public double getEdgeLength() {
@@ -184,7 +184,7 @@ public abstract class VisualEdge extends PNode {
     }
 
     public double getNormalizedLogValue() {
-        FlowMapParams model = getVisualFlowMap().getModel();
+        FlowMapParams model = getVisualFlowMap().getParams();
         double value = getEdgeWeight();
         double nv;
         if (model.getAutoAdjustEdgeColorScale()) {
@@ -220,7 +220,7 @@ public abstract class VisualEdge extends PNode {
    
     protected Paint createPaint() {
 		// TODO: use colors from color scheme
-        FlowMapParams model = getVisualFlowMap().getModel();
+        FlowMapParams model = getVisualFlowMap().getParams();
         final double normalizedValue = getNormalizedLogValue();
         int intensity = (int)Math.round(255 * normalizedValue);
         int alpha = model.getEdgeAlpha();

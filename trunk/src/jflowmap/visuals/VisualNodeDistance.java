@@ -47,6 +47,17 @@ public class VisualNodeDistance implements Comparable<VisualNodeDistance> {
         return list;
     }
 
+    public static double findMaxDistance(List<VisualNodeDistance> distances) {
+        double max = Double.NaN;
+        if (distances.size() > 0) {
+            max = 0;
+            for (VisualNodeDistance d : distances) {
+                if (!Double.isInfinite(d.getDistance()) && d.getDistance() > max) max = d.getDistance();
+            }
+        }
+        return max;
+    }
+
     public static final Comparator<VisualNodeDistance> FROM_LABEL_COMPARATOR = new Comparator<VisualNodeDistance>() {
         public int compare(VisualNodeDistance o1, VisualNodeDistance o2) {
             String src1 = o1.getSource().getLabel();

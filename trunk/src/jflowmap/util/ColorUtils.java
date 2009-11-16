@@ -7,10 +7,10 @@ import java.awt.Color;
  */
 public class ColorUtils {
 
-    public static final Color[] createCategoryColors(int numberOfColors, int alpha) {
+    public static final Color[] createCategoryColors(int numberOfColors, double brightness, int alpha) {
         Color[] colors = new Color[numberOfColors];
         for (int i = 0; i < numberOfColors; i++) {
-            colors[i] = new Color(ColorUtils.convertHSVtoRGB(i * 1.0 / numberOfColors, .7, 1.0, alpha), true);
+            colors[i] = new Color(ColorUtils.convertHSVtoRGB(i * 1.0 / numberOfColors, brightness, 1.0, alpha), true);
         }
         return colors;
     }

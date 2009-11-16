@@ -113,6 +113,10 @@ public class ControlPanel {
     private JSlider euclideanMaxClusterDistanceSlider;
     private JSpinner euclideanMaxClusterDistanceSpinner;
     private JCheckBox combineWithEuclideanClustersCheckBox;
+    private JLabel euclideanMaxClusterDistanceLabel;
+    private JLabel numberOfClustersValueLabel;
+    private JLabel numberOfClustersLabel;
+    private JButton resetJoinedEdgesButton;
     private final JFlowMap jFlowMap;
     private boolean initializing;
     private ForceDirectedBundlerParameters fdBundlingParams;
@@ -145,7 +149,7 @@ public class ControlPanel {
             modelsInitialized = true;
         }
         initModels();
-        setData(visualFlowMap.getModel());
+        setData(visualFlowMap.getParams());
     }
 
     private void updateRepulsionSpinner() {
@@ -185,7 +189,7 @@ public class ControlPanel {
         datasetCombo.setModel(new DefaultComboBoxModel(JFlowMap.datasetSpecs));
     }
 
-    public void initForceDirectedEdgeBundlerParamsModels() {
+    public void initEdgeBundlingModels() {
         numberOfCyclesSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getNumCycles(), 1, 10, 1));
         stepsInCycleSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getI(), 1, 1000, 1));
         edgeCompatibilityThresholdSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getEdgeCompatibilityThreshold(), 0.0, 1.0, 0.1));
@@ -210,6 +214,45 @@ public class ControlPanel {
 
     private void initModels() {
         initializing = true;
+        initFilterModels();
+        initAestheticsModels();
+        initEdgeBundlingModels();
+        initNodeClusteringModels();
+        initializing = false;
+    }
+
+    private void initAestheticsModels() {
+        Pair<SpinnerModel, BoundedRangeModel> edgeOpacityModels =
+                new BoundSpinnerSliderModels<Integer>(
+                        0, 0, 255, 1, BoundSpinnerSliderModels.MAP_ID_INTEGER
+                ).build();
+        edgeOpacitySpinner.setModel(edgeOpacityModels.first());
+        edgeOpacitySlider.setModel(edgeOpacityModels.second());
+
+        Pair<SpinnerModel, BoundedRangeModel> edgeMarkerSizeModels =
+                new BoundSpinnerSliderModels<Double>(
+                        .0, .0, 0.5, 0.01,
+                        BoundSpinnerSliderModels.createLinearMapping(100.0)
+                ).build();
+        edgeMarkerSizeSpinner.setModel(edgeMarkerSizeModels.first());
+        edgeMarkerSizeSlider.setModel(edgeMarkerSizeModels.second());
+
+        Pair<SpinnerModel, BoundedRangeModel> edgeMarkerOpacityModels =
+                new BoundSpinnerSliderModels<Integer>(
+                        0, 0, 255, 1, BoundSpinnerSliderModels.MAP_ID_INTEGER
+                ).build();
+        edgeMarkerOpacitySpinner.setModel(edgeMarkerOpacityModels.first());
+        edgeMarkerOpacitySlider.setModel(edgeMarkerOpacityModels.second());
+
+        Pair<SpinnerModel, BoundedRangeModel> maxEdgeWidthModels =
+                new BoundSpinnerSliderModels<Double>(
+                        .0, .0, 100.0, 1.0, BoundSpinnerSliderModels.MAP_ID_DOUBLE
+                ).build();
+        maxEdgeWidthSpinner.setModel(maxEdgeWidthModels.first());
+        maxEdgeWidthSlider.setModel(maxEdgeWidthModels.second());
+    }
+
+    private void initFilterModels() {
         GraphStats stats = getGraphStats();
 
         MinMax weightStats = stats.getEdgeWeightStats();
@@ -251,50 +294,6 @@ public class ControlPanel {
                 ).build();
         maxLengthFilterSpinner.setModel(maxLengthFilterModels.first());
         maxLengthFilterSlider.setModel(maxLengthFilterModels.second());
-
-
-        Pair<SpinnerModel, BoundedRangeModel> edgeOpacityModels =
-                new BoundSpinnerSliderModels<Integer>(
-                        0, 0, 255, 1, BoundSpinnerSliderModels.MAP_ID_INTEGER
-                ).build();
-        edgeOpacitySpinner.setModel(edgeOpacityModels.first());
-        edgeOpacitySlider.setModel(edgeOpacityModels.second());
-
-        Pair<SpinnerModel, BoundedRangeModel> edgeMarkerSizeModels =
-                new BoundSpinnerSliderModels<Double>(
-                        .0, .0, 0.5, 0.01,
-                        BoundSpinnerSliderModels.createLinearMapping(100.0)
-                ).build();
-        edgeMarkerSizeSpinner.setModel(edgeMarkerSizeModels.first());
-        edgeMarkerSizeSlider.setModel(edgeMarkerSizeModels.second());
-
-        Pair<SpinnerModel, BoundedRangeModel> edgeMarkerOpacityModels =
-                new BoundSpinnerSliderModels<Integer>(
-                        0, 0, 255, 1, BoundSpinnerSliderModels.MAP_ID_INTEGER
-                ).build();
-        edgeMarkerOpacitySpinner.setModel(edgeMarkerOpacityModels.first());
-        edgeMarkerOpacitySlider.setModel(edgeMarkerOpacityModels.second());
-
-        Pair<SpinnerModel, BoundedRangeModel> maxEdgeWidthModels =
-                new BoundSpinnerSliderModels<Double>(
-                        .0, .0, 100.0, 1.0, BoundSpinnerSliderModels.MAP_ID_DOUBLE
-                ).build();
-        maxEdgeWidthSpinner.setModel(maxEdgeWidthModels.first());
-        maxEdgeWidthSlider.setModel(maxEdgeWidthModels.second());
-
-        initializing = false;
-
-        initForceDirectedEdgeBundlerParamsModels();
-
-//        maxClusterDistanceSpinner.setEditor(new JSpinner.NumberEditor(maxClusterDistanceSpinner, "0.0######"));
-//        maxClusterDistanceSpinner.setModel(new SpinnerNumberModel(0, 0, 10000, 1));
-//        maxClusterDistanceSlider.setMinimum(0);
-//        maxClusterDistanceSlider.setMaximum(10000);
-        initClusterModels();
-
-        similarNodesTableModel.clearData();
-        clustersTableModel.clearData();
-        flowsTableModel.setVisualFlowMap(getVisualFlowMap());
     }
 
     public void setData(FlowMapParams data) {
@@ -323,13 +322,23 @@ public class ControlPanel {
     }
 
     private void initChangeListeners() {
+        initDatasetListeners();
+        initFilterListeners();
+        initAestheticsListeners();
+        initEdgeBundlingListeners();
+        initNodeClusterListeners();
+    }
+
+    private void initDatasetListeners() {
         datasetCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (initializing) return;
                 loadFlowMap((JFlowMap.DatasetSpec) datasetCombo.getSelectedItem());
             }
         });
+    }
 
+    private void initFilterListeners() {
         // Edge value filter
         minWeightFilterSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -374,7 +383,9 @@ public class ControlPanel {
                 getFlowMapModel().setEdgeLengthFilterMax((Double) maxLengthFilterSpinner.getValue());
             }
         });
+    }
 
+    private void initAestheticsListeners() {
         // Aesthetics
         fillEdgesWithGradientCheckBox.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -389,6 +400,12 @@ public class ControlPanel {
                 getFlowMapModel().setShowDirectionMarkers(
                         showDirectionMarkersCheckBox.isSelected());
                 updateMarkersInputs();
+            }
+        });
+        showNodesCheckBox.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
+                getFlowMapModel().setShowNodes(showNodesCheckBox.isSelected());
             }
         });
         proportionalDirectionMarkersCheckBox.addChangeListener(new ChangeListener() {
@@ -430,8 +447,9 @@ public class ControlPanel {
                 getFlowMapModel().setMaxEdgeWidth((Double) maxEdgeWidthSpinner.getValue());
             }
         });
+    }
 
-
+    private void initEdgeBundlingListeners() {
         // Edge Bundling
         bundleButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -459,7 +477,7 @@ public class ControlPanel {
         defaultValuesButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 fdBundlingParams.resetToDefaults();
-                initForceDirectedEdgeBundlerParamsModels();
+                initEdgeBundlingModels();
             }
         });
         simpleCompatibilityMeasureCheckBox.addChangeListener(new ChangeListener() {
@@ -474,27 +492,27 @@ public class ControlPanel {
                 updateRepulsionSpinner();
             }
         });
+    }
 
-
+    private void initNodeClusterListeners() {
         // Node clustering
         clusterButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 getVisualFlowMap().clusterNodes(
                         (NodeDistanceMeasure) distanceMeasureCombo.getSelectedItem(),
-                        (Linkage) linkageComboBox.getSelectedItem()
+                        (Linkage) linkageComboBox.getSelectedItem(),
+                        combineWithEuclideanClustersCheckBox.isSelected()
                 );
-                initClusterModels();
-//                joinEdgesButton.setEnabled(true);
-
-//                maxClusterDistanceSlider.setEnabled(true);
-//                maxClusterDistanceSpinner.setEnabled(true);
-//                maxClusterDistanceLabel.setEnabled(true);
-//                resetClustersButton.setEnabled(true);
+                initNodeClusteringModels();
+                updateNumberOfClustersLabel();
+                updateClustersTable();
             }
         });
         joinEdgesButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 getVisualFlowMap().joinEdgesToClusters();
+                updateClusterButtons();
+                updateNumberOfClustersLabel();
             }
         });
         resetClustersButton.addActionListener(new ActionListener() {
@@ -502,33 +520,35 @@ public class ControlPanel {
                 getVisualFlowMap().resetClusters();
                 similarNodesTableModel.clearData();
                 clustersTableModel.clearData();
-//                joinEdgesButton.setEnabled(false);
-//
-//                maxClusterDistanceSlider.setEnabled(false);
-//                maxClusterDistanceSpinner.setModel(new SpinnerNumberModel());
-//                maxClusterDistanceSpinner.setEnabled(false);
-//                maxClusterDistanceLabel.setEnabled(false);
-//                resetClustersButton.setEnabled(false);
+                updateClusterDistanceSliderSpinner();
+                updateClusterButtons();
+                updateNumberOfClustersLabel();
             }
-        }
-        );
+        });
+        resetJoinedEdgesButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                getVisualFlowMap().resetJoinedNodes();
+                updateClusterButtons();
+            }
+        });
         maxClusterDistanceSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
                 double spinnerValue = ((Number) maxClusterDistanceSpinner.getValue()).doubleValue();
-//                maxClusterDistanceSlider.setValue(toMaxClusterDistanceSliderValue(spinnerValue));
                 getVisualFlowMap().setClusterDistanceThreshold(spinnerValue);
-                clustersTableModel.setVisualNodes(getVisualFlowMap().getVisualNodes()); // to update list (re-run filtering)
-                clustersTableSorter.fireTableDataChanged();
-                clustersTableSorter.setSortingStatus(1, TableSorter.ASCENDING); // to re-sort
+                updateNumberOfClustersLabel();
+                updateClustersTable();
             }
         });
-//        maxClusterDistanceSlider.addChangeListener(new ChangeListener() {
-//            public void stateChanged(ChangeEvent e) {
-//                if (initializing) return;
-//                maxClusterDistanceSpinner.setValue(fromMaxClusterDistanceSliderValue(maxClusterDistanceSlider.getValue()));
-//            }
-//        });
+        euclideanMaxClusterDistanceSpinner.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (initializing) return;
+                double spinnerValue = ((Number) euclideanMaxClusterDistanceSpinner.getValue()).doubleValue();
+                getVisualFlowMap().setEuclideanClusterDistanceThreshold(spinnerValue);
+                updateNumberOfClustersLabel();
+                updateClustersTable();
+            }
+        });
     }
 
     private void loadFlowMap(JFlowMap.DatasetSpec dataset) {
@@ -539,7 +559,7 @@ public class ControlPanel {
     }
 
     public FlowMapParams getFlowMapModel() {
-        return getVisualFlowMap().getModel();
+        return getVisualFlowMap().getParams();
     }
 
     private VisualFlowMap getVisualFlowMap() {
@@ -566,7 +586,6 @@ public class ControlPanel {
         flowsTableSorter.setColumnSortable(0, true);
         flowsTableSorter.setColumnSortable(1, true);
         flowsTableSorter.setColumnSortable(2, true);
-        flowsTableSorter.setSortingStatus(2, TableSorter.ASCENDING);
         flowsTableSorter.setTableHeader(flowsTable.getTableHeader());
         getVisualFlowMap().addPropertyChangeListener(
                 VisualFlowMap.Attributes.NODE_SELECTION.name(),
@@ -657,23 +676,90 @@ public class ControlPanel {
         linkageComboBox = new JComboBox(new Linkage[]{Linkage.AVERAGE, Linkage.COMPLETE, Linkage.SINGLE});
     }
 
-    private void initClusterModels() {
-        double max = getVisualFlowMap().getMaxNodeDistance();
-        double val = max / 2;
-        getVisualFlowMap().setClusterDistanceThreshold(val);
+    private void initNodeClusteringModels() {
+        VisualFlowMap flowMap = getVisualFlowMap();
 
+        updateClusterDistanceSliderSpinner();
+        updateClusterButtons();
+
+        initMaxClusterDistanceControls(
+                getVisualFlowMap().getClusterDistanceThreshold(),
+                flowMap.getMaxNodeDistance(),
+                maxClusterDistanceSpinner,
+                maxClusterDistanceSlider);
+
+        if (getVisualFlowMap().hasEuclideanClusters()) {
+            initMaxClusterDistanceControls(
+                    getVisualFlowMap().getEuclideanClusterDistanceThreshold(),
+                    flowMap.getEuclideanMaxNodeDistance(),
+                    euclideanMaxClusterDistanceSpinner,
+                    euclideanMaxClusterDistanceSlider);
+        }
+
+
+        similarNodesTableModel.setDistances(flowMap.getNodeDistanceList());
+        similarNodesTableSorter.setSortingStatus(2, TableSorter.ASCENDING);
+        clustersTableModel.setVisualNodes(flowMap.getVisualNodes());     // to re-filter
+        clustersTableSorter.setSortingStatus(1, TableSorter.ASCENDING);   // to re-sort
+
+//      maxClusterDistanceSpinner.setEditor(new JSpinner.NumberEditor(maxClusterDistanceSpinner, "0.0######"));
+//      maxClusterDistanceSpinner.setModel(new SpinnerNumberModel(0, 0, 10000, 1));
+//      maxClusterDistanceSlider.setMinimum(0);
+//      maxClusterDistanceSlider.setMaximum(10000);
+
+        similarNodesTableModel.clearData();
+        clustersTableModel.clearData();
+        flowsTableModel.setVisualFlowMap(flowMap);
+        flowsTableSorter.setSortingStatus(2, TableSorter.DESCENDING);
+    }
+
+    private void updateClusterDistanceSliderSpinner() {
+        boolean hasClusters = getVisualFlowMap().hasClusters();
+        boolean hasEuClusters = getVisualFlowMap().hasEuclideanClusters();
+        maxClusterDistanceSpinner.setEnabled(hasClusters);
+        maxClusterDistanceSlider.setEnabled(hasClusters);
+        maxClusterDistanceLabel.setEnabled(hasClusters);
+
+        euclideanMaxClusterDistanceSpinner.setEnabled(hasEuClusters);
+        euclideanMaxClusterDistanceSlider.setEnabled(hasEuClusters);
+        euclideanMaxClusterDistanceLabel.setEnabled(hasEuClusters);
+    }
+
+    private void updateClusterButtons() {
+        joinEdgesButton.setEnabled(getVisualFlowMap().hasClusters());
+        resetClustersButton.setEnabled(getVisualFlowMap().hasClusters());
+        resetJoinedEdgesButton.setEnabled(getVisualFlowMap().hasJoinedEdges());
+    }
+    
+    private void initMaxClusterDistanceControls(double val, double max, JSpinner spinner, JSlider slider) {
         Pair<SpinnerModel, BoundedRangeModel> maxClusterDistanceModels =
                 new BoundSpinnerSliderModels<Double>(
                         val, 0.0, max, AxisMarks.ordAlpha(max / 100.0),
                         BoundSpinnerSliderModels.createLinearMapping(100.0 / max)
                 ).build();
-        maxClusterDistanceSpinner.setModel(maxClusterDistanceModels.first());
-        maxClusterDistanceSlider.setModel(maxClusterDistanceModels.second());
+        spinner.setModel(maxClusterDistanceModels.first());
+        slider.setModel(maxClusterDistanceModels.second());
+    }
 
-        similarNodesTableModel.setDistances(getVisualFlowMap().getNodeDistanceList());
-        similarNodesTableSorter.setSortingStatus(2, TableSorter.ASCENDING);
-        clustersTableModel.setVisualNodes(getVisualFlowMap().getVisualNodes());     // to re-filter
-        clustersTableSorter.setSortingStatus(1, TableSorter.ASCENDING);   // to re-sort
+    private void updateClustersTable() {
+        clustersTableModel.setVisualNodes(getVisualFlowMap().getVisualNodes()); // to update list (re-run filtering)
+        clustersTableSorter.fireTableDataChanged();
+        clustersTableSorter.setSortingStatus(1, TableSorter.ASCENDING); // to re-sort
+    }
+
+    private void updateNumberOfClustersLabel() {
+        String text;
+        boolean enabled;
+        if (getVisualFlowMap().hasClusters()) {
+            text = Integer.toString(getVisualFlowMap().getNumberOfClusters());
+            enabled = true;
+        } else {
+            text = "";
+            enabled = false;
+        }
+        numberOfClustersLabel.setEnabled(enabled);
+        numberOfClustersValueLabel.setEnabled(enabled);
+        numberOfClustersValueLabel.setText(text);
     }
 
     /**
@@ -948,22 +1034,16 @@ public class ControlPanel {
         edgeValueAffectsAttractionCheckBox.setText("Edge value affects attraction");
         panel7.add(edgeValueAffectsAttractionCheckBox, cc.xy(17, 3));
         final JPanel panel8 = new JPanel();
-        panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(p;75px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(p;300px):noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:20px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:min(p;200px):grow"));
+        panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(p;75px):noGrow,left:10dlu:noGrow,fill:1px:noGrow,left:10dlu:noGrow,fill:max(p;200px):noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:m:noGrow,top:d:noGrow,center:max(d;6px):noGrow,center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:min(p;200px):grow"));
         tabbedPane1.addTab("Node clustering", panel8);
         panel8.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        final JSeparator separator11 = new JSeparator();
-        separator11.setOrientation(1);
-        panel8.add(separator11, cc.xywh(3, 1, 1, 13, CellConstraints.CENTER, CellConstraints.FILL));
-        panel8.add(distanceMeasureCombo, cc.xyw(7, 1, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        panel8.add(distanceMeasureCombo, cc.xyw(7, 1, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JLabel label19 = new JLabel();
         label19.setText("Distance measure:");
         panel8.add(label19, cc.xy(5, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        clusterButton = new JButton();
-        clusterButton.setText("Cluster");
-        panel8.add(clusterButton, cc.xy(1, 1));
         tabbedPane2 = new JTabbedPane();
         tabbedPane2.setTabPlacement(3);
-        panel8.add(tabbedPane2, cc.xywh(13, 1, 1, 13, CellConstraints.DEFAULT, CellConstraints.FILL));
+        panel8.add(tabbedPane2, cc.xywh(15, 1, 1, 14, CellConstraints.DEFAULT, CellConstraints.FILL));
         final JScrollPane scrollPane2 = new JScrollPane();
         tabbedPane2.addTab("Clusters", scrollPane2);
         scrollPane2.setBorder(BorderFactory.createTitledBorder(""));
@@ -974,46 +1054,67 @@ public class ControlPanel {
         scrollPane3.setBorder(BorderFactory.createTitledBorder(""));
         similarNodesTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
         scrollPane3.setViewportView(similarNodesTable);
-        final JSeparator separator12 = new JSeparator();
-        separator12.setOrientation(1);
-        panel8.add(separator12, cc.xywh(11, 1, 1, 13, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator11 = new JSeparator();
+        separator11.setOrientation(1);
+        panel8.add(separator11, cc.xywh(13, 1, 1, 14, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label20 = new JLabel();
         label20.setText("Linkage:");
         panel8.add(label20, cc.xy(5, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        panel8.add(linkageComboBox, cc.xyw(7, 3, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        panel8.add(linkageComboBox, cc.xy(7, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        maxClusterDistanceSlider = new JSlider();
+        maxClusterDistanceSlider.setEnabled(false);
+        panel8.add(maxClusterDistanceSlider, cc.xyw(6, 8, 4, CellConstraints.FILL, CellConstraints.DEFAULT));
+        euclideanMaxClusterDistanceSlider = new JSlider();
+        euclideanMaxClusterDistanceSlider.setEnabled(false);
+        panel8.add(euclideanMaxClusterDistanceSlider, cc.xyw(6, 10, 4, CellConstraints.FILL, CellConstraints.DEFAULT));
+        maxClusterDistanceSpinner = new JSpinner();
+        maxClusterDistanceSpinner.setEnabled(false);
+        panel8.add(maxClusterDistanceSpinner, cc.xy(11, 8, CellConstraints.FILL, CellConstraints.DEFAULT));
+        euclideanMaxClusterDistanceSpinner = new JSpinner();
+        euclideanMaxClusterDistanceSpinner.setEnabled(false);
+        panel8.add(euclideanMaxClusterDistanceSpinner, cc.xy(11, 10, CellConstraints.FILL, CellConstraints.DEFAULT));
+        euclideanMaxClusterDistanceLabel = new JLabel();
+        euclideanMaxClusterDistanceLabel.setEnabled(false);
+        euclideanMaxClusterDistanceLabel.setText("Euclidean max cluster distance:");
+        panel8.add(euclideanMaxClusterDistanceLabel, cc.xy(5, 10, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        maxClusterDistanceLabel = new JLabel();
+        maxClusterDistanceLabel.setEnabled(false);
+        maxClusterDistanceLabel.setText("Max cluster distance:");
+        panel8.add(maxClusterDistanceLabel, cc.xy(5, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        final JSeparator separator12 = new JSeparator();
+        separator12.setOrientation(1);
+        panel8.add(separator12, cc.xywh(3, 1, 1, 4, CellConstraints.FILL, CellConstraints.FILL));
+        clusterButton = new JButton();
+        clusterButton.setText("Cluster");
+        panel8.add(clusterButton, cc.xy(1, 1));
+        final JSeparator separator13 = new JSeparator();
+        panel8.add(separator13, cc.xyw(1, 5, 12, CellConstraints.FILL, CellConstraints.FILL));
+        numberOfClustersLabel = new JLabel();
+        numberOfClustersLabel.setEnabled(false);
+        numberOfClustersLabel.setText("Number of clusters:");
+        panel8.add(numberOfClustersLabel, cc.xy(5, 12, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        numberOfClustersValueLabel = new JLabel();
+        numberOfClustersValueLabel.setText("");
+        panel8.add(numberOfClustersValueLabel, cc.xy(7, 12));
         joinEdgesButton = new JButton();
         joinEdgesButton.setEnabled(true);
         joinEdgesButton.setText("Join edges");
-        panel8.add(joinEdgesButton, cc.xy(1, 3));
+        panel8.add(joinEdgesButton, cc.xy(1, 8));
         resetClustersButton = new JButton();
         resetClustersButton.setEnabled(true);
         resetClustersButton.setText("Reset");
-        panel8.add(resetClustersButton, cc.xy(1, 5));
-        final JSeparator separator13 = new JSeparator();
-        panel8.add(separator13, cc.xyw(5, 5, 5, CellConstraints.FILL, CellConstraints.FILL));
-        maxClusterDistanceLabel = new JLabel();
-        maxClusterDistanceLabel.setEnabled(true);
-        maxClusterDistanceLabel.setText("Max cluster distance:");
-        panel8.add(maxClusterDistanceLabel, cc.xy(5, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        maxClusterDistanceSlider = new JSlider();
-        maxClusterDistanceSlider.setEnabled(true);
-        panel8.add(maxClusterDistanceSlider, cc.xy(7, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
-        maxClusterDistanceSpinner = new JSpinner();
-        maxClusterDistanceSpinner.setEnabled(true);
-        panel8.add(maxClusterDistanceSpinner, cc.xy(9, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
+        panel8.add(resetClustersButton, cc.xy(1, 3));
+        resetJoinedEdgesButton = new JButton();
+        resetJoinedEdgesButton.setText("Reset");
+        panel8.add(resetJoinedEdgesButton, cc.xy(1, 10));
+        final JSeparator separator14 = new JSeparator();
+        separator14.setOrientation(1);
+        panel8.add(separator14, cc.xywh(3, 7, 1, 7, CellConstraints.FILL, CellConstraints.FILL));
         combineWithEuclideanClustersCheckBox = new JCheckBox();
         combineWithEuclideanClustersCheckBox.setEnabled(true);
+        combineWithEuclideanClustersCheckBox.setSelected(true);
         combineWithEuclideanClustersCheckBox.setText("Combine with Euclidean clusters");
-        panel8.add(combineWithEuclideanClustersCheckBox, cc.xyw(5, 9, 3));
-        euclideanMaxClusterDistanceSlider = new JSlider();
-        euclideanMaxClusterDistanceSlider.setEnabled(true);
-        panel8.add(euclideanMaxClusterDistanceSlider, cc.xy(7, 11, CellConstraints.FILL, CellConstraints.DEFAULT));
-        euclideanMaxClusterDistanceSpinner = new JSpinner();
-        euclideanMaxClusterDistanceSpinner.setEnabled(true);
-        panel8.add(euclideanMaxClusterDistanceSpinner, cc.xy(9, 11, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label21 = new JLabel();
-        label21.setText("Euclidean max cluster distance:");
-        panel8.add(label21, cc.xy(5, 11));
+        panel8.add(combineWithEuclideanClustersCheckBox, cc.xy(9, 3));
     }
 
     /**

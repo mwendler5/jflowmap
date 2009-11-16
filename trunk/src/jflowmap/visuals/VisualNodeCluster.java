@@ -91,7 +91,7 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
 //        ));
         final int numClusters = nodeClusterLists.size();
         
-        Color[] colors = ColorUtils.createCategoryColors(numClusters, 150);
+        Color[] colors = ColorUtils.createCategoryColors(numClusters, .6, 255);
         List<VisualNodeCluster> nodeClusters = new ArrayList<VisualNodeCluster>(numClusters);
         int cnt = 0;
         for (Collection<VisualNode> nodes : nodeClusterLists) {
