@@ -58,8 +58,7 @@
 			<zipgroupfileset dir="${path.lib}">
 				<include name="**/*.jar"/>
 				<exclude name="CopyLibs/*.jar"/>
-				<exclude name="junit/*.jar"/>
-				<exclude name="junit_4/*.jar"/>
+				<exclude name="junit*.jar"/>
 				<exclude name="beans-binding/*.jar"/>
 			</zipgroupfileset>
 		</jar>
