@@ -375,7 +375,8 @@ public class VisualFlowMap extends PNode {
 		});
     }
 
-    private void updateEdgeColors() {
+    @SuppressWarnings("unchecked")
+	private void updateEdgeColors() {
         for (PNode node : (List<PNode>) edgeLayer.getChildrenReference()) {
             if (node instanceof VisualEdge) {
                 ((VisualEdge) node).updateEdgeColors();
@@ -575,6 +576,7 @@ public class VisualFlowMap extends PNode {
     public void resetClusters() {
         removeClusterTags();
         if (originalVisualFlowMap != null) {
+//        	originalVisualFlowMap.removeClusterTags();
             jFlowMap.setVisualFlowMap(originalVisualFlowMap);
             jFlowMap.getControlPanel().loadFlowMapData(originalVisualFlowMap);
         }

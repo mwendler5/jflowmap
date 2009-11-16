@@ -84,13 +84,4 @@ final class LogScale {
 		}
 	}
 	
-	public static double log(double x, double base) {
-		if (base == Math.E) {
-			return Math.log(x);
-		}
-		if (base == 10) {
-			return Math.log10(x);
-		}
-		return Math.log(x) / Math.log(base);
-	}
 }

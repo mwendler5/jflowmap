@@ -11,14 +11,18 @@ public final class DoubleUtils {
     /**
      * See http://stackoverflow.com/questions/343584
      */
-    public static final long getMantissa(double d) {
+    public static final long mantissa(double d) {
         long bits = Double.doubleToLongBits(d);
         return bits & 0x000fffffffffffffL;
     }
+    
+    public static final long exponent(double d) {
+    	long bits = Double.doubleToLongBits(d);
+    	return (bits & 0x7ff0000000000000L) >> 52;
+    }
 
-    public static final long getExponent(double d) {
-        long bits = Double.doubleToLongBits(d);
-        return (bits & 0x7ff0000000000000L) >> 52;
+    public static final double magnitude(double d) {
+    	return Math.pow(10, exponent(d));
     }
     
 }

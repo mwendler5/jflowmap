@@ -134,7 +134,7 @@ public class JFlowMap extends JComponent {
             String xNodeAttr, String yNodeAttr, double weightFilterMin, Graph graph, VisualAreaMap areaMap) {
         FlowMapParams params = new FlowMapParams(graph, weightAttrName, xNodeAttr, yNodeAttr, nodeLabelAttrName);
         if (!Double.isNaN(weightFilterMin)) {
-            params.setValueFilterMin(weightFilterMin);
+            params.setEdgeWeightFilterMin(weightFilterMin);
         }
         VisualFlowMap visualFlowMap = new VisualFlowMap(this, graph, params.getGraphStats(), params);
         if (areaMap != null) {

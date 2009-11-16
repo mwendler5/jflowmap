@@ -8,6 +8,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -21,6 +22,7 @@ import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -32,6 +34,7 @@ import jflowmap.clustering.NodeDistanceMeasure;
 import jflowmap.models.FlowMapParams;
 import jflowmap.util.GraphStats;
 import jflowmap.util.MinMax;
+import jflowmap.util.Pair;
 import jflowmap.visuals.VisualFlowMap;
 import jflowmap.visuals.VisualNode;
 import at.fhj.utils.graphics.AxisMarks;
@@ -49,15 +52,15 @@ public class ControlPanel {
     private JCheckBox useLogColorScaleCheckbox;
     private JSlider maxEdgeWidthSlider;
     private JSpinner maxEdgeWidthSpinner;
-    private JSpinner minValueFilterSpinner;
+    private JSpinner minWeightFilterSpinner;
     private JSlider minLengthFilterSlider;
     private JSpinner minLengthFilterSpinner;
-    private JSlider maxValueFilterSlider;
-    private JSpinner maxValueFilterSpinner;
+    private JSlider maxWeightFilterSlider;
+    private JSpinner maxWeightFilterSpinner;
     private JCheckBox autoAdjustColorScaleCheckBox;
     private JSlider maxLengthFilterSlider;
     private JSpinner maxLengthFilterSpinner;
-    private JSlider minValueFilterSlider;
+    private JSlider minWeightFilterSlider;
     private JCheckBox useLogWidthScaleCheckbox;
     private JComboBox datasetCombo;
     private JComboBox comboBox2;
@@ -108,8 +111,8 @@ public class ControlPanel {
     private JButton resetClustersButton;
     private JLabel maxClusterDistanceLabel;
     private JSlider euclideanMaxClusterDistanceSlider;
-    private JSpinner spinner1;
-    private JCheckBox euclideanClusterDistanceCheckBox;
+    private JSpinner euclideanMaxClusterDistanceSpinner;
+    private JCheckBox combineWithEuclideanClustersCheckBox;
     private final JFlowMap jFlowMap;
     private boolean initializing;
     private ForceDirectedBundlerParameters fdBundlingParams;
@@ -209,49 +212,85 @@ public class ControlPanel {
         initializing = true;
         GraphStats stats = getGraphStats();
 
-        MinMax valueStats = stats.getEdgeWeightStats();
+        MinMax weightStats = stats.getEdgeWeightStats();
 
-        minValueFilterSpinner.setModel(new SpinnerNumberModel(valueStats.getMin(), valueStats.getMin(), valueStats.getMax(), 1));
-        maxValueFilterSpinner.setModel(new SpinnerNumberModel(valueStats.getMax(), valueStats.getMin(), valueStats.getMax(), 1));
+        final double minWeight = weightStats.getMin();
+        final double maxWeight = weightStats.getMax();
 
-        minValueFilterSlider.setMinimum(toValueEdgeFilterSliderValue(valueStats.getMin()));
-        minValueFilterSlider.setMaximum(toValueEdgeFilterSliderValue(valueStats.getMax()));
-        maxValueFilterSlider.setMinimum(toValueEdgeFilterSliderValue(valueStats.getMin()));
-        maxValueFilterSlider.setMaximum(toValueEdgeFilterSliderValue(valueStats.getMax()));
+        double weightFilterLogMappingShift = (minWeight >= 1.0 ? 0 : 1.0 - minWeight);
+        Pair<SpinnerModel, BoundedRangeModel> minWeightFilterModels =
+                new BoundSpinnerSliderModels<Double>(
+                        minWeight, minWeight, maxWeight, 1.0,
+                        BoundSpinnerSliderModels.createLogMapping(2, weightFilterLogMappingShift)
+                ).build();
+        minWeightFilterSpinner.setModel(minWeightFilterModels.first());
+        minWeightFilterSlider.setModel(minWeightFilterModels.second());
+
+        Pair<SpinnerModel, BoundedRangeModel> maxWeightFilterModels =
+                new BoundSpinnerSliderModels<Double>(
+                        maxWeight, minWeight, maxWeight, 1.0,
+                        BoundSpinnerSliderModels.createLogMapping(2, 1.0 - minWeight)
+                ).build();
+        maxWeightFilterSpinner.setModel(maxWeightFilterModels.first());
+        maxWeightFilterSlider.setModel(maxWeightFilterModels.second());
 
         MinMax lengthStats = stats.getEdgeLengthStats();
 
-        minLengthFilterSpinner.setModel(new SpinnerNumberModel(lengthStats.getMin(), lengthStats.getMin(), lengthStats.getMax(), 1));
-        maxLengthFilterSpinner.setModel(new SpinnerNumberModel(lengthStats.getMax(), lengthStats.getMin(), lengthStats.getMax(), 1));
+        Pair<SpinnerModel, BoundedRangeModel> minLengthFilterModels =
+                new BoundSpinnerSliderModels<Double>(
+                        lengthStats.getMin(), lengthStats.getMin(), lengthStats.getMax(), 1.0,
+                        BoundSpinnerSliderModels.MAP_ID_DOUBLE
+                ).build();
+        minLengthFilterSpinner.setModel(minLengthFilterModels.first());
+        minLengthFilterSlider.setModel(minLengthFilterModels.second());
 
-        minLengthFilterSlider.setMinimum(toEdgeLengthFilterSliderValue(lengthStats.getMin()));
-        minLengthFilterSlider.setMaximum(toEdgeLengthFilterSliderValue(lengthStats.getMax()));
-        maxLengthFilterSlider.setMinimum(toEdgeLengthFilterSliderValue(lengthStats.getMin()));
-        maxLengthFilterSlider.setMaximum(toEdgeLengthFilterSliderValue(lengthStats.getMax()));
+        Pair<SpinnerModel, BoundedRangeModel> maxLengthFilterModels =
+                new BoundSpinnerSliderModels<Double>(
+                        lengthStats.getMax(), lengthStats.getMin(), lengthStats.getMax(), 1.0,
+                        BoundSpinnerSliderModels.MAP_ID_DOUBLE
+                ).build();
+        maxLengthFilterSpinner.setModel(maxLengthFilterModels.first());
+        maxLengthFilterSlider.setModel(maxLengthFilterModels.second());
 
-        edgeOpacitySpinner.setModel(new SpinnerNumberModel(0, 0, 255, 1));
-        edgeOpacitySlider.setMinimum(0);
-        edgeOpacitySlider.setMaximum(255);
 
-        edgeMarkerSizeSpinner.setModel(new SpinnerNumberModel(0, 0, 0.5, 0.01));
-        edgeMarkerSizeSlider.setMinimum(0);
-        edgeMarkerSizeSlider.setMaximum(50);
+        Pair<SpinnerModel, BoundedRangeModel> edgeOpacityModels =
+                new BoundSpinnerSliderModels<Integer>(
+                        0, 0, 255, 1, BoundSpinnerSliderModels.MAP_ID_INTEGER
+                ).build();
+        edgeOpacitySpinner.setModel(edgeOpacityModels.first());
+        edgeOpacitySlider.setModel(edgeOpacityModels.second());
 
-        edgeMarkerOpacitySpinner.setModel(new SpinnerNumberModel(0, 0, 255, 1));
-        edgeMarkerOpacitySlider.setMinimum(0);
-        edgeMarkerOpacitySlider.setMaximum(255);
+        Pair<SpinnerModel, BoundedRangeModel> edgeMarkerSizeModels =
+                new BoundSpinnerSliderModels<Double>(
+                        .0, .0, 0.5, 0.01,
+                        BoundSpinnerSliderModels.createLinearMapping(100.0)
+                ).build();
+        edgeMarkerSizeSpinner.setModel(edgeMarkerSizeModels.first());
+        edgeMarkerSizeSlider.setModel(edgeMarkerSizeModels.second());
 
-        maxEdgeWidthSpinner.setModel(new SpinnerNumberModel(0, 0, 100, 1));
-        maxEdgeWidthSlider.setMinimum(0);
-        maxEdgeWidthSlider.setMaximum(100);
+        Pair<SpinnerModel, BoundedRangeModel> edgeMarkerOpacityModels =
+                new BoundSpinnerSliderModels<Integer>(
+                        0, 0, 255, 1, BoundSpinnerSliderModels.MAP_ID_INTEGER
+                ).build();
+        edgeMarkerOpacitySpinner.setModel(edgeMarkerOpacityModels.first());
+        edgeMarkerOpacitySlider.setModel(edgeMarkerOpacityModels.second());
+
+        Pair<SpinnerModel, BoundedRangeModel> maxEdgeWidthModels =
+                new BoundSpinnerSliderModels<Double>(
+                        .0, .0, 100.0, 1.0, BoundSpinnerSliderModels.MAP_ID_DOUBLE
+                ).build();
+        maxEdgeWidthSpinner.setModel(maxEdgeWidthModels.first());
+        maxEdgeWidthSlider.setModel(maxEdgeWidthModels.second());
+
         initializing = false;
 
         initForceDirectedEdgeBundlerParamsModels();
 
 //        maxClusterDistanceSpinner.setEditor(new JSpinner.NumberEditor(maxClusterDistanceSpinner, "0.0######"));
-        maxClusterDistanceSpinner.setModel(new SpinnerNumberModel(0, 0, 10000, 1));
-        maxClusterDistanceSlider.setMinimum(0);
-        maxClusterDistanceSlider.setMaximum(10000);
+//        maxClusterDistanceSpinner.setModel(new SpinnerNumberModel(0, 0, 10000, 1));
+//        maxClusterDistanceSlider.setMinimum(0);
+//        maxClusterDistanceSlider.setMaximum(10000);
+        initClusterModels();
 
         similarNodesTableModel.clearData();
         clustersTableModel.clearData();
@@ -263,21 +302,15 @@ public class ControlPanel {
         useLogWidthScaleCheckbox.setSelected(data.isUseLogWidthScale());
         useLogColorScaleCheckbox.setSelected(data.isUseLogColorScale());
 
-        minLengthFilterSlider.setValue(toEdgeLengthFilterSliderValue(data.getEdgeLengthFilterMin()));
-        maxLengthFilterSlider.setValue(toEdgeLengthFilterSliderValue(data.getEdgeLengthFilterMax()));
         minLengthFilterSpinner.setValue(data.getEdgeLengthFilterMin());
         maxLengthFilterSpinner.setValue(data.getEdgeLengthFilterMax());
 
-        minValueFilterSlider.setValue(toValueEdgeFilterSliderValue(data.getValueFilterMin()));
-        maxValueFilterSlider.setValue(toValueEdgeFilterSliderValue(data.getValueFilterMax()));
-        minValueFilterSpinner.setValue(data.getValueFilterMin());
-        maxValueFilterSpinner.setValue(data.getValueFilterMax());
+        minWeightFilterSpinner.setValue(data.getEdgeWeightFilterMin());
+        maxWeightFilterSpinner.setValue(data.getEdgeWeightFilterMax());
 
         edgeOpacitySpinner.setValue(data.getEdgeAlpha());
-        edgeOpacitySlider.setValue(data.getEdgeAlpha());
+//        edgeOpacitySlider.setValue(data.getEdgeAlpha());
         edgeMarkerOpacitySpinner.setValue(data.getDirectionMarkerAlpha());
-        edgeMarkerOpacitySlider.setValue(data.getDirectionMarkerAlpha());
-        edgeMarkerSizeSlider.setValue(toEdgeMarkerSizeSliderValue(data.getDirectionMarkerSize()));
         edgeMarkerSizeSpinner.setValue(data.getDirectionMarkerSize());
 
         showDirectionMarkersCheckBox.setSelected(data.getShowDirectionMarkers());
@@ -286,7 +319,7 @@ public class ControlPanel {
         proportionalDirectionMarkersCheckBox.setSelected(data.getUseProportionalDirectionMarkers());
 
         maxEdgeWidthSpinner.setValue(data.getMaxEdgeWidth());
-        maxEdgeWidthSlider.setValue((int) Math.round(data.getMaxEdgeWidth()));
+//        maxEdgeWidthSlider.setValue((int) Math.round(data.getMaxEdgeWidth()));
     }
 
     private void initChangeListeners() {
@@ -298,66 +331,49 @@ public class ControlPanel {
         });
 
         // Edge value filter
-        minValueFilterSpinner.addChangeListener(new ChangeListener() {
+        minWeightFilterSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
-                minValueFilterSlider.setValue(toValueEdgeFilterSliderValue((Double) minValueFilterSpinner.getValue()));
+//                minWeightFilterSlider.setValue(toValueEdgeFilterSliderValue((Double) minWeightFilterSpinner.getValue()));
+                getFlowMapModel().setEdgeWeightFilterMin((Double) minWeightFilterSpinner.getValue());
             }
         });
-        minValueFilterSlider.addChangeListener(new ChangeListener() {
+//        minWeightFilterSlider.addChangeListener(new ChangeListener() {
+//            public void stateChanged(ChangeEvent e) {
+//                if (initializing) return;
+//                double value = fromValueEdgeFilterSliderValue(minWeightFilterSlider.getValue());
+//                getFlowMapModel().setEdgeWeightFilterMin(value);
+//                minWeightFilterSpinner.setValue(value);
+//            }
+//        });
+        maxWeightFilterSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
-                double value = fromValueEdgeFilterSliderValue(minValueFilterSlider.getValue());
-                getFlowMapModel().setValueFilterMin(value);
-                minValueFilterSpinner.setValue(value);
+                getFlowMapModel().setEdgeWeightFilterMax((Double) maxWeightFilterSpinner.getValue());
             }
         });
-        maxValueFilterSpinner.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (initializing) return;
-                maxValueFilterSlider.setValue(toValueEdgeFilterSliderValue((Double) maxValueFilterSpinner.getValue()));
-            }
-        });
-        maxValueFilterSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (initializing) return;
-                double value = fromValueEdgeFilterSliderValue(maxValueFilterSlider.getValue());
-                getFlowMapModel().setValueFilterMax(value);
-                maxValueFilterSpinner.setValue(value);
-            }
-        });
+//        maxWeightFilterSlider.addChangeListener(new ChangeListener() {
+//            public void stateChanged(ChangeEvent e) {
+//                if (initializing) return;
+//                double value = fromValueEdgeFilterSliderValue(maxWeightFilterSlider.getValue());
+//                maxWeightFilterSpinner.setValue(value);
+//            }
+//        });
 
 
         // Edge length filter
         minLengthFilterSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
-                minLengthFilterSlider.setValue(toEdgeLengthFilterSliderValue((Double) minLengthFilterSpinner.getValue()));
-            }
-        });
-        minLengthFilterSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (initializing) return;
-                double value = fromLengthEdgeFilterSliderValue(minLengthFilterSlider.getValue());
-                getFlowMapModel().setEdgeLengthFilterMin(value);
-                minLengthFilterSpinner.setValue(value);
+                getFlowMapModel().setEdgeLengthFilterMin((Double) minLengthFilterSpinner.getValue());
             }
         });
         maxLengthFilterSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
-                maxLengthFilterSlider.setValue(toEdgeLengthFilterSliderValue((Double) maxLengthFilterSpinner.getValue()));
+                getFlowMapModel().setEdgeLengthFilterMax((Double) maxLengthFilterSpinner.getValue());
             }
         });
-        maxLengthFilterSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (initializing) return;
-                double value = fromLengthEdgeFilterSliderValue(maxLengthFilterSlider.getValue());
-                getFlowMapModel().setEdgeLengthFilterMax(value);
-                maxLengthFilterSpinner.setValue(value);
-            }
-        });
-
 
         // Aesthetics
         fillEdgesWithGradientCheckBox.addChangeListener(new ChangeListener() {
@@ -387,16 +403,7 @@ public class ControlPanel {
         edgeMarkerSizeSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
-                edgeMarkerSizeSlider.setValue(toEdgeMarkerSizeSliderValue(
-                        (Double) edgeMarkerSizeSpinner.getValue()));
-            }
-        });
-        edgeMarkerSizeSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (initializing) return;
-                double value = fromEdgeMarkerSizeSliderValue(edgeMarkerSizeSlider.getValue());
-                getFlowMapModel().setDirectionMarkerSize(value);
-                edgeMarkerSizeSpinner.setValue(value);
+                getFlowMapModel().setDirectionMarkerSize((Double) edgeMarkerSizeSpinner.getValue());
             }
         });
 
@@ -404,15 +411,7 @@ public class ControlPanel {
         edgeOpacitySpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
-                edgeOpacitySlider.setValue((Integer) edgeOpacitySpinner.getValue());
-            }
-        });
-        edgeOpacitySlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (initializing) return;
-                int value = edgeOpacitySlider.getValue();
-                getFlowMapModel().setEdgeAlpha(value);
-                edgeOpacitySpinner.setValue(value);
+                getFlowMapModel().setEdgeAlpha((Integer) edgeOpacitySpinner.getValue());
             }
         });
 
@@ -420,15 +419,7 @@ public class ControlPanel {
         edgeMarkerOpacitySpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
-                edgeMarkerOpacitySlider.setValue((Integer) edgeMarkerOpacitySpinner.getValue());
-            }
-        });
-        edgeMarkerOpacitySlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (initializing) return;
-                int value = edgeMarkerOpacitySlider.getValue();
-                getFlowMapModel().setDirectionMarkerAlpha(value);
-                edgeMarkerOpacitySpinner.setValue(value);
+                getFlowMapModel().setDirectionMarkerAlpha((Integer) edgeMarkerOpacitySpinner.getValue());
             }
         });
 
@@ -436,15 +427,7 @@ public class ControlPanel {
         maxEdgeWidthSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
-                maxEdgeWidthSlider.setValue((int) Math.round(((Number) maxEdgeWidthSpinner.getValue()).doubleValue()));
-            }
-        });
-        maxEdgeWidthSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (initializing) return;
-                int value = maxEdgeWidthSlider.getValue();
-                getFlowMapModel().setMaxEdgeWidth(value);
-                maxEdgeWidthSpinner.setValue(value);
+                getFlowMapModel().setMaxEdgeWidth((Double) maxEdgeWidthSpinner.getValue());
             }
         });
 
@@ -500,16 +483,7 @@ public class ControlPanel {
                         (NodeDistanceMeasure) distanceMeasureCombo.getSelectedItem(),
                         (Linkage) linkageComboBox.getSelectedItem()
                 );
-                double max = getVisualFlowMap().getMaxNodeDistance();
-                double val = max / 2;
-                getVisualFlowMap().setClusterDistanceThreshold(val);
-                maxClusterDistanceSpinner.setModel(new SpinnerNumberModel(val, 0, max, AxisMarks.ordAlpha(max / 1e2)));
-                maxClusterDistanceSlider.setValue(toMaxClusterDistanceSliderValue(val));
-                maxClusterDistanceSlider.setMaximum(toMaxClusterDistanceSliderValue(max));
-                similarNodesTableModel.setDistances(getVisualFlowMap().getNodeDistanceList());
-                similarNodesTableSorter.setSortingStatus(2, TableSorter.ASCENDING);
-                clustersTableModel.setVisualNodes(getVisualFlowMap().getVisualNodes());     // to re-filter
-                clustersTableSorter.setSortingStatus(1, TableSorter.ASCENDING);   // to re-sort
+                initClusterModels();
 //                joinEdgesButton.setEnabled(true);
 
 //                maxClusterDistanceSlider.setEnabled(true);
@@ -542,19 +516,19 @@ public class ControlPanel {
             public void stateChanged(ChangeEvent e) {
                 if (initializing) return;
                 double spinnerValue = ((Number) maxClusterDistanceSpinner.getValue()).doubleValue();
-                maxClusterDistanceSlider.setValue(toMaxClusterDistanceSliderValue(spinnerValue));
+//                maxClusterDistanceSlider.setValue(toMaxClusterDistanceSliderValue(spinnerValue));
                 getVisualFlowMap().setClusterDistanceThreshold(spinnerValue);
                 clustersTableModel.setVisualNodes(getVisualFlowMap().getVisualNodes()); // to update list (re-run filtering)
                 clustersTableSorter.fireTableDataChanged();
                 clustersTableSorter.setSortingStatus(1, TableSorter.ASCENDING); // to re-sort
             }
         });
-        maxClusterDistanceSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                if (initializing) return;
-                maxClusterDistanceSpinner.setValue(fromMaxClusterDistanceSliderValue(maxClusterDistanceSlider.getValue()));
-            }
-        });
+//        maxClusterDistanceSlider.addChangeListener(new ChangeListener() {
+//            public void stateChanged(ChangeEvent e) {
+//                if (initializing) return;
+//                maxClusterDistanceSpinner.setValue(fromMaxClusterDistanceSliderValue(maxClusterDistanceSlider.getValue()));
+//            }
+//        });
     }
 
     private void loadFlowMap(JFlowMap.DatasetSpec dataset) {
@@ -576,75 +550,9 @@ public class ControlPanel {
         return getVisualFlowMap().getGraphStats();
     }
 
-    private double fromValueEdgeFilterSliderValue(final int logValue) {
-        MinMax stats = getGraphStats().getEdgeWeightStats();
-        double value = Math.round(Math.pow(Math.E, logValue));
-        if (value < stats.getMin()) {
-            value = stats.getMin();
-        }
-        if (value > stats.getMax()) {
-            value = stats.getMax();
-        }
-        return value;
-    }
-
-    private double fromLengthEdgeFilterSliderValue(int value) {
-        double v = value;
-        MinMax stats = getGraphStats().getEdgeLengthStats();
-        if (v < stats.getMin()) {
-            v = stats.getMin();
-        }
-        if (v > stats.getMax()) {
-            v = stats.getMax();
-        }
-        return v;
-    }
-
-
-    private int toMaxClusterDistanceSliderValue(double value) {
-        double max = getVisualFlowMap().getMaxNodeDistance();
-        return (int) Math.round(value / (max / 100));
-    }
-
-    private double fromMaxClusterDistanceSliderValue(int value) {
-        double max = getVisualFlowMap().getMaxNodeDistance();
-        return ((double) value) * (max / 100);
-    }
-
-    private int toValueEdgeFilterSliderValue(double value) {
-        return (int) Math.round(Math.log(value));
-    }
-
-    private int toEdgeLengthFilterSliderValue(double value) {
-        return (int) value;
-    }
-
-    private int toEdgeMarkerSizeSliderValue(double value) {
-        return (int) (Math.round(100 * value));
-    }
-
-    private double fromEdgeMarkerSizeSliderValue(int value) {
-        return value / 100.0;
-    }
-
     public JPanel getPanel() {
         return panel1;
     }
-
-//    public void getData(FlowMapModel data) {
-//        data.setAutoAdjustColorScale(autoAdjustColorScaleCheckBox.isSelected());
-//        data.setUseLogWidthScale(useLogWidthScaleCheckbox.isSelected());
-//        data.setUseLogColorScale(useLogColorScaleCheckbox.isSelected());
-//        data.setLengthFilterMin((Double) minLengthFilterSpinner.getValue());
-//        data.setLengthFilterMax((Double) maxLengthFilterSpinner.getValue());
-//    }
-//
-//    public boolean isModified(FlowMapModel data) {
-//        if (autoAdjustColorScaleCheckBox.isSelected() != data.getAutoAdjustColorScale()) return true;
-//        if (useLogWidthScaleCheckbox.isSelected() != data.isUseLogWidthScale()) return true;
-//        if (useLogColorScaleCheckbox.isSelected() != data.isUseLogColorScale()) return true;
-//        return false;
-//    }
 
     private void createUIComponents() {
         // custom component creation code here
@@ -749,6 +657,25 @@ public class ControlPanel {
         linkageComboBox = new JComboBox(new Linkage[]{Linkage.AVERAGE, Linkage.COMPLETE, Linkage.SINGLE});
     }
 
+    private void initClusterModels() {
+        double max = getVisualFlowMap().getMaxNodeDistance();
+        double val = max / 2;
+        getVisualFlowMap().setClusterDistanceThreshold(val);
+
+        Pair<SpinnerModel, BoundedRangeModel> maxClusterDistanceModels =
+                new BoundSpinnerSliderModels<Double>(
+                        val, 0.0, max, AxisMarks.ordAlpha(max / 100.0),
+                        BoundSpinnerSliderModels.createLinearMapping(100.0 / max)
+                ).build();
+        maxClusterDistanceSpinner.setModel(maxClusterDistanceModels.first());
+        maxClusterDistanceSlider.setModel(maxClusterDistanceModels.second());
+
+        similarNodesTableModel.setDistances(getVisualFlowMap().getNodeDistanceList());
+        similarNodesTableSorter.setSortingStatus(2, TableSorter.ASCENDING);
+        clustersTableModel.setVisualNodes(getVisualFlowMap().getVisualNodes());     // to re-filter
+        clustersTableSorter.setSortingStatus(1, TableSorter.ASCENDING);   // to re-sort
+    }
+
     /**
      * Method generated by IntelliJ IDEA GUI Designer
      * >>> IMPORTANT!! <<<
@@ -763,7 +690,7 @@ public class ControlPanel {
         tabbedPane1 = new JTabbedPane();
         panel1.add(tabbedPane1, BorderLayout.CENTER);
         final JPanel panel2 = new JPanel();
-        panel2.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:187px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:119px:noGrow,left:20dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:119px:noGrow,left:4dlu:noGrow,fill:max(d;20px):noGrow,left:5dlu:noGrow,fill:max(d;4px):grow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):grow"));
+        panel2.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:187px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:119px:noGrow,left:20dlu:noGrow,fill:max(d;4px):grow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:min(p;200px):grow"));
         tabbedPane1.addTab("Dataset", panel2);
         panel2.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         datasetCombo = new JComboBox();
@@ -774,58 +701,55 @@ public class ControlPanel {
         panel2.add(label1, cc.xy(1, 1));
         final JSeparator separator1 = new JSeparator();
         separator1.setOrientation(1);
-        panel2.add(separator1, cc.xywh(5, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
-        comboBox2 = new JComboBox();
-        comboBox2.setEnabled(false);
-        panel2.add(comboBox2, cc.xy(13, 1));
+        panel2.add(separator1, cc.xywh(5, 1, 1, 9, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label2 = new JLabel();
         label2.setEnabled(false);
-        label2.setText("Node X coord field:");
-        panel2.add(label2, cc.xy(11, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        final JLabel label3 = new JLabel();
-        label3.setEnabled(false);
-        label3.setText("Node Y coord field:");
-        panel2.add(label3, cc.xy(11, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        comboBox3 = new JComboBox();
-        comboBox3.setEnabled(false);
-        panel2.add(comboBox3, cc.xy(13, 3));
-        final JLabel label4 = new JLabel();
-        label4.setEnabled(false);
-        label4.setText("Edge value field:");
-        panel2.add(label4, cc.xy(7, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        label2.setText("Edge weight field:");
+        panel2.add(label2, cc.xy(7, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         comboBox4 = new JComboBox();
         comboBox4.setEnabled(false);
         panel2.add(comboBox4, cc.xy(9, 1));
-        final JLabel label5 = new JLabel();
-        label5.setEnabled(false);
-        label5.setText("Node label field:");
-        panel2.add(label5, cc.xy(7, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        final JLabel label3 = new JLabel();
+        label3.setEnabled(false);
+        label3.setText("Node label field:");
+        panel2.add(label3, cc.xy(7, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         comboBox6 = new JComboBox();
         comboBox6.setEnabled(false);
         panel2.add(comboBox6, cc.xy(9, 3));
         final JSeparator separator2 = new JSeparator();
         separator2.setOrientation(1);
-        panel2.add(separator2, cc.xywh(10, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
-        final JSeparator separator3 = new JSeparator();
-        separator3.setOrientation(1);
-        panel2.add(separator3, cc.xywh(15, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        panel2.add(separator2, cc.xywh(10, 1, 1, 9, CellConstraints.CENTER, CellConstraints.FILL));
         final JTabbedPane tabbedPane3 = new JTabbedPane();
         tabbedPane3.setTabPlacement(3);
-        panel2.add(tabbedPane3, cc.xywh(17, 1, 1, 5, CellConstraints.DEFAULT, CellConstraints.FILL));
+        panel2.add(tabbedPane3, cc.xywh(11, 1, 1, 9, CellConstraints.DEFAULT, CellConstraints.FILL));
         final JScrollPane scrollPane1 = new JScrollPane();
         tabbedPane3.addTab("Flows", scrollPane1);
         scrollPane1.setBorder(BorderFactory.createTitledBorder(""));
         flowsTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
         scrollPane1.setViewportView(flowsTable);
+        final JLabel label4 = new JLabel();
+        label4.setEnabled(false);
+        label4.setText("Node X coord field:");
+        panel2.add(label4, cc.xy(7, 5, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        comboBox2 = new JComboBox();
+        comboBox2.setEnabled(false);
+        panel2.add(comboBox2, cc.xy(9, 5));
+        final JLabel label5 = new JLabel();
+        label5.setEnabled(false);
+        label5.setText("Node Y coord field:");
+        panel2.add(label5, cc.xy(7, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        comboBox3 = new JComboBox();
+        comboBox3.setEnabled(false);
+        panel2.add(comboBox3, cc.xy(9, 7));
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new FormLayout("right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow(2.0),left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,right:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:p:noGrow", "center:26px:noGrow,top:4dlu:noGrow,center:24px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:d:noGrow"));
         tabbedPane1.addTab("Filter", panel3);
         panel3.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        minValueFilterSpinner = new JSpinner();
-        panel3.add(minValueFilterSpinner, cc.xy(5, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JSeparator separator4 = new JSeparator();
-        separator4.setOrientation(1);
-        panel3.add(separator4, cc.xywh(7, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        minWeightFilterSpinner = new JSpinner();
+        panel3.add(minWeightFilterSpinner, cc.xy(5, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
+        final JSeparator separator3 = new JSeparator();
+        separator3.setOrientation(1);
+        panel3.add(separator3, cc.xywh(7, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label6 = new JLabel();
         label6.setText("Min length:");
         panel3.add(label6, cc.xy(9, 1));
@@ -834,12 +758,12 @@ public class ControlPanel {
         minLengthFilterSpinner = new JSpinner();
         panel3.add(minLengthFilterSpinner, cc.xy(13, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label7 = new JLabel();
-        label7.setText("Max value:");
+        label7.setText("Max edge weight:");
         panel3.add(label7, cc.xy(1, 3));
-        maxValueFilterSlider = new JSlider();
-        panel3.add(maxValueFilterSlider, cc.xy(3, 3, CellConstraints.FILL, CellConstraints.CENTER));
-        maxValueFilterSpinner = new JSpinner();
-        panel3.add(maxValueFilterSpinner, cc.xy(5, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        maxWeightFilterSlider = new JSlider();
+        panel3.add(maxWeightFilterSlider, cc.xy(3, 3, CellConstraints.FILL, CellConstraints.CENTER));
+        maxWeightFilterSpinner = new JSpinner();
+        panel3.add(maxWeightFilterSpinner, cc.xy(5, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         autoAdjustColorScaleCheckBox = new JCheckBox();
         autoAdjustColorScaleCheckBox.setEnabled(false);
         autoAdjustColorScaleCheckBox.setText("Auto adjust color scale");
@@ -855,17 +779,17 @@ public class ControlPanel {
         panel4.setLayout(new FormLayout("fill:d:grow", "center:d:grow"));
         panel3.add(panel4, cc.xy(5, 7));
         final JLabel label9 = new JLabel();
-        label9.setText("Min value:");
+        label9.setText("Min edge weight:");
         panel3.add(label9, cc.xy(1, 1));
-        minValueFilterSlider = new JSlider();
-        panel3.add(minValueFilterSlider, cc.xy(3, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
+        minWeightFilterSlider = new JSlider();
+        panel3.add(minWeightFilterSlider, cc.xy(3, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new FormLayout("fill:d:noGrow,left:p:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:20dlu:noGrow,fill:max(d;4px):grow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:24px:noGrow,top:6dlu:noGrow,top:4dlu:noGrow"));
         tabbedPane1.addTab("Scales", panel5);
         panel5.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        final JSeparator separator5 = new JSeparator();
-        separator5.setOrientation(1);
-        panel5.add(separator5, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator4 = new JSeparator();
+        separator4.setOrientation(1);
+        panel5.add(separator4, cc.xywh(3, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         useLogWidthScaleCheckbox = new JCheckBox();
         useLogWidthScaleCheckbox.setEnabled(false);
         useLogWidthScaleCheckbox.setText("Use log width scale");
@@ -882,9 +806,9 @@ public class ControlPanel {
         mapEdgeValueToCheckBox1.setEnabled(false);
         mapEdgeValueToCheckBox1.setText("Map edge value to width");
         panel5.add(mapEdgeValueToCheckBox1, cc.xy(5, 3));
-        final JSeparator separator6 = new JSeparator();
-        separator6.setOrientation(1);
-        panel5.add(separator6, cc.xywh(6, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator5 = new JSeparator();
+        separator5.setOrientation(1);
+        panel5.add(separator5, cc.xywh(6, 1, 1, 5, CellConstraints.CENTER, CellConstraints.FILL));
         final JPanel panel6 = new JPanel();
         panel6.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:110px:noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):grow,left:4dlu:noGrow,fill:max(m;50px):noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Aesthetics", panel6);
@@ -896,9 +820,9 @@ public class ControlPanel {
         comboBox5 = new JComboBox();
         comboBox5.setEnabled(false);
         panel6.add(comboBox5, cc.xy(3, 1));
-        final JSeparator separator7 = new JSeparator();
-        separator7.setOrientation(1);
-        panel6.add(separator7, cc.xywh(5, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator6 = new JSeparator();
+        separator6.setOrientation(1);
+        panel6.add(separator6, cc.xywh(5, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label11 = new JLabel();
         label11.setText("Edge width:");
         panel6.add(label11, cc.xy(10, 1, CellConstraints.RIGHT, CellConstraints.CENTER));
@@ -919,9 +843,9 @@ public class ControlPanel {
         showNodesCheckBox = new JCheckBox();
         showNodesCheckBox.setText("Show nodes");
         panel6.add(showNodesCheckBox, cc.xy(7, 1));
-        final JSeparator separator8 = new JSeparator();
-        separator8.setOrientation(1);
-        panel6.add(separator8, cc.xywh(8, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator7 = new JSeparator();
+        separator7.setOrientation(1);
+        panel6.add(separator7, cc.xywh(8, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
         showDirectionMarkersCheckBox = new JCheckBox();
         showDirectionMarkersCheckBox.setText("Show direction markers");
         panel6.add(showDirectionMarkersCheckBox, cc.xy(7, 5));
@@ -949,9 +873,9 @@ public class ControlPanel {
         panel7.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:12dlu:noGrow,fill:p:noGrow,fill:d:noGrow,left:d:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:25px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Edge bundling", panel7);
         panel7.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        final JSeparator separator9 = new JSeparator();
-        separator9.setOrientation(1);
-        panel7.add(separator9, cc.xywh(9, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator8 = new JSeparator();
+        separator8.setOrientation(1);
+        panel7.add(separator8, cc.xywh(9, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label13 = new JLabel();
         label13.setHorizontalAlignment(4);
         label13.setText("Step damping factor:");
@@ -970,9 +894,9 @@ public class ControlPanel {
         panel7.add(label15, cc.xy(5, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         edgeStiffnessSpinner = new JSpinner();
         panel7.add(edgeStiffnessSpinner, cc.xy(7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JSeparator separator10 = new JSeparator();
-        separator10.setOrientation(1);
-        panel7.add(separator10, cc.xywh(14, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator9 = new JSeparator();
+        separator9.setOrientation(1);
+        panel7.add(separator9, cc.xywh(14, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label16 = new JLabel();
         label16.setHorizontalAlignment(4);
         label16.setText("Number of cycles:");
@@ -1000,9 +924,9 @@ public class ControlPanel {
         defaultValuesButton = new JButton();
         defaultValuesButton.setText("Default Values");
         panel7.add(defaultValuesButton, cc.xy(1, 5));
-        final JSeparator separator11 = new JSeparator();
-        separator11.setOrientation(1);
-        panel7.add(separator11, cc.xywh(3, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator10 = new JSeparator();
+        separator10.setOrientation(1);
+        panel7.add(separator10, cc.xywh(3, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
         repulsiveEdgesCheckBox = new JCheckBox();
         repulsiveEdgesCheckBox.setText("Repulsion:");
         panel7.add(repulsiveEdgesCheckBox, cc.xy(5, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
@@ -1024,12 +948,12 @@ public class ControlPanel {
         edgeValueAffectsAttractionCheckBox.setText("Edge value affects attraction");
         panel7.add(edgeValueAffectsAttractionCheckBox, cc.xy(17, 3));
         final JPanel panel8 = new JPanel();
-        panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(p;75px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(p;300px):noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:20px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:91px:grow"));
+        panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(p;75px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(p;300px):noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:20px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:min(p;200px):grow"));
         tabbedPane1.addTab("Node clustering", panel8);
         panel8.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        final JSeparator separator12 = new JSeparator();
-        separator12.setOrientation(1);
-        panel8.add(separator12, cc.xywh(3, 1, 1, 11, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator11 = new JSeparator();
+        separator11.setOrientation(1);
+        panel8.add(separator11, cc.xywh(3, 1, 1, 13, CellConstraints.CENTER, CellConstraints.FILL));
         panel8.add(distanceMeasureCombo, cc.xyw(7, 1, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JLabel label19 = new JLabel();
         label19.setText("Distance measure:");
@@ -1039,7 +963,7 @@ public class ControlPanel {
         panel8.add(clusterButton, cc.xy(1, 1));
         tabbedPane2 = new JTabbedPane();
         tabbedPane2.setTabPlacement(3);
-        panel8.add(tabbedPane2, cc.xywh(13, 1, 1, 11, CellConstraints.DEFAULT, CellConstraints.FILL));
+        panel8.add(tabbedPane2, cc.xywh(13, 1, 1, 13, CellConstraints.DEFAULT, CellConstraints.FILL));
         final JScrollPane scrollPane2 = new JScrollPane();
         tabbedPane2.addTab("Clusters", scrollPane2);
         scrollPane2.setBorder(BorderFactory.createTitledBorder(""));
@@ -1050,9 +974,9 @@ public class ControlPanel {
         scrollPane3.setBorder(BorderFactory.createTitledBorder(""));
         similarNodesTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
         scrollPane3.setViewportView(similarNodesTable);
-        final JSeparator separator13 = new JSeparator();
-        separator13.setOrientation(1);
-        panel8.add(separator13, cc.xywh(11, 1, 1, 11, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator12 = new JSeparator();
+        separator12.setOrientation(1);
+        panel8.add(separator12, cc.xywh(11, 1, 1, 13, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label20 = new JLabel();
         label20.setText("Linkage:");
         panel8.add(label20, cc.xy(5, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
@@ -1062,11 +986,11 @@ public class ControlPanel {
         joinEdgesButton.setText("Join edges");
         panel8.add(joinEdgesButton, cc.xy(1, 3));
         resetClustersButton = new JButton();
-        resetClustersButton.setEnabled(false);
+        resetClustersButton.setEnabled(true);
         resetClustersButton.setText("Reset");
         panel8.add(resetClustersButton, cc.xy(1, 5));
-        final JSeparator separator14 = new JSeparator();
-        panel8.add(separator14, cc.xyw(5, 5, 5, CellConstraints.FILL, CellConstraints.FILL));
+        final JSeparator separator13 = new JSeparator();
+        panel8.add(separator13, cc.xyw(5, 5, 5, CellConstraints.FILL, CellConstraints.FILL));
         maxClusterDistanceLabel = new JLabel();
         maxClusterDistanceLabel.setEnabled(true);
         maxClusterDistanceLabel.setText("Max cluster distance:");
@@ -1077,16 +1001,19 @@ public class ControlPanel {
         maxClusterDistanceSpinner = new JSpinner();
         maxClusterDistanceSpinner.setEnabled(true);
         panel8.add(maxClusterDistanceSpinner, cc.xy(9, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
+        combineWithEuclideanClustersCheckBox = new JCheckBox();
+        combineWithEuclideanClustersCheckBox.setEnabled(true);
+        combineWithEuclideanClustersCheckBox.setText("Combine with Euclidean clusters");
+        panel8.add(combineWithEuclideanClustersCheckBox, cc.xyw(5, 9, 3));
         euclideanMaxClusterDistanceSlider = new JSlider();
-        euclideanMaxClusterDistanceSlider.setEnabled(false);
-        panel8.add(euclideanMaxClusterDistanceSlider, cc.xy(7, 9, CellConstraints.FILL, CellConstraints.DEFAULT));
-        spinner1 = new JSpinner();
-        spinner1.setEnabled(false);
-        panel8.add(spinner1, cc.xy(9, 9, CellConstraints.FILL, CellConstraints.DEFAULT));
-        euclideanClusterDistanceCheckBox = new JCheckBox();
-        euclideanClusterDistanceCheckBox.setEnabled(false);
-        euclideanClusterDistanceCheckBox.setText("Euclidean cluster distance:");
-        panel8.add(euclideanClusterDistanceCheckBox, cc.xy(5, 9));
+        euclideanMaxClusterDistanceSlider.setEnabled(true);
+        panel8.add(euclideanMaxClusterDistanceSlider, cc.xy(7, 11, CellConstraints.FILL, CellConstraints.DEFAULT));
+        euclideanMaxClusterDistanceSpinner = new JSpinner();
+        euclideanMaxClusterDistanceSpinner.setEnabled(true);
+        panel8.add(euclideanMaxClusterDistanceSpinner, cc.xy(9, 11, CellConstraints.FILL, CellConstraints.DEFAULT));
+        final JLabel label21 = new JLabel();
+        label21.setText("Euclidean max cluster distance:");
+        panel8.add(label21, cc.xy(5, 11));
     }
 
     /**

@@ -104,18 +104,21 @@ public abstract class VisualEdge extends PNode {
 
     public void updateVisibiliy() {
         final FlowMapParams model = visualFlowMap.getModel();
-        double valueFilterMin = model.getValueFilterMin();
-        double valueFilterMax = model.getValueFilterMax();
+        double weightFilterMin = model.getEdgeWeightFilterMin();
+        double weightFilterMax = model.getEdgeWeightFilterMax();
 
         double edgeLengthFilterMin = model.getEdgeLengthFilterMin();
         double edgeLengthFilterMax = model.getEdgeLengthFilterMax();
-        final double value = getEdgeWeight();
+        final double weight = getEdgeWeight();
         double length = getEdgeLength();
         final boolean visible =
-                valueFilterMin <= value && value <= valueFilterMax    &&
+                weightFilterMin <= weight && weight <= weightFilterMax    &&
                 edgeLengthFilterMin <= length && length <= edgeLengthFilterMax
         ;
-//        System.out.println(this + "  " + visible  + "  filter:[" + weightFilterMin + "-" + valueFilterMax + "] value = " + value);
+//        System.out.println(this + "  " + visible  + 
+//        		"  weight filter:[" + weightFilterMin + "-" + weightFilterMax + "] value = " + weight + "; " +
+//        		"  length filter:[" + edgeLengthFilterMin + "-" + edgeLengthFilterMax + "] value = " + length
+//        );
         setVisible(visible);
         setPickable(visible);
         setChildrenPickable(visible);
@@ -186,11 +189,11 @@ public abstract class VisualEdge extends PNode {
         double nv;
         if (model.getAutoAdjustEdgeColorScale()) {
             double minLog = 1.0;
-            double maxLog = Math.log(model.getValueFilterMax() - model.getValueFilterMin());
+            double maxLog = Math.log(model.getEdgeWeightFilterMax() - model.getEdgeWeightFilterMin());
             if (maxLog == minLog) {
                 nv = 1.0;
             } else {
-                nv = (Math.log(value - model.getValueFilterMin()) - minLog) / (maxLog - minLog);
+                nv = (Math.log(value - model.getEdgeWeightFilterMin()) - minLog) / (maxLog - minLog);
             }
         } else {
             MinMax stats = visualFlowMap.getGraphStats().getEdgeWeightStats();

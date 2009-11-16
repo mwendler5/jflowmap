@@ -29,8 +29,8 @@ public class FlowMapParams {
     private int edgeAlpha = 40;
     private int directionMarkerAlpha = 200;
 
-    private double valueFilterMin = Double.MIN_VALUE;
-    private double valueFilterMax = Double.MAX_VALUE;
+    private double edgeWeightFilterMin = Double.MIN_VALUE;
+    private double edgeWeightFilterMax = Double.MAX_VALUE;
 
     private double edgeLengthFilterMin = Double.MIN_VALUE;
     private double edgeLengthFilterMax = Double.MAX_VALUE;
@@ -51,8 +51,8 @@ public class FlowMapParams {
         this.nodeLabelAttr = nodeLabelAttr;
 
         MinMax minMax = graphStats.getEdgeWeightStats();
-        this.valueFilterMin = minMax.getMin();
-        this.valueFilterMax = minMax.getMax();
+        this.edgeWeightFilterMin = minMax.getMin();
+        this.edgeWeightFilterMax = minMax.getMax();
 
         if (minMax.getMax() - minMax.getMin() > 10.0) {
             maxEdgeWidth = 10.0;
@@ -122,12 +122,12 @@ public class FlowMapParams {
         return directionMarkerAlpha;
     }
 
-    public double getValueFilterMin() {
-        return valueFilterMin;
+    public double getEdgeWeightFilterMin() {
+        return edgeWeightFilterMin;
     }
 
-    public double getValueFilterMax() {
-        return valueFilterMax;
+    public double getEdgeWeightFilterMax() {
+        return edgeWeightFilterMax;
     }
 
     public double getEdgeLengthFilterMin() {
@@ -152,18 +152,18 @@ public class FlowMapParams {
         changes.firePropertyChange(PROPERTY_DIRECTION_MARKER_ALPHA, old, edgeMarkerAlpha);
     }
 
-    public void setValueFilterMin(double valueFilterMin) {
-        if (this.valueFilterMin != valueFilterMin) {
-            double old = this.valueFilterMin;
-            this.valueFilterMin = valueFilterMin;
+    public void setEdgeWeightFilterMin(double valueFilterMin) {
+        if (this.edgeWeightFilterMin != valueFilterMin) {
+            double old = this.edgeWeightFilterMin;
+            this.edgeWeightFilterMin = valueFilterMin;
             changes.firePropertyChange(PROPERTY_VALUE_FILTER_MIN, old, valueFilterMin);
         }
     }
 
-    public void setValueFilterMax(double valueFilterMax) {
-        if (this.valueFilterMax != valueFilterMax) {
-            double old = this.valueFilterMax;
-            this.valueFilterMax = valueFilterMax;
+    public void setEdgeWeightFilterMax(double valueFilterMax) {
+        if (this.edgeWeightFilterMax != valueFilterMax) {
+            double old = this.edgeWeightFilterMax;
+            this.edgeWeightFilterMax = valueFilterMax;
             changes.firePropertyChange(PROPERTY_VALUE_FILTER_MAX, old, valueFilterMax);
         }
     }

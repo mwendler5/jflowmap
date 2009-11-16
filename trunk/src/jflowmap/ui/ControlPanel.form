@@ -17,7 +17,11 @@
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:max(d;4px):grow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:min(p;200px):grow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:187px:noGrow"/>
@@ -28,12 +32,6 @@
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:119px:noGrow"/>
             <colspec value="left:20dlu:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:119px:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:max(d;20px):noGrow"/>
-            <colspec value="left:5dlu:noGrow"/>
             <colspec value="fill:max(d;4px):grow"/>
             <constraints>
               <tabbedpane title="Dataset"/>
@@ -61,49 +59,11 @@
               </component>
               <component id="cb38e" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="4" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="4" row-span="9" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
                   <orientation value="1"/>
-                </properties>
-              </component>
-              <component id="d77cc" class="javax.swing.JComboBox" binding="comboBox2" default-binding="true">
-                <constraints>
-                  <grid row="0" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <enabled value="false"/>
-                </properties>
-              </component>
-              <component id="22e9a" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <enabled value="false"/>
-                  <text value="Node X coord field:"/>
-                </properties>
-              </component>
-              <component id="986e3" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="2" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <enabled value="false"/>
-                  <text value="Node Y coord field:"/>
-                </properties>
-              </component>
-              <component id="ea815" class="javax.swing.JComboBox" binding="comboBox3" default-binding="true">
-                <constraints>
-                  <grid row="2" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <enabled value="false"/>
                 </properties>
               </component>
               <component id="5077c" class="javax.swing.JLabel">
@@ -113,7 +73,7 @@
                 </constraints>
                 <properties>
                   <enabled value="false"/>
-                  <text value="Edge value field:"/>
+                  <text value="Edge weight field:"/>
                 </properties>
               </component>
               <component id="53beb" class="javax.swing.JComboBox" binding="comboBox4" default-binding="true">
@@ -146,16 +106,7 @@
               </component>
               <component id="78c2e" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="9" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
-                </constraints>
-                <properties>
-                  <orientation value="1"/>
-                </properties>
-              </component>
-              <component id="2055a" class="javax.swing.JSeparator">
-                <constraints>
-                  <grid row="0" column="14" row-span="5" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="9" row-span="9" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -164,7 +115,7 @@
               </component>
               <tabbedpane id="47b66" default-binding="true">
                 <constraints>
-                  <grid row="0" column="16" row-span="5" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                  <grid row="0" column="10" row-span="9" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
                     <preferred-size width="200" height="200"/>
                   </grid>
                   <forms defaultalign-vert="false"/>
@@ -191,6 +142,44 @@
                   </scrollpane>
                 </children>
               </tabbedpane>
+              <component id="22e9a" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="false"/>
+                  <text value="Node X coord field:"/>
+                </properties>
+              </component>
+              <component id="d77cc" class="javax.swing.JComboBox" binding="comboBox2" default-binding="true">
+                <constraints>
+                  <grid row="4" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <enabled value="false"/>
+                </properties>
+              </component>
+              <component id="986e3" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="false"/>
+                  <text value="Node Y coord field:"/>
+                </properties>
+              </component>
+              <component id="ea815" class="javax.swing.JComboBox" binding="comboBox3" default-binding="true">
+                <constraints>
+                  <grid row="6" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <enabled value="false"/>
+                </properties>
+              </component>
             </children>
           </grid>
           <grid id="5b542" default-binding="true" layout-manager="FormLayout">
@@ -222,7 +211,7 @@
               <size top="10" left="10" bottom="10" right="10"/>
             </border>
             <children>
-              <component id="2a68e" class="javax.swing.JSpinner" binding="minValueFilterSpinner">
+              <component id="2a68e" class="javax.swing.JSpinner" binding="minWeightFilterSpinner">
                 <constraints>
                   <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
@@ -267,17 +256,17 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Max value:"/>
+                  <text value="Max edge weight:"/>
                 </properties>
               </component>
-              <component id="5d40a" class="javax.swing.JSlider" binding="maxValueFilterSlider">
+              <component id="5d40a" class="javax.swing.JSlider" binding="maxWeightFilterSlider">
                 <constraints>
                   <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties/>
               </component>
-              <component id="f1429" class="javax.swing.JSpinner" binding="maxValueFilterSpinner">
+              <component id="f1429" class="javax.swing.JSpinner" binding="maxWeightFilterSpinner">
                 <constraints>
                   <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
@@ -334,10 +323,10 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Min value:"/>
+                  <text value="Min edge weight:"/>
                 </properties>
               </component>
-              <component id="bee00" class="javax.swing.JSlider" binding="minValueFilterSlider">
+              <component id="bee00" class="javax.swing.JSlider" binding="minWeightFilterSlider">
                 <constraints>
                   <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
@@ -893,7 +882,9 @@
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:91px:grow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:min(p;200px):grow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:20px:noGrow"/>
@@ -917,7 +908,7 @@
             <children>
               <component id="b4906" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="2" row-span="11" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="2" row-span="13" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -951,7 +942,7 @@
               </component>
               <tabbedpane id="86023" binding="tabbedPane2" default-binding="true">
                 <constraints>
-                  <grid row="0" column="12" row-span="11" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                  <grid row="0" column="12" row-span="13" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
                     <preferred-size width="200" height="200"/>
                   </grid>
                   <forms defaultalign-vert="false"/>
@@ -995,7 +986,7 @@
               </tabbedpane>
               <component id="1ba28" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="10" row-span="11" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="10" row-span="13" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -1034,7 +1025,7 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <enabled value="false"/>
+                  <enabled value="true"/>
                   <text value="Reset"/>
                 </properties>
               </component>
@@ -1073,32 +1064,41 @@
                   <enabled value="true"/>
                 </properties>
               </component>
-              <component id="62d3" class="javax.swing.JSlider" binding="euclideanMaxClusterDistanceSlider">
+              <component id="36c23" class="javax.swing.JCheckBox" binding="combineWithEuclideanClustersCheckBox">
                 <constraints>
-                  <grid row="8" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <enabled value="false"/>
-                </properties>
-              </component>
-              <component id="bab8d" class="javax.swing.JSpinner" binding="spinner1" default-binding="true">
-                <constraints>
-                  <grid row="8" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <enabled value="false"/>
-                </properties>
-              </component>
-              <component id="36c23" class="javax.swing.JCheckBox" binding="euclideanClusterDistanceCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="8" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
-                  <enabled value="false"/>
-                  <text value="Euclidean cluster distance:"/>
+                  <enabled value="true"/>
+                  <text value="Combine with Euclidean clusters"/>
+                </properties>
+              </component>
+              <component id="62d3" class="javax.swing.JSlider" binding="euclideanMaxClusterDistanceSlider">
+                <constraints>
+                  <grid row="10" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="true"/>
+                </properties>
+              </component>
+              <component id="bab8d" class="javax.swing.JSpinner" binding="euclideanMaxClusterDistanceSpinner">
+                <constraints>
+                  <grid row="10" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="true"/>
+                </properties>
+              </component>
+              <component id="148f8" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="10" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Euclidean max cluster distance:"/>
                 </properties>
               </component>
             </children>
