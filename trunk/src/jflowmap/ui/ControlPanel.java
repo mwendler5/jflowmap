@@ -694,6 +694,11 @@ public class ControlPanel {
                     flowMap.getEuclideanMaxNodeDistance(),
                     euclideanMaxClusterDistanceSpinner,
                     euclideanMaxClusterDistanceSlider);
+        } else {
+            initMaxClusterDistanceControls(
+                    0, 0,
+                    euclideanMaxClusterDistanceSpinner,
+                    euclideanMaxClusterDistanceSlider);
         }
 
 
