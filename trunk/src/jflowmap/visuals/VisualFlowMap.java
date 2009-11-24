@@ -1,5 +1,6 @@
 package jflowmap.visuals;
 
+import java.awt.FontMetrics;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
@@ -27,6 +28,7 @@ import org.apache.log4j.Logger;
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
+import sun.swing.SwingUtilities2;
 import at.fhj.utils.misc.ProgressTracker;
 import at.fhj.utils.misc.TaskCompletionListener;
 import at.fhj.utils.swing.ProgressDialog;
@@ -204,7 +206,7 @@ public class VisualFlowMap extends PNode {
 
                 VisualEdge visualEdge;
                 if (edgeSplinePoints == null) {
-                    visualEdge = new LineVisualEdge(this, edge, fromNode, toNode, false);
+                    visualEdge = new LineVisualEdge(this, edge, fromNode, toNode);
                 } else {
                     visualEdge = new BSplineVisualEdge(this, edge, fromNode, toNode, edgeSplinePoints[edge.getRow()], showPoints);
                 }
@@ -284,11 +286,12 @@ public class VisualFlowMap extends PNode {
     }
 
     public void showTooltip(PNode component, Point2D pos) {
+        final PBounds cameraBounds = getCamera().getBoundsReference();
+        double maxLabelWidth = cameraBounds.getWidth() - pos.getX();
         if (component instanceof VisualNode) {
             VisualNode vnode = (VisualNode) component;
-//    		tooltipBox.setText(fnode.getId(), nodeData.nodeLabel(nodeIdx), "");
             tooltipBox.setText(
-                    vnode.getFullLabel(),
+                    wordWrapLabel(vnode.getFullLabel(), maxLabelWidth),
                     ""
 //			        "Outgoing " + selectedFlowAttrName + ": " + graph.getOutgoingTotal(fnode.getId(), selectedFlowAttrName) + "\n" +
 //			        "Incoming " + selectedFlowAttrName + ": " + graph.getIncomingTotal(fnode.getId(), selectedFlowAttrName)
@@ -297,36 +300,60 @@ public class VisualFlowMap extends PNode {
         } else if (component instanceof VisualEdge) {
             VisualEdge edge = (VisualEdge) component;
             tooltipBox.setText(
-//                    flow.getStartNodeId() + " - " + flow.getEndNodeId(), 
-                    edge.getLabel(),
+                    wordWrapLabel(edge.getLabel(), maxLabelWidth),
                     params.getEdgeWeightAttr() + ": ", Double.toString(edge.getEdgeWeight()));
         } else {
             return;
         }
-//			Point2D pos = event.getPosition();
-        final PBounds vb = getCamera().getBoundsReference();
-        final PBounds tb = tooltipBox.getBoundsReference();
+        final PBounds tooltipBounds = tooltipBox.getBoundsReference();
         double x = pos.getX();
         double y = pos.getY();
         pos = new Point2D.Double(x, y);
         getCamera().viewToLocal(pos);
         x = pos.getX();
         y = pos.getY();
-        if (x + tb.getWidth() > vb.getWidth()) {
-            final double _x = pos.getX() - tb.getWidth() - 8;
-            if (vb.getX() - _x < x + tb.getWidth() - vb.getMaxX()) {
+        if (x + tooltipBounds.getWidth() > cameraBounds.getWidth()) {
+            final double _x = pos.getX() - tooltipBounds.getWidth() - 8;
+            if (cameraBounds.getX() - _x < x + tooltipBounds.getWidth() - cameraBounds.getMaxX()) {
                 x = _x;
             }
         }
-        if (y + tb.getHeight() > vb.getHeight()) {
-            final double _y = pos.getY() - tb.getHeight() - 8;
-            if (vb.getY() - _y < y + tb.getHeight() - vb.getMaxY()) {
+        if (y + tooltipBounds.getHeight() > cameraBounds.getHeight()) {
+            final double _y = pos.getY() - tooltipBounds.getHeight() - 8;
+            if (cameraBounds.getY() - _y < y + tooltipBounds.getHeight() - cameraBounds.getMaxY()) {
                 y = _y;
             }
         }
         pos.setLocation(x + 8, y + 8);
         tooltipBox.setPosition(pos.getX(), pos.getY());
         tooltipBox.setVisible(true);
+    }
+
+    private String wordWrapLabel(String label, double maxWidth) {
+        FontMetrics fm = jFlowMap.getGraphics().getFontMetrics();
+        int width = SwingUtilities.computeStringWidth(fm, label);
+        if (width > maxWidth) {
+            StringBuilder sb = new StringBuilder();
+            StringBuilder line = new StringBuilder();
+            for (String word : label.split(" ")) {
+                line.append(word);
+                int w = SwingUtilities.computeStringWidth(fm, line.toString());
+                if (w > maxWidth) {
+                    int newLength = line.length() - word.length();
+                    if (newLength > 0) {        // wrap line only if there are more than one words
+                        line.setLength(newLength);  // remove last word
+                        sb.append(line).append("\n");
+                        line.setLength(0);
+                        line.append(word);
+                    } else {
+                        sb.append(line);        // TODO: wordWrapLabel: implement hyphenation
+                    }
+                }
+                line.append(" ");
+            }
+            label = sb.toString();
+        }
+        return label;
     }
 
     public void hideTooltip() {
@@ -541,6 +568,13 @@ public class VisualFlowMap extends PNode {
         }
         this.visualNodeClusters = clusters;
     }
+    
+    public List<VisualNodeCluster> getVisualNodeClusters() {
+        if (!hasClusters()) {
+            throw new IllegalStateException("The flow map is not clustered");
+        }
+        return Collections.unmodifiableList(visualNodeClusters);
+    }
 
     public int getNumberOfClusters() {
         if (visualNodeClusters == null) {
@@ -629,19 +663,35 @@ public class VisualFlowMap extends PNode {
         );
         clusteredFlowMap.setOriginalVisualFlowMap(this);
         jFlowMap.setVisualFlowMap(clusteredFlowMap);
-        jFlowMap.getControlPanel().loadFlowMapData(clusteredFlowMap);
+        jFlowMap.getControlPanel().loadVisualFlowMap(clusteredFlowMap);
     }
 
     public void resetClusters() {
         removeClusterTags();
         rootCluster = null;
         euclideanRootCluster = null;
+        visualNodeClusters = null;
     }
     
     public void resetJoinedNodes() {
         if (flowMapBeforeJoining != null) {
             jFlowMap.setVisualFlowMap(flowMapBeforeJoining);
-            jFlowMap.getControlPanel().loadFlowMapData(flowMapBeforeJoining);
+            jFlowMap.getControlPanel().loadVisualFlowMap(flowMapBeforeJoining);
+        }
+    }
+
+    public void setNodeClustersToShow(List<VisualNodeCluster> nodeClustersToShow) {
+        if (visualNodeClusters == null) {
+            return;
+        }
+        for (VisualNodeCluster cluster : visualNodeClusters) {
+            final boolean visible;
+            if (nodeClustersToShow.isEmpty()) {
+                visible = true;
+            } else {
+                visible = nodeClustersToShow.contains(cluster);
+            }
+            cluster.setVisible(visible);
         }
     }
 

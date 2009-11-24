@@ -13,8 +13,8 @@ import jflowmap.models.map.Polygon;
  */
 public class VisualArea extends PNode {
 
-    private static final Color mapPaintColor = new Color(25, 25, 25);
-    private static final Color mapStrokeColor = new Color(35, 35, 35);
+    private static final Color mapPaintColor = new Color(45, 45, 45);
+    private static final Color mapStrokeColor = new Color(55, 55, 55);
 //    private static final Color mapPaintColor = new Color(235, 235, 235);
 //    private static final Color mapStrokeColor = new Color(225, 225, 225);
     private static final PFixedWidthStroke mapStroke = new PFixedWidthStroke(1);

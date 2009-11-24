@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
@@ -26,6 +28,8 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
 
 import jflowmap.JFlowMap;
@@ -37,6 +41,7 @@ import jflowmap.util.MinMax;
 import jflowmap.util.Pair;
 import jflowmap.visuals.VisualFlowMap;
 import jflowmap.visuals.VisualNode;
+import jflowmap.visuals.VisualNodeCluster;
 import at.fhj.utils.graphics.AxisMarks;
 import at.fhj.utils.swing.FancyTable;
 import at.fhj.utils.swing.TableSorter;
@@ -80,7 +85,7 @@ public class ControlPanel {
     private JSpinner stepDampingFactorSpinner;
     private JSpinner stepsInCycleSpinner;
     private JButton bundleButton;
-    private JButton resetButton;
+    private JButton resetBundlingButton;
     private JSpinner numberOfCyclesSpinner;
     private JButton defaultValuesButton;
     private JCheckBox directionAffectsCompatibilityCheckBox;
@@ -91,7 +96,7 @@ public class ControlPanel {
     private JCheckBox showNodesCheckBox;
     private JSpinner repulsionSpinner;
     private JCheckBox edgeValueAffectsAttractionCheckBox;
-    private JTable similarNodesTable;
+    private JTable clusterDistancesTable;
     private JButton clusterButton;
     private JSlider maxClusterDistanceSlider;
     private JCheckBox fillEdgesWithGradientCheckBox;
@@ -104,7 +109,7 @@ public class ControlPanel {
     private JSpinner maxClusterDistanceSpinner;
     private JComboBox distanceMeasureCombo;
     private JTabbedPane tabbedPane2;
-    private JTable clustersTable;
+    private JTable clusterNodesTable;
     private JTable flowsTable;
     private JComboBox linkageComboBox;
     private JButton joinEdgesButton;
@@ -117,24 +122,27 @@ public class ControlPanel {
     private JLabel numberOfClustersValueLabel;
     private JLabel numberOfClustersLabel;
     private JButton resetJoinedEdgesButton;
+    private JTable clustersTable;
     private final JFlowMap jFlowMap;
     private boolean initializing;
     private ForceDirectedBundlerParameters fdBundlingParams;
-    private NodeSimilarityDistancesTableModel similarNodesTableModel;
-    private TableSorter similarNodesTableSorter;
+    private NodeSimilarityDistancesTableModel clusterDistancesTableModel;
+    private TableSorter clusterDistancesTableSorter;
     private boolean modelsInitialized;
-    private ClustersTableModel clustersTableModel;
-    private TableSorter clustersTableSorter;
+    private ClusterNodesTableModel clusterNodesTableModel;
+    private TableSorter clusterNodesTableSorter;
     private FlowsTableModel flowsTableModel;
     private TableSorter flowsTableSorter;
+    private ClustersTableModel clustersTableModel;
+    private VisualFlowMap visualFlowMap;
 
 
     public ControlPanel(JFlowMap flowMap) {
         this.jFlowMap = flowMap;
         $$$setupUI$$$();
 
-        loadFlowMapData(flowMap.getVisualFlowMap());
-        initChangeListeners();
+        loadVisualFlowMap(flowMap.getVisualFlowMap());
+        initUIChangeListeners();
 
         updateDirectionAffectsCompatibilityCheckBox();
         updateDirectionAffectsCompatibilityCheckBox();
@@ -142,7 +150,15 @@ public class ControlPanel {
         updateMarkersInputs();
     }
 
-    public void loadFlowMapData(VisualFlowMap visualFlowMap) {
+    public void loadVisualFlowMap(VisualFlowMap newVisualFlowMap) {
+        // attach listeners
+        if (visualFlowMap != null) {
+            removeVisualFlowMapListeners(visualFlowMap);
+        }
+        visualFlowMap = newVisualFlowMap;
+        attachVisualFlowMapListeners(newVisualFlowMap);
+
+        // load data
         fdBundlingParams = new ForceDirectedBundlerParameters(visualFlowMap.getGraphStats());
         if (!modelsInitialized) {
             initModelsOnce();
@@ -151,7 +167,7 @@ public class ControlPanel {
         initModels();
         setData(visualFlowMap.getParams());
     }
-
+    
     private void updateRepulsionSpinner() {
         repulsionSpinner.setEnabled(repulsiveEdgesCheckBox.isSelected());
     }
@@ -321,7 +337,7 @@ public class ControlPanel {
 //        maxEdgeWidthSlider.setValue((int) Math.round(data.getMaxEdgeWidth()));
     }
 
-    private void initChangeListeners() {
+    private void initUIChangeListeners() {
         initDatasetListeners();
         initFilterListeners();
         initAestheticsListeners();
@@ -469,9 +485,9 @@ public class ControlPanel {
                 getVisualFlowMap().bundleEdges(fdBundlingParams);
             }
         });
-        resetButton.addActionListener(new ActionListener() {
+        resetBundlingButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                jFlowMap.resetBundling();
+                getVisualFlowMap().resetBundling();
             }
         });
         defaultValuesButton.addActionListener(new ActionListener() {
@@ -505,7 +521,7 @@ public class ControlPanel {
                 );
                 initNodeClusteringModels();
                 updateNumberOfClustersLabel();
-                updateClustersTable();
+                updateNodeClustersTables();
             }
         });
         joinEdgesButton.addActionListener(new ActionListener() {
@@ -518,17 +534,18 @@ public class ControlPanel {
         resetClustersButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 getVisualFlowMap().resetClusters();
-                similarNodesTableModel.clearData();
-                clustersTableModel.clearData();
+                clearClusterTableModels();
                 updateClusterDistanceSliderSpinner();
                 updateClusterButtons();
-                updateNumberOfClustersLabel();
             }
         });
         resetJoinedEdgesButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 getVisualFlowMap().resetJoinedNodes();
                 updateClusterButtons();
+                updateNumberOfClustersLabel();
+                updateNumberOfClustersLabel();
+                updateNodeClustersTables();
             }
         });
         maxClusterDistanceSpinner.addChangeListener(new ChangeListener() {
@@ -537,7 +554,7 @@ public class ControlPanel {
                 double spinnerValue = ((Number) maxClusterDistanceSpinner.getValue()).doubleValue();
                 getVisualFlowMap().setClusterDistanceThreshold(spinnerValue);
                 updateNumberOfClustersLabel();
-                updateClustersTable();
+                updateNodeClustersTables();
             }
         });
         euclideanMaxClusterDistanceSpinner.addChangeListener(new ChangeListener() {
@@ -546,7 +563,7 @@ public class ControlPanel {
                 double spinnerValue = ((Number) euclideanMaxClusterDistanceSpinner.getValue()).doubleValue();
                 getVisualFlowMap().setEuclideanClusterDistanceThreshold(spinnerValue);
                 updateNumberOfClustersLabel();
-                updateClustersTable();
+                updateNodeClustersTables();
             }
         });
     }
@@ -555,9 +572,38 @@ public class ControlPanel {
         VisualFlowMap visualFlowMap = jFlowMap.loadFlowMap(dataset);
         jFlowMap.setVisualFlowMap(visualFlowMap);
         jFlowMap.fitFlowMapInView();
-        loadFlowMapData(visualFlowMap);
+        loadVisualFlowMap(visualFlowMap);
+    }
+    
+    private List<PropertyChangeListener> visualFlowMapListeners = 
+        new ArrayList<PropertyChangeListener>();
+
+    private void attachVisualFlowMapListeners(VisualFlowMap visualFlowMap) {
+        PropertyChangeListener selectionListener = new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                VisualNode selectedNode = getVisualFlowMap().getSelectedNode();
+                if (selectedNode == null) {
+                    flowsTableModel.showAllVisualEdges();
+                } else {
+                    flowsTableModel.setVisualEdges(selectedNode.getEdges());
+                }
+                flowsTableSorter.setSortingStatus(2, TableSorter.DESCENDING);
+            }
+        };
+        visualFlowMap.addPropertyChangeListener(
+                VisualFlowMap.Attributes.NODE_SELECTION.name(),
+                selectionListener
+        );
+        visualFlowMapListeners.add(selectionListener);
     }
 
+    private void removeVisualFlowMapListeners(VisualFlowMap visualFlowMap) {
+        for (PropertyChangeListener li : visualFlowMapListeners) {
+            visualFlowMap.removePropertyChangeListener(li);
+        }
+        visualFlowMapListeners.clear();
+    }
+    
     public FlowMapParams getFlowMapModel() {
         return getVisualFlowMap().getParams();
     }
@@ -587,90 +633,81 @@ public class ControlPanel {
         flowsTableSorter.setColumnSortable(1, true);
         flowsTableSorter.setColumnSortable(2, true);
         flowsTableSorter.setTableHeader(flowsTable.getTableHeader());
-        getVisualFlowMap().addPropertyChangeListener(
-                VisualFlowMap.Attributes.NODE_SELECTION.name(),
-                new PropertyChangeListener() {
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        VisualNode selectedNode = getVisualFlowMap().getSelectedNode();
-                        if (selectedNode == null) {
-                            flowsTableModel.showAllVisualEdges();
-                        } else {
-                            flowsTableModel.setVisualEdges(selectedNode.getEdges());
-                        }
-                        flowsTableSorter.setSortingStatus(2, TableSorter.DESCENDING);
-                    }
-                }
-        );
 
 
-        // clustersTable
-        clustersTableModel = new ClustersTableModel();
-        clustersTableSorter = new TableSorter(clustersTableModel);
-        clustersTableSorter.setColumnSortable(0, true);
-        clustersTableSorter.setColumnSortable(1, true);
-        clustersTableSorter.setSortingStatus(1, TableSorter.ASCENDING);
+        // clusterNodesTable
+        clusterNodesTableModel = new ClusterNodesTableModel();
+        clusterNodesTableSorter = new TableSorter(clusterNodesTableModel);
+        clusterNodesTableSorter.setColumnSortable(0, true);
+        clusterNodesTableSorter.setColumnSortable(1, true);
+        clusterNodesTableSorter.setSortingStatus(1, TableSorter.ASCENDING);
 
 
-        clustersTable = new FancyTable(clustersTableSorter);
-        clustersTable.setDefaultRenderer(ClustersTableModel.ClusterIcon.class,
-                ((FancyTable) clustersTable).new FancyIconRenderer());
-        clustersTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-//        clustersTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        clustersTable.setAutoCreateColumnsFromModel(false);
-        clustersTableSorter.setTableHeader(clustersTable.getTableHeader());
+        clusterNodesTable = new FancyTable(clusterNodesTableSorter);
+        clusterNodesTable.setDefaultRenderer(ClusterIcon.class,
+                ((FancyTable) clusterNodesTable).new FancyIconRenderer());
+        clusterNodesTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+//        clusterNodesTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        clusterNodesTable.setAutoCreateColumnsFromModel(false);
+        clusterNodesTableSorter.setTableHeader(clusterNodesTable.getTableHeader());
 
-        TableColumnModel tcm1 = clustersTable.getColumnModel();
+        TableColumnModel tcm1 = clusterNodesTable.getColumnModel();
         tcm1.getColumn(0).setPreferredWidth(300);
 //        tcm1.getColumn(0).setResizable(false);
-        tcm1.getColumn(0).setMaxWidth(350);
+//        tcm1.getColumn(0).setMaxWidth(350);
         tcm1.getColumn(1).setPreferredWidth(50);
         tcm1.getColumn(1).setMaxWidth(100);
-//        tcm1.getColumn(1).setResizable(false);
 
-//        tcm1.getColumn(1).setCellRenderer(new TableCellRenderer() {
-//           public Component getTableCellRendererComponent(JTable table,
-//                    Object value, boolean isSelected, boolean hasFocus,
-//                    final int row, int column) {
-//                return new JComponent() {
-//                    private static final long serialVersionUID = 1L;
-//                    Dimension size = new Dimension(32, 16);
-//                    @Override
-//                    public Dimension getPreferredSize() {
-//                        return size;
-//                    }
-//                    @Override
-//                    public void paint(Graphics g) {
-//                        super.paint(g);
-//                        Rectangle b = g.getClipBounds();
-//                        g.setColor(clustersTableModel.getVisualNode(clustersTableSorter.modelIndex(row)).getClusterColor());
-////                        g.fillRoundRect(b.x + 1, b.y + 1, b.width - 2, b.height - 2, 7, 7);
-//                        int r = 6;
-//                        g.fillOval(b.x + b.width/2 - r, b.y + b.height/2 - r, r, r);
-//                    }
-//                };
-//            }
-//        });
+        // clusterDistancesTable
+        clusterDistancesTableModel = new NodeSimilarityDistancesTableModel();
+        clusterDistancesTableSorter = new TableSorter(clusterDistancesTableModel);
+        clusterDistancesTableSorter.setColumnSortable(0, true);
+        clusterDistancesTableSorter.setColumnSortable(1, true);
+        clusterDistancesTableSorter.setColumnSortable(2, true);
 
+        clusterDistancesTable = new FancyTable(clusterDistancesTableSorter);
+        clusterDistancesTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        clusterDistancesTable.setAutoCreateColumnsFromModel(false);
+        clusterDistancesTableSorter.setTableHeader(clusterDistancesTable.getTableHeader());
 
-        // similarNodesTable
-        similarNodesTableModel = new NodeSimilarityDistancesTableModel();
-        similarNodesTableSorter = new TableSorter(similarNodesTableModel);
-        similarNodesTableSorter.setColumnSortable(0, true);
-        similarNodesTableSorter.setColumnSortable(1, true);
-        similarNodesTableSorter.setColumnSortable(2, true);
-
-        similarNodesTable = new FancyTable(similarNodesTableSorter);
-        similarNodesTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-        similarNodesTable.setAutoCreateColumnsFromModel(false);
-        similarNodesTableSorter.setTableHeader(similarNodesTable.getTableHeader());
-
-        TableColumnModel tcm2 = similarNodesTable.getColumnModel();
+        TableColumnModel tcm2 = clusterDistancesTable.getColumnModel();
         tcm2.getColumn(0).setPreferredWidth(100);
         tcm2.getColumn(0).setMaxWidth(150);
         tcm2.getColumn(1).setPreferredWidth(100);
         tcm2.getColumn(1).setMaxWidth(150);
         tcm2.getColumn(1).setPreferredWidth(120);
         tcm2.getColumn(1).setMaxWidth(150);
+
+
+        // clusterFilter table
+        clustersTableModel = new ClustersTableModel();
+        clustersTable = new FancyTable(clustersTableModel);
+        clustersTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        clustersTable.setAutoCreateColumnsFromModel(false);
+        clustersTable.setDefaultRenderer(ClusterIcon.class,
+                ((FancyTable) clustersTable).new FancyIconRenderer());
+        clustersTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    if (visualFlowMap.hasClusters()) {
+                        List<VisualNodeCluster> all = visualFlowMap.getVisualNodeClusters();
+                        List<VisualNodeCluster> selected = new ArrayList<VisualNodeCluster>();
+                        for (int i : clustersTable.getSelectedRows()) {
+                            selected.add(all.get(i));
+                        }
+                        visualFlowMap.setNodeClustersToShow(selected);
+                    }
+                }
+            }
+        });
+
+        TableColumnModel tcm3 = clustersTable.getColumnModel();
+        tcm3.getColumn(0).setPreferredWidth(30);
+        tcm3.getColumn(0).setMinWidth(20);
+        tcm3.getColumn(1).setPreferredWidth(200);
+//        tcm3.getColumn(1).setMaxWidth(350);
+
 
         distanceMeasureCombo = new JComboBox(NodeDistanceMeasure.values());
         linkageComboBox = new JComboBox(new Linkage[]{Linkage.AVERAGE, Linkage.COMPLETE, Linkage.SINGLE});
@@ -702,20 +739,22 @@ public class ControlPanel {
         }
 
 
-        similarNodesTableModel.setDistances(flowMap.getNodeDistanceList());
-        similarNodesTableSorter.setSortingStatus(2, TableSorter.ASCENDING);
-        clustersTableModel.setVisualNodes(flowMap.getVisualNodes());     // to re-filter
-        clustersTableSorter.setSortingStatus(1, TableSorter.ASCENDING);   // to re-sort
+//        clusterDistancesTableModel.setDistances(flowMap.getNodeDistanceList());
+//        clusterDistancesTableSorter.setSortingStatus(2, TableSorter.ASCENDING);
+//        clusterNodesTableModel.setVisualNodes(flowMap.getVisualNodes());     // to re-filter
+//        clusterNodesTableSorter.setSortingStatus(1, TableSorter.ASCENDING);   // to re-sort
 
 //      maxClusterDistanceSpinner.setEditor(new JSpinner.NumberEditor(maxClusterDistanceSpinner, "0.0######"));
 //      maxClusterDistanceSpinner.setModel(new SpinnerNumberModel(0, 0, 10000, 1));
 //      maxClusterDistanceSlider.setMinimum(0);
 //      maxClusterDistanceSlider.setMaximum(10000);
 
-        similarNodesTableModel.clearData();
-        clustersTableModel.clearData();
+        clearClusterTableModels();
+        
         flowsTableModel.setVisualFlowMap(flowMap);
         flowsTableSorter.setSortingStatus(2, TableSorter.DESCENDING);
+
+//        clusterFilterTableModel.setClusters(flowMap.);
     }
 
     private void updateClusterDistanceSliderSpinner() {
@@ -735,7 +774,7 @@ public class ControlPanel {
         resetClustersButton.setEnabled(getVisualFlowMap().hasClusters());
         resetJoinedEdgesButton.setEnabled(getVisualFlowMap().hasJoinedEdges());
     }
-    
+
     private void initMaxClusterDistanceControls(double val, double max, JSpinner spinner, JSlider slider) {
         Pair<SpinnerModel, BoundedRangeModel> maxClusterDistanceModels =
                 new BoundSpinnerSliderModels<Double>(
@@ -746,10 +785,15 @@ public class ControlPanel {
         slider.setModel(maxClusterDistanceModels.second());
     }
 
-    private void updateClustersTable() {
-        clustersTableModel.setVisualNodes(getVisualFlowMap().getVisualNodes()); // to update list (re-run filtering)
-        clustersTableSorter.fireTableDataChanged();
-        clustersTableSorter.setSortingStatus(1, TableSorter.ASCENDING); // to re-sort
+    private void updateNodeClustersTables() {
+        clusterNodesTableModel.setVisualNodes(getVisualFlowMap().getVisualNodes()); // to update list (re-run filtering)
+        clusterNodesTableSorter.fireTableDataChanged();
+        clusterNodesTableSorter.setSortingStatus(1, TableSorter.ASCENDING); // to re-sort
+
+        clusterDistancesTableModel.setDistances(getVisualFlowMap().getNodeDistanceList());
+        clusterDistancesTableSorter.setSortingStatus(2, TableSorter.ASCENDING);
+
+        clustersTableModel.setClusters(getVisualFlowMap().getVisualNodeClusters());
     }
 
     private void updateNumberOfClustersLabel() {
@@ -1009,9 +1053,9 @@ public class ControlPanel {
         bundleButton = new JButton();
         bundleButton.setText("Bundle");
         panel7.add(bundleButton, cc.xy(1, 1));
-        resetButton = new JButton();
-        resetButton.setText("Reset");
-        panel7.add(resetButton, cc.xy(1, 3));
+        resetBundlingButton = new JButton();
+        resetBundlingButton.setText("Reset");
+        panel7.add(resetBundlingButton, cc.xy(1, 3));
         defaultValuesButton = new JButton();
         defaultValuesButton.setText("Default Values");
         panel7.add(defaultValuesButton, cc.xy(1, 5));
@@ -1039,7 +1083,7 @@ public class ControlPanel {
         edgeValueAffectsAttractionCheckBox.setText("Edge value affects attraction");
         panel7.add(edgeValueAffectsAttractionCheckBox, cc.xy(17, 3));
         final JPanel panel8 = new JPanel();
-        panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(p;75px):noGrow,left:10dlu:noGrow,fill:1px:noGrow,left:10dlu:noGrow,fill:max(p;200px):noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:m:noGrow,top:d:noGrow,center:max(d;6px):noGrow,center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:min(p;200px):grow"));
+        panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:noGrow,left:4dlu:noGrow,fill:max(d;4px):grow,left:4dlu:noGrow,fill:max(p;75px):noGrow,left:10dlu:noGrow,fill:1px:noGrow,left:10dlu:noGrow,fill:max(p;200px):noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:m:noGrow,top:d:noGrow,center:max(d;6px):noGrow,center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:min(p;200px):grow"));
         tabbedPane1.addTab("Node clustering", panel8);
         panel8.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         panel8.add(distanceMeasureCombo, cc.xyw(7, 1, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
@@ -1049,16 +1093,24 @@ public class ControlPanel {
         tabbedPane2 = new JTabbedPane();
         tabbedPane2.setTabPlacement(3);
         panel8.add(tabbedPane2, cc.xywh(15, 1, 1, 14, CellConstraints.DEFAULT, CellConstraints.FILL));
+        final JPanel panel9 = new JPanel();
+        panel9.setLayout(new FormLayout("fill:d:grow", "center:d:grow"));
+        tabbedPane2.addTab("Clusters", panel9);
         final JScrollPane scrollPane2 = new JScrollPane();
-        tabbedPane2.addTab("Clusters", scrollPane2);
+        panel9.add(scrollPane2, cc.xy(1, 1, CellConstraints.DEFAULT, CellConstraints.FILL));
         scrollPane2.setBorder(BorderFactory.createTitledBorder(""));
         clustersTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
         scrollPane2.setViewportView(clustersTable);
         final JScrollPane scrollPane3 = new JScrollPane();
-        tabbedPane2.addTab("Distances", scrollPane3);
+        tabbedPane2.addTab("Nodes", scrollPane3);
         scrollPane3.setBorder(BorderFactory.createTitledBorder(""));
-        similarNodesTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
-        scrollPane3.setViewportView(similarNodesTable);
+        clusterNodesTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
+        scrollPane3.setViewportView(clusterNodesTable);
+        final JScrollPane scrollPane4 = new JScrollPane();
+        tabbedPane2.addTab("Distances", scrollPane4);
+        scrollPane4.setBorder(BorderFactory.createTitledBorder(""));
+        clusterDistancesTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
+        scrollPane4.setViewportView(clusterDistancesTable);
         final JSeparator separator11 = new JSeparator();
         separator11.setOrientation(1);
         panel8.add(separator11, cc.xywh(13, 1, 1, 14, CellConstraints.CENTER, CellConstraints.FILL));
@@ -1119,7 +1171,7 @@ public class ControlPanel {
         combineWithEuclideanClustersCheckBox.setEnabled(true);
         combineWithEuclideanClustersCheckBox.setSelected(true);
         combineWithEuclideanClustersCheckBox.setText("Combine with Euclidean clusters");
-        panel8.add(combineWithEuclideanClustersCheckBox, cc.xy(9, 3));
+        panel8.add(combineWithEuclideanClustersCheckBox, cc.xyw(9, 3, 3));
     }
 
     /**
@@ -1127,5 +1179,11 @@ public class ControlPanel {
      */
     public JComponent $$$getRootComponent$$$() {
         return panel1;
+    }
+
+    private void clearClusterTableModels() {
+        clusterDistancesTableModel.clearData();
+        clusterNodesTableModel.clearData();
+        clustersTableModel.clearData();
     }
 }

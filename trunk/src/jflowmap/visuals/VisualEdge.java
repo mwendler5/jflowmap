@@ -3,9 +3,13 @@ package jflowmap.visuals;
 import java.awt.Color;
 import java.awt.LinearGradientPaint;
 import java.awt.Paint;
+import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.Point2D;
+import java.util.Arrays;
 
 import jflowmap.models.FlowMapParams;
+import jflowmap.util.BSplinePath;
 import jflowmap.util.GeomUtils;
 import jflowmap.util.MinMax;
 
@@ -30,6 +34,8 @@ public abstract class VisualEdge extends PNode {
 
 	private static final float[] DEFAULT_GRADIENT_FRACTIONS = new float[] { 0.0f, 1.0f };
     private static final float MIN_FRACTION_DIFF = 1e-5f;
+
+    private static final double SELF_LOOP_CIRCLE_SIZE = 10;
 
     private static final Color STROKE_HIGHLIGHTED_PAINT = new Color(0, 0, 255, 200);
     private static final Color STROKE_HIGHLIGHTED_INCOMING_PAINT = new Color(255, 0, 0, 200);
@@ -63,6 +69,29 @@ public abstract class VisualEdge extends PNode {
 
         addInputEventListener(visualEdgeListener);
     }
+
+    protected Shape createSelfLoopShape() {
+        Shape shape;
+        final double x1 = sourceNode.getValueX();
+        final double y1 = sourceNode.getValueY();
+        
+//        shape = new Ellipse2D.Double(
+//                x1 - SELF_LOOP_CIRCLE_SIZE/2, y1, 
+//                SELF_LOOP_CIRCLE_SIZE, SELF_LOOP_CIRCLE_SIZE);
+
+        final double size = SELF_LOOP_CIRCLE_SIZE;
+        shape = new BSplinePath(Arrays.asList(new Point2D[] {
+                new Point2D.Double(x1, y1),
+                new Point2D.Double(x1 - size/2, y1 + size/2),
+                new Point2D.Double(x1, y1 + size),
+                new Point2D.Double(x1 + size/2, y1 + size/2),
+                new Point2D.Double(x1, y1)
+        }));
+        
+        
+        return shape;
+    }
+
 
     
     public double getSourceX() {
@@ -133,7 +162,7 @@ public abstract class VisualEdge extends PNode {
     }
 
     public String getLabel() {
-        return sourceNode.getLabel() + " -> " +
+        return sourceNode.getLabel() + "  -->  " +
                targetNode.getLabel();
     }
 
@@ -365,6 +394,5 @@ public abstract class VisualEdge extends PNode {
         }
         return (VisualEdge) parent;
     }
-
 
 }

@@ -17,13 +17,12 @@ import jflowmap.util.GeomUtils;
 import jflowmap.util.Pair;
 import prefuse.data.Graph;
 import prefuse.data.Node;
-import ch.unifr.dmlib.cluster.ClusterNode;
-import ch.unifr.dmlib.cluster.ClusterSetBuilder;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 /**
@@ -31,7 +30,9 @@ import com.google.common.collect.Multimap;
  */
 public class VisualNodeCluster implements Iterable<VisualNode> {
     
-    private static final String LABEL_SEPARATOR = ", ";
+    private static final String JOINED_FLOW_MAP_CLUSTER_ATTR = "visualNodeCluster";
+    private static final String LABEL_SEPARATOR = "; ";
+//    private static final String LABEL_SEPARATOR = "\n ";
     private ClusterTag tag;
     private List<VisualNode> nodes;
     
@@ -42,6 +43,14 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
         updateClusterTags();
     }
     
+    public void setVisible(boolean visible) {
+        if (visible == tag.isVisible()) {
+            return;     // no change
+        }
+        tag = tag.withVisible(visible);
+        updateClusterTags();
+    }
+
     private void updateClusterTags() {
         for (VisualNode node : nodes) {
             node.setClusterTag(tag);
@@ -50,6 +59,15 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
     
     public ClusterTag getTag() {
         return tag;
+    }
+
+    private transient String cachedNodeListAsString;
+    
+    public String getNodeListAsString() {
+        if (cachedNodeListAsString == null) {
+            cachedNodeListAsString = makeCumulatedLabel(this);
+        }
+        return cachedNodeListAsString;
     }
     
     public List<VisualEdge> getIncomingEdges() {
@@ -92,7 +110,7 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
         final int numClusters = nodeClusterLists.size();
         
         Color[] colors = ColorUtils.createCategoryColors(numClusters, .6, 255);
-        List<VisualNodeCluster> nodeClusters = new ArrayList<VisualNodeCluster>(numClusters);
+        List<VisualNodeCluster> nodeClusters = Lists.newArrayListWithExpectedSize(numClusters);
         int cnt = 0;
         for (Collection<VisualNode> nodes : nodeClusterLists) {
             nodeClusters.add(VisualNodeCluster.createFor(cnt + 1, colors[cnt], nodes.iterator()));
@@ -112,17 +130,17 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
             }
         }
 
-        List<List<VisualNode>> newClustersList = new ArrayList<List<VisualNode>>();
+        List<List<VisualNode>> newClustersList = Lists.newArrayList();
         for (Pair<Integer, Integer> key : newClusters.asMap().keySet()) {
             newClustersList.add(ImmutableList.copyOf(newClusters.get(key)));
         }
-        
+
         return newClustersList;
     }
     
     private static Map<VisualNode, Integer> createNodeToClusterIndexMap(
             List<List<VisualNode>> nodeClusterLists) {
-        Map<VisualNode, Integer> map = new HashMap<VisualNode, Integer>();
+        Map<VisualNode, Integer> map = Maps.newHashMap();
         for (int clusterIndex = 0, size = nodeClusterLists.size(); clusterIndex < size; clusterIndex++) {
             for (VisualNode node : nodeClusterLists.get(clusterIndex)) {
                 map.put(node, clusterIndex);
@@ -134,10 +152,11 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
     
     public static Graph createClusteredFlowMap(List<VisualNodeCluster> clusters) {
         FlowMapGraphBuilder builder =
-            new FlowMapGraphBuilder().withCumulativeEdges();
+            new FlowMapGraphBuilder().withCumulativeEdges().addNodeAttr(
+                    JOINED_FLOW_MAP_CLUSTER_ATTR, VisualNodeCluster.class);
         
         // Create (visualNode->cluster node) mapping
-        Map<VisualNode, Node> visualToNode = new HashMap<VisualNode, Node>();
+        Map<VisualNode, Node> visualToNode = Maps.newHashMap();
         for (VisualNodeCluster cluster : clusters) {
             Point2D centroid = GeomUtils.centroid(
                     Iterators.transform(
@@ -145,6 +164,7 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
                     )
             );
             Node node = builder.addNode(centroid, makeCumulatedLabel(cluster));
+            node.set(JOINED_FLOW_MAP_CLUSTER_ATTR, cluster);
             for (VisualNode visualNode : cluster) {
                 visualToNode.put(visualNode, node);  
             }
@@ -180,6 +200,12 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
         return label.toString();
     }
     
-
+    public static VisualNodeCluster getJoinedFlowMapNodeCluster(Node node) {
+        if (!node.canGet(JOINED_FLOW_MAP_CLUSTER_ATTR, VisualNodeCluster.class)) {
+//            throw new IllegalArgumentException("Node " + node + " doesn't have a cluster attr");
+            return null;
+        }
+        return (VisualNodeCluster) node.get(JOINED_FLOW_MAP_CLUSTER_ATTR);
+    }
     
 }

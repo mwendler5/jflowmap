@@ -781,7 +781,7 @@
                   <text value="Bundle"/>
                 </properties>
               </component>
-              <component id="9fc31" class="javax.swing.JButton" binding="resetButton" default-binding="true">
+              <component id="9fc31" class="javax.swing.JButton" binding="resetBundlingButton">
                 <constraints>
                   <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
@@ -892,9 +892,9 @@
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:d:grow"/>
+            <colspec value="fill:d:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="fill:max(d;4px):grow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(p;75px):noGrow"/>
             <colspec value="left:10dlu:noGrow"/>
@@ -937,14 +937,41 @@
                 </properties>
                 <border type="none"/>
                 <children>
-                  <scrollpane id="e4986">
+                  <grid id="247a9" layout-manager="FormLayout">
+                    <rowspec value="center:d:grow"/>
+                    <colspec value="fill:d:grow"/>
                     <constraints>
                       <tabbedpane title="Clusters"/>
                     </constraints>
                     <properties/>
+                    <border type="none"/>
+                    <children>
+                      <scrollpane id="32308">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                          <forms defaultalign-vert="false"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none" title=""/>
+                        <children>
+                          <component id="5aa34" class="javax.swing.JTable" binding="clustersTable" custom-create="true">
+                            <constraints/>
+                            <properties>
+                              <preferredScrollableViewportSize width="450" height="100"/>
+                            </properties>
+                          </component>
+                        </children>
+                      </scrollpane>
+                    </children>
+                  </grid>
+                  <scrollpane id="e4986">
+                    <constraints>
+                      <tabbedpane title="Nodes"/>
+                    </constraints>
+                    <properties/>
                     <border type="none" title=""/>
                     <children>
-                      <component id="5b3e0" class="javax.swing.JTable" binding="clustersTable" custom-create="true">
+                      <component id="5b3e0" class="javax.swing.JTable" binding="clusterNodesTable" custom-create="true">
                         <constraints/>
                         <properties>
                           <preferredScrollableViewportSize width="450" height="100"/>
@@ -959,7 +986,7 @@
                     <properties/>
                     <border type="none" title=""/>
                     <children>
-                      <component id="ef50b" class="javax.swing.JTable" binding="similarNodesTable" custom-create="true">
+                      <component id="ef50b" class="javax.swing.JTable" binding="clusterDistancesTable" custom-create="true">
                         <constraints/>
                         <properties>
                           <preferredScrollableViewportSize width="450" height="100"/>
@@ -1134,7 +1161,7 @@
               </component>
               <component id="36c23" class="javax.swing.JCheckBox" binding="combineWithEuclideanClustersCheckBox">
                 <constraints>
-                  <grid row="2" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="8" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>

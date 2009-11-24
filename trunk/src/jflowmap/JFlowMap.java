@@ -82,10 +82,6 @@ public class JFlowMap extends JComponent {
         return canvas;
     }
 
-    public void resetBundling() {
-        visualFlowMap.resetBundling();
-    }
-
     public Frame getApp() {
         return app;
     }

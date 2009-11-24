@@ -2,6 +2,7 @@ package jflowmap.models;
 
 import java.awt.geom.Point2D;
 import java.util.HashMap;
+import java.util.Map;
 
 import jflowmap.JFlowMap;
 import prefuse.data.Edge;
@@ -27,6 +28,11 @@ public class FlowMapGraphBuilder {
         graph.addColumn(nodeYAttr, double.class);
         graph.addColumn(edgeWeightAttr, double.class);
         graph.addColumn(nodeLabelAttr, String.class);
+    }
+    
+    public FlowMapGraphBuilder addNodeAttr(String name, Class<?> type) {
+        graph.addColumn(name, type);
+        return this;
     }
 
     public FlowMapGraphBuilder withCumulativeEdges() {
