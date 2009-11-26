@@ -22,7 +22,9 @@ public class ForceDirectedBundlerParameters {
     private boolean useRepulsionForOppositeEdges; // for compatible edges going into opposite directions
     private boolean useSimpleCompatibilityMeasure;
     private boolean edgeValueAffectsAttraction;
+    private boolean joinCloseSubdivisionPoints;
     private double repulsionAmount;
+    private double subdivisionPointsCycleIncreaseRate;
     private GraphStats graphStats;
     
     public ForceDirectedBundlerParameters(GraphStats graphStats) {
@@ -31,15 +33,17 @@ public class ForceDirectedBundlerParameters {
     }
     
     public void resetToDefaults() {
-        numCycles = 6;
+        numCycles = 10;
         P = 1;
         MinMax xStats = graphStats.getNodeXStats();
         MinMax yStats = graphStats.getNodeYStats();
 //        MinMax lenStats = graphStats.getEdgeLengthStats();
 //        S = 0.4;
-        S = AxisMarks.ordAlpha(Math.min(xStats.getMax() - xStats.getMin(), yStats.getMax() - yStats.getMin()) / 1000) * 4;
+//        S = AxisMarks.ordAlpha(Math.min(xStats.getMax() - xStats.getMin(), yStats.getMax() - yStats.getMin()) / 1000) * 4;
+        S = AxisMarks.ordAlpha(Math.min(xStats.getMax() - xStats.getMin(), yStats.getMax() - yStats.getMin()) / 100);
 //        S = AxisMarks.ordAlpha(lenStats.getAvg()) * 4 * 1e-3;
-        I = 50;
+//        I = 50;
+        I = 100;
 //        K = 0.1;
         K = AxisMarks.ordAlpha(Math.min(xStats.getMax() - xStats.getMin(), yStats.getMax() - yStats.getMin()) / 1000);
         repulsionAmount = 1.0;
@@ -51,8 +55,19 @@ public class ForceDirectedBundlerParameters {
         useRepulsionForOppositeEdges = false;
         useSimpleCompatibilityMeasure = false;
         edgeValueAffectsAttraction = false;
+        joinCloseSubdivisionPoints = true;
+        subdivisionPointsCycleIncreaseRate = 1.3;
     }
     
+    public double getSubdivisionPointsCycleIncreaseRate() {
+        return subdivisionPointsCycleIncreaseRate;
+    }
+
+    public void setSubdivisionPointsCycleIncreaseRate(
+            double subdivisionPointsCycleIncreaseRate) {
+        this.subdivisionPointsCycleIncreaseRate = subdivisionPointsCycleIncreaseRate;
+    }
+
     public GraphStats getGraphStats() {
         return graphStats;
     }
@@ -61,6 +76,14 @@ public class ForceDirectedBundlerParameters {
         if (useSimpleCompatibilityMeasure  ||  useRepulsionForOppositeEdges) {
             directionAffectsCompatibility = false;
         }
+    }
+    
+    public boolean getJoinCloseSubdivisionPoints() {
+        return joinCloseSubdivisionPoints;
+    }
+    
+    public void setJoinCloseSubdivisionPoints(boolean joinCloseSubdivisionPoints) {
+        this.joinCloseSubdivisionPoints = joinCloseSubdivisionPoints;
     }
     
     public int getNumCycles() {
@@ -206,11 +229,14 @@ public class ForceDirectedBundlerParameters {
             + "useRepulsionForOppositeEdges = " + this.useRepulsionForOppositeEdges + TAB
             + "useSimpleCompatibilityMeasure = " + this.useSimpleCompatibilityMeasure + TAB
             + "edgeValueAffectsAttraction = " + this.edgeValueAffectsAttraction + TAB
+            + "joinCloseSubdivisionPoints = " + this.joinCloseSubdivisionPoints + TAB
             + "repulsionAmount = " + this.repulsionAmount + TAB
-//            + "graphStats = " + this.graphStats + TAB
+            + "subdivisionPointsCycleIncreaseRate = " + this.subdivisionPointsCycleIncreaseRate + TAB
+            + "graphStats = " + this.graphStats + TAB
             + " )";
     
         return retValue;
     }
+    
     
 }

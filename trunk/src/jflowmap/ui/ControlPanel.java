@@ -112,7 +112,7 @@ public class ControlPanel {
     private JTable clusterNodesTable;
     private JTable flowsTable;
     private JComboBox linkageComboBox;
-    private JButton joinEdgesButton;
+    private JButton joinClusterEdgesButton;
     private JButton resetClustersButton;
     private JLabel maxClusterDistanceLabel;
     private JSlider euclideanMaxClusterDistanceSlider;
@@ -123,6 +123,7 @@ public class ControlPanel {
     private JLabel numberOfClustersLabel;
     private JButton resetJoinedEdgesButton;
     private JTable clustersTable;
+    private JCheckBox aggregateEdgesCheckBox;
     private final JFlowMap jFlowMap;
     private boolean initializing;
     private ForceDirectedBundlerParameters fdBundlingParams;
@@ -167,7 +168,7 @@ public class ControlPanel {
         initModels();
         setData(visualFlowMap.getParams());
     }
-    
+
     private void updateRepulsionSpinner() {
         repulsionSpinner.setEnabled(repulsiveEdgesCheckBox.isSelected());
     }
@@ -206,13 +207,14 @@ public class ControlPanel {
     }
 
     public void initEdgeBundlingModels() {
-        numberOfCyclesSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getNumCycles(), 1, 10, 1));
+        numberOfCyclesSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getNumCycles(), 1, 100, 1));
         stepsInCycleSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getI(), 1, 1000, 1));
         edgeCompatibilityThresholdSpinner.setModel(new SpinnerNumberModel(fdBundlingParams.getEdgeCompatibilityThreshold(), 0.0, 1.0, 0.1));
 
         double s = fdBundlingParams.getS();
         double sExp = AxisMarks.ordAlpha(s);
-        double sStep = sExp / 100;
+        double sStep = sExp;
+//        double sStep = sExp / 100;
         double sMax = sExp * 100;
         stepSizeSpinner.setModel(new SpinnerNumberModel(s, 0.0, sMax, sStep));
 
@@ -490,6 +492,11 @@ public class ControlPanel {
                 getVisualFlowMap().resetBundling();
             }
         });
+//        aggregateBundledEdgesButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                getVisualFlowMap().aggregateBundledEdges();
+//            }
+//        });
         defaultValuesButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 fdBundlingParams.resetToDefaults();
@@ -524,9 +531,9 @@ public class ControlPanel {
                 updateNodeClustersTables();
             }
         });
-        joinEdgesButton.addActionListener(new ActionListener() {
+        joinClusterEdgesButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                getVisualFlowMap().joinEdgesToClusters();
+                getVisualFlowMap().joinClusterEdges();
                 updateClusterButtons();
                 updateNumberOfClustersLabel();
             }
@@ -574,9 +581,9 @@ public class ControlPanel {
         jFlowMap.fitFlowMapInView();
         loadVisualFlowMap(visualFlowMap);
     }
-    
-    private List<PropertyChangeListener> visualFlowMapListeners = 
-        new ArrayList<PropertyChangeListener>();
+
+    private List<PropertyChangeListener> visualFlowMapListeners =
+            new ArrayList<PropertyChangeListener>();
 
     private void attachVisualFlowMapListeners(VisualFlowMap visualFlowMap) {
         PropertyChangeListener selectionListener = new PropertyChangeListener() {
@@ -603,7 +610,7 @@ public class ControlPanel {
         }
         visualFlowMapListeners.clear();
     }
-    
+
     public FlowMapParams getFlowMapModel() {
         return getVisualFlowMap().getParams();
     }
@@ -750,7 +757,7 @@ public class ControlPanel {
 //      maxClusterDistanceSlider.setMaximum(10000);
 
         clearClusterTableModels();
-        
+
         flowsTableModel.setVisualFlowMap(flowMap);
         flowsTableSorter.setSortingStatus(2, TableSorter.DESCENDING);
 
@@ -770,7 +777,7 @@ public class ControlPanel {
     }
 
     private void updateClusterButtons() {
-        joinEdgesButton.setEnabled(getVisualFlowMap().hasClusters());
+        joinClusterEdgesButton.setEnabled(getVisualFlowMap().hasClusters());
         resetClustersButton.setEnabled(getVisualFlowMap().hasClusters());
         resetJoinedEdgesButton.setEnabled(getVisualFlowMap().hasJoinedEdges());
     }
@@ -809,6 +816,12 @@ public class ControlPanel {
         numberOfClustersLabel.setEnabled(enabled);
         numberOfClustersValueLabel.setEnabled(enabled);
         numberOfClustersValueLabel.setText(text);
+    }
+
+    private void clearClusterTableModels() {
+        clusterDistancesTableModel.clearData();
+        clusterNodesTableModel.clearData();
+        clustersTableModel.clearData();
     }
 
     /**
@@ -1005,12 +1018,12 @@ public class ControlPanel {
         edgeMarkerOpacityLabel.setText("Direction marker opacity:");
         panel6.add(edgeMarkerOpacityLabel, cc.xy(10, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         final JPanel panel7 = new JPanel();
-        panel7.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:12dlu:noGrow,fill:p:noGrow,fill:d:noGrow,left:d:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:25px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        panel7.setLayout(new FormLayout("fill:d:noGrow,left:6dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:p:noGrow,left:4dlu:noGrow,fill:12px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:p:noGrow,left:12dlu:noGrow,fill:p:noGrow,fill:d:noGrow,left:d:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:25px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Edge bundling", panel7);
         panel7.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
         final JSeparator separator8 = new JSeparator();
         separator8.setOrientation(1);
-        panel7.add(separator8, cc.xywh(9, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        panel7.add(separator8, cc.xywh(9, 1, 1, 8, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label13 = new JLabel();
         label13.setHorizontalAlignment(4);
         label13.setText("Step damping factor:");
@@ -1031,7 +1044,7 @@ public class ControlPanel {
         panel7.add(edgeStiffnessSpinner, cc.xy(7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JSeparator separator9 = new JSeparator();
         separator9.setOrientation(1);
-        panel7.add(separator9, cc.xywh(14, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        panel7.add(separator9, cc.xywh(14, 1, 1, 8, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label16 = new JLabel();
         label16.setHorizontalAlignment(4);
         label16.setText("Number of cycles:");
@@ -1061,27 +1074,32 @@ public class ControlPanel {
         panel7.add(defaultValuesButton, cc.xy(1, 5));
         final JSeparator separator10 = new JSeparator();
         separator10.setOrientation(1);
-        panel7.add(separator10, cc.xywh(3, 1, 1, 7, CellConstraints.CENTER, CellConstraints.FILL));
+        panel7.add(separator10, cc.xywh(3, 1, 1, 8, CellConstraints.CENTER, CellConstraints.FILL));
         repulsiveEdgesCheckBox = new JCheckBox();
         repulsiveEdgesCheckBox.setText("Repulsion:");
-        panel7.add(repulsiveEdgesCheckBox, cc.xy(5, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        panel7.add(repulsiveEdgesCheckBox, cc.xy(5, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         repulsionSpinner = new JSpinner();
-        panel7.add(repulsionSpinner, cc.xy(7, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
-        binaryCompatibilityCheckBox = new JCheckBox();
-        binaryCompatibilityCheckBox.setText("Binary compatibility");
-        panel7.add(binaryCompatibilityCheckBox, cc.xy(17, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        simpleCompatibilityMeasureCheckBox = new JCheckBox();
-        simpleCompatibilityMeasureCheckBox.setText("Simple compatibility measure");
-        panel7.add(simpleCompatibilityMeasureCheckBox, cc.xy(17, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        panel7.add(repulsionSpinner, cc.xy(7, 8, CellConstraints.FILL, CellConstraints.DEFAULT));
         inverseQuadraticModelCheckBox = new JCheckBox();
         inverseQuadraticModelCheckBox.setText("Inverse-quadratic model");
-        panel7.add(inverseQuadraticModelCheckBox, cc.xyw(11, 7, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        directionAffectsCompatibilityCheckBox = new JCheckBox();
-        directionAffectsCompatibilityCheckBox.setText("Direction affects compatibility");
-        panel7.add(directionAffectsCompatibilityCheckBox, cc.xy(17, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        panel7.add(inverseQuadraticModelCheckBox, cc.xyw(11, 8, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        final JSeparator separator11 = new JSeparator();
+        panel7.add(separator11, cc.xyw(1, 7, 2, CellConstraints.FILL, CellConstraints.FILL));
+        binaryCompatibilityCheckBox = new JCheckBox();
+        binaryCompatibilityCheckBox.setText("Binary compatibility");
+        panel7.add(binaryCompatibilityCheckBox, cc.xy(17, 10, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        simpleCompatibilityMeasureCheckBox = new JCheckBox();
+        simpleCompatibilityMeasureCheckBox.setText("Simple compatibility measure");
+        panel7.add(simpleCompatibilityMeasureCheckBox, cc.xy(17, 8, CellConstraints.LEFT, CellConstraints.DEFAULT));
         edgeValueAffectsAttractionCheckBox = new JCheckBox();
         edgeValueAffectsAttractionCheckBox.setText("Edge value affects attraction");
-        panel7.add(edgeValueAffectsAttractionCheckBox, cc.xy(17, 3));
+        panel7.add(edgeValueAffectsAttractionCheckBox, cc.xy(17, 5));
+        directionAffectsCompatibilityCheckBox = new JCheckBox();
+        directionAffectsCompatibilityCheckBox.setText("Direction affects compatibility");
+        panel7.add(directionAffectsCompatibilityCheckBox, cc.xy(17, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        aggregateEdgesCheckBox = new JCheckBox();
+        aggregateEdgesCheckBox.setText("Aggregate edges");
+        panel7.add(aggregateEdgesCheckBox, cc.xy(17, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JPanel panel8 = new JPanel();
         panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:noGrow,left:4dlu:noGrow,fill:max(d;4px):grow,left:4dlu:noGrow,fill:max(p;75px):noGrow,left:10dlu:noGrow,fill:1px:noGrow,left:10dlu:noGrow,fill:max(p;200px):noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:m:noGrow,top:d:noGrow,center:max(d;6px):noGrow,center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:min(p;200px):grow"));
         tabbedPane1.addTab("Node clustering", panel8);
@@ -1111,9 +1129,9 @@ public class ControlPanel {
         scrollPane4.setBorder(BorderFactory.createTitledBorder(""));
         clusterDistancesTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
         scrollPane4.setViewportView(clusterDistancesTable);
-        final JSeparator separator11 = new JSeparator();
-        separator11.setOrientation(1);
-        panel8.add(separator11, cc.xywh(13, 1, 1, 14, CellConstraints.CENTER, CellConstraints.FILL));
+        final JSeparator separator12 = new JSeparator();
+        separator12.setOrientation(1);
+        panel8.add(separator12, cc.xywh(13, 1, 1, 14, CellConstraints.CENTER, CellConstraints.FILL));
         final JLabel label20 = new JLabel();
         label20.setText("Linkage:");
         panel8.add(label20, cc.xy(5, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
@@ -1138,14 +1156,14 @@ public class ControlPanel {
         maxClusterDistanceLabel.setEnabled(false);
         maxClusterDistanceLabel.setText("Max cluster distance:");
         panel8.add(maxClusterDistanceLabel, cc.xy(5, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        final JSeparator separator12 = new JSeparator();
-        separator12.setOrientation(1);
-        panel8.add(separator12, cc.xywh(3, 1, 1, 4, CellConstraints.FILL, CellConstraints.FILL));
+        final JSeparator separator13 = new JSeparator();
+        separator13.setOrientation(1);
+        panel8.add(separator13, cc.xywh(3, 1, 1, 4, CellConstraints.FILL, CellConstraints.FILL));
         clusterButton = new JButton();
         clusterButton.setText("Cluster");
         panel8.add(clusterButton, cc.xy(1, 1));
-        final JSeparator separator13 = new JSeparator();
-        panel8.add(separator13, cc.xyw(1, 5, 12, CellConstraints.FILL, CellConstraints.FILL));
+        final JSeparator separator14 = new JSeparator();
+        panel8.add(separator14, cc.xyw(1, 5, 12, CellConstraints.FILL, CellConstraints.FILL));
         numberOfClustersLabel = new JLabel();
         numberOfClustersLabel.setEnabled(false);
         numberOfClustersLabel.setText("Number of clusters:");
@@ -1153,10 +1171,10 @@ public class ControlPanel {
         numberOfClustersValueLabel = new JLabel();
         numberOfClustersValueLabel.setText("");
         panel8.add(numberOfClustersValueLabel, cc.xy(7, 12));
-        joinEdgesButton = new JButton();
-        joinEdgesButton.setEnabled(true);
-        joinEdgesButton.setText("Join edges");
-        panel8.add(joinEdgesButton, cc.xy(1, 8));
+        joinClusterEdgesButton = new JButton();
+        joinClusterEdgesButton.setEnabled(true);
+        joinClusterEdgesButton.setText("Join edges");
+        panel8.add(joinClusterEdgesButton, cc.xy(1, 8));
         resetClustersButton = new JButton();
         resetClustersButton.setEnabled(true);
         resetClustersButton.setText("Reset");
@@ -1164,9 +1182,9 @@ public class ControlPanel {
         resetJoinedEdgesButton = new JButton();
         resetJoinedEdgesButton.setText("Reset");
         panel8.add(resetJoinedEdgesButton, cc.xy(1, 10));
-        final JSeparator separator14 = new JSeparator();
-        separator14.setOrientation(1);
-        panel8.add(separator14, cc.xywh(3, 7, 1, 7, CellConstraints.FILL, CellConstraints.FILL));
+        final JSeparator separator15 = new JSeparator();
+        separator15.setOrientation(1);
+        panel8.add(separator15, cc.xywh(3, 7, 1, 7, CellConstraints.FILL, CellConstraints.FILL));
         combineWithEuclideanClustersCheckBox = new JCheckBox();
         combineWithEuclideanClustersCheckBox.setEnabled(true);
         combineWithEuclideanClustersCheckBox.setSelected(true);
@@ -1179,11 +1197,5 @@ public class ControlPanel {
      */
     public JComponent $$$getRootComponent$$$() {
         return panel1;
-    }
-
-    private void clearClusterTableModels() {
-        clusterDistancesTableModel.clearData();
-        clusterNodesTableModel.clearData();
-        clustersTableModel.clearData();
     }
 }

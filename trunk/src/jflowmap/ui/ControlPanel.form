@@ -624,10 +624,13 @@
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:d:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:12px:noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <colspec value="fill:d:noGrow"/>
+            <colspec value="left:6dlu:noGrow"/>
+            <colspec value="fill:p:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:p:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
@@ -652,7 +655,7 @@
             <children>
               <component id="b27ba" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="8" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="8" row-span="8" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -714,7 +717,7 @@
               </component>
               <component id="bdf4c" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="13" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="13" row-span="8" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -801,7 +804,7 @@
               </component>
               <component id="4298" class="javax.swing.JSeparator">
                 <constraints>
-                  <grid row="0" column="2" row-span="7" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="2" row-span="8" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
@@ -810,7 +813,7 @@
               </component>
               <component id="a30d2" class="javax.swing.JCheckBox" binding="repulsiveEdgesCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="7" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -819,14 +822,30 @@
               </component>
               <component id="e3e63" class="javax.swing.JSpinner" binding="repulsionSpinner">
                 <constraints>
-                  <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="7" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="7954a" class="javax.swing.JCheckBox" binding="inverseQuadraticModelCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="7" column="10" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Inverse-quadratic model"/>
+                </properties>
+              </component>
+              <component id="afaa1" class="javax.swing.JSeparator">
+                <constraints>
+                  <grid row="6" column="0" row-span="1" col-span="2" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties/>
               </component>
               <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="6" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="9" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -835,38 +854,38 @@
               </component>
               <component id="83fa4" class="javax.swing.JCheckBox" binding="simpleCompatibilityMeasureCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="4" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="7" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="Simple compatibility measure"/>
                 </properties>
               </component>
-              <component id="7954a" class="javax.swing.JCheckBox" binding="inverseQuadraticModelCheckBox" default-binding="true">
+              <component id="26269" class="javax.swing.JCheckBox" binding="edgeValueAffectsAttractionCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="6" column="10" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
+                  <grid row="4" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
                 </constraints>
                 <properties>
-                  <text value="Inverse-quadratic model"/>
+                  <text value="Edge value affects attraction"/>
                 </properties>
               </component>
               <component id="500e9" class="javax.swing.JCheckBox" binding="directionAffectsCompatibilityCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="0" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="Direction affects compatibility"/>
                 </properties>
               </component>
-              <component id="26269" class="javax.swing.JCheckBox" binding="edgeValueAffectsAttractionCheckBox" default-binding="true">
+              <component id="8525" class="javax.swing.JCheckBox" binding="aggregateEdgesCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="2" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="0" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <text value="Edge value affects attraction"/>
+                  <text value="Aggregate edges"/>
                 </properties>
               </component>
             </children>
@@ -1121,7 +1140,7 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="f578c" class="javax.swing.JButton" binding="joinEdgesButton" default-binding="true">
+              <component id="f578c" class="javax.swing.JButton" binding="joinClusterEdgesButton">
                 <constraints>
                   <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>

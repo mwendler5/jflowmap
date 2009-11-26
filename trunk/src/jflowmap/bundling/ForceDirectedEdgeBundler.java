@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import jflowmap.aggregation.AggregatedEdges;
 import jflowmap.util.GeomUtils;
 import jflowmap.util.Vector2D;
 
@@ -42,7 +43,8 @@ public class ForceDirectedEdgeBundler {
     private int numEdges;
     private int cycle;
 
-    private int P;      // number of subdivision points (will double with every cycle)
+    private int P;      // number of subdivision points (will increase with every cycle)
+    private double Pdouble; // used to keep the double value to keep the stable increase rate 
     private double S;   // step size
     private int I;      // number of iteration steps performed during a cycle
     
@@ -75,7 +77,12 @@ public class ForceDirectedEdgeBundler {
         }
         return points;
     }
+
+    public AggregatedEdges getAggregatedEdges() {
+        return AggregatedEdges.createFrom(getEdgePoints());
+    }
     
+
     public void bundle(ProgressTracker pt) {
         logger.info("FDE bundling started with the following parameters: " + params);
         pt.startTask("Initializing", .05);
@@ -138,8 +145,8 @@ public class ForceDirectedEdgeBundler {
 
         this.I = params.getI();
         this.P = params.getP();
+        this.Pdouble = this.P;
         this.S = params.getS();
-//        this.S = 1e-6;
         
         calcEdgeCompatibilityMeasures();
         
@@ -311,13 +318,18 @@ public class ForceDirectedEdgeBundler {
 
     public void nextCycle() {
         logger.info("FDE bundling cycle " + (cycle + 1));
+        
+        double Pdouble = this.Pdouble;
         int P = this.P;
         double S = this.S;
         int I = this.I;
         
+        
         // Set parameters for the next cycle
         if (cycle > 0) {
-            P *= 2;
+//            P *= 2;
+            Pdouble *= params.getSubdivisionPointsCycleIncreaseRate();
+            P = (int)Math.round(Pdouble);
             S *= (1.0 - params.getStepDampingFactor());
             I = (I * 2) / 3;
         }
@@ -332,6 +344,7 @@ public class ForceDirectedEdgeBundler {
         // Perform simulation steps
         
         Point2D.Double[][] tmpEdgePoints = new Point2D.Double[numEdges][P];
+//        Point2D.Double[][] tmpEdgePoints = edgePoints;
         
         for (int step = 0; step < I; step++) {
             if (progressTracker.isCancelled()) {
@@ -359,15 +372,15 @@ public class ForceDirectedEdgeBundler {
                     Point2D p_i = p[i];
                     Point2D p_prev = (i == 0 ? edgeStarts[pe] : p[i - 1]);
                     Point2D p_next = (i == P - 1 ? edgeEnds[pe] : p[i + 1]);
-                    double Fsi_x = p_prev.getX() - p_i.getX() + p_next.getX() - p_i.getX();
-                    double Fsi_y = p_prev.getY() - p_i.getY() + p_next.getY() - p_i.getY();
+                    double Fsi_x = (p_prev.getX() - p_i.getX()) + (p_next.getX() - p_i.getX());
+                    double Fsi_y = (p_prev.getY() - p_i.getY()) + (p_next.getY() - p_i.getY());
                     
                     if (Math.abs(k_p) < 1.0) {
                         Fsi_x *= k_p;
                         Fsi_y *= k_p; 
                     }
 
-                    // attracting electrostatic forces (for each other edge)
+                    // attracting electrostatic forces (for each other compatible edge)
                     double Fei_x = 0;
                     double Fei_y = 0;
                     for (int ci = 0, size = compatible.size(); ci < size; ci++) {
@@ -411,6 +424,7 @@ public class ForceDirectedEdgeBundler {
 
                     double Fpi_x = Fsi_x + Fei_x;
                     double Fpi_y = Fsi_y + Fei_y;
+
                     Point2D.Double np = newP[i];
                     if (np == null) {
                         np = new Point2D.Double(p[i].getX(), p[i].getY());
@@ -427,6 +441,7 @@ public class ForceDirectedEdgeBundler {
         if (!progressTracker.isCancelled()) {
             // update params only in case of success (i.e. no exception)
             this.P = P;
+            this.Pdouble = Pdouble;
             this.S = S;
             this.I = I;
             
@@ -435,6 +450,15 @@ public class ForceDirectedEdgeBundler {
     }
 
     private void addSubdivisionPoints(int P) {
+        int prevP;
+        if (edgePoints == null  ||  edgePoints.length == 0) {
+            prevP = 0;
+        } else {
+            prevP = edgePoints[0].length;
+        }
+
+        logger.debug("Adding subdivision points: " + prevP + " -> " + P);
+        
         // bigger array for subdivision points of the next cycle
         Point2D.Double[][] newEdgePoints = new Point2D.Double[numEdges][P];
 
@@ -452,7 +476,7 @@ public class ForceDirectedEdgeBundler {
                 points.add(0, edgeStarts[i]);
                 points.add(edgeEnds[i]);
                 
-                final int prevP = edgePoints[i].length;
+//                final int prevP = edgePoints[i].length;
                 
                 double polylineLen = 0;
                 double[] segmentLen = new double[prevP + 1];

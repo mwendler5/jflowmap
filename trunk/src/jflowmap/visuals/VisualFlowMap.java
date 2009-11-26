@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import jflowmap.JFlowMap;
+import jflowmap.aggregation.AggregatedEdges;
 import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.bundling.ForceDirectedEdgeBundler;
 import jflowmap.clustering.NodeDistanceMeasure;
@@ -28,7 +29,6 @@ import org.apache.log4j.Logger;
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
-import sun.swing.SwingUtilities2;
 import at.fhj.utils.misc.ProgressTracker;
 import at.fhj.utils.misc.TaskCompletionListener;
 import at.fhj.utils.swing.ProgressDialog;
@@ -39,6 +39,9 @@ import ch.unifr.dmlib.cluster.ClusterVisitorAdapter;
 import ch.unifr.dmlib.cluster.HierarchicalClusterer;
 import ch.unifr.dmlib.cluster.Linkage;
 import ch.unifr.dmlib.cluster.HierarchicalClusterer.DistanceMatrix;
+
+import com.google.common.collect.Maps;
+
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -77,9 +80,11 @@ public class VisualFlowMap extends PNode {
     private double clusterDistanceThreshold;
     private double euclideanClusterDistanceThreshold;
     private List<VisualNodeCluster> visualNodeClusters;
+    private Map<VisualNode, VisualNodeCluster> nodesToClusters;
     private VisualAreaMap areaMap;
     private double euclideanMaxNodeDistance;
     // endOf clustering fields
+    private boolean bundled;
 
     public VisualFlowMap(JFlowMap jFlowMap, Graph graph, GraphStats stats,
     		FlowMapParams model) {
@@ -108,6 +113,11 @@ public class VisualFlowMap extends PNode {
 //        fitInCameraView();
 //        fitInCameraView(false);
     }
+    
+    public boolean isBundled() {
+        return bundled;
+    }
+
     
     private void createNodes() {
         nodeLayer.removeAllChildren();
@@ -425,7 +435,7 @@ public class VisualFlowMap extends PNode {
 
     private void updateEdgeVisibility() {
         for (VisualEdge ve : visualEdges) {
-            ve.updateVisibiliy();
+            ve.updateVisibility();
         }
 //        for (VisualNode vn : visualNodes) {
 //            vn.updatePickability();
@@ -449,18 +459,32 @@ public class VisualFlowMap extends PNode {
     }
     
     public void resetBundling() {
+        bundled = false;
         createEdges();
         repaint();
     }
 
     public void bundleEdges(ForceDirectedBundlerParameters bundlerParams) {
-        ProgressTracker pt = new ProgressTracker();
+        final ProgressTracker pt = new ProgressTracker();
         final ForceDirectedEdgeBundler bundler =
                 new ForceDirectedEdgeBundler(graph, 
                         params.getXNodeAttr(), params.getYNodeAttr(), 
                         params.getEdgeWeightAttr(), 
                         bundlerParams);
-        EdgeBundlerWorker worker = new EdgeBundlerWorker(pt, bundler);
+        ProgressWorker worker = new ProgressWorker(pt) {
+            @Override
+            public Object construct() {
+                try {
+                    bundler.bundle(getProgressTracker());
+                } catch (Throwable th) {
+                    logger.error("Bundling error", th);
+                    JOptionPane.showMessageDialog(jFlowMap,
+                            "Bundling error: [" + th.getClass().getSimpleName()+ "] " + th.getMessage()
+                    );
+                }
+                return null;
+            }
+        };
         ProgressDialog dialog = new ProgressDialog(jFlowMap.getApp(), "Edge Bundling", worker, true);
         pt.addProgressListener(dialog);
         pt.addTaskCompletionListener(new TaskCompletionListener() {
@@ -468,6 +492,7 @@ public class VisualFlowMap extends PNode {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         createEdges(bundler.getEdgePoints(), false);
+                        bundled = true;
                         repaint();
                     }
                 });
@@ -476,29 +501,15 @@ public class VisualFlowMap extends PNode {
         worker.start();
         dialog.setVisible(true);
     }
-    
-    private class EdgeBundlerWorker extends ProgressWorker {
 
-        private final ForceDirectedEdgeBundler bundler;
-
-        public EdgeBundlerWorker(ProgressTracker progress, ForceDirectedEdgeBundler bundler) {
-            super(progress);
-            this.bundler = bundler;
-        }
-
-        @Override
-        public Object construct() {
-            try {
-                bundler.bundle(getProgressTracker());
-            } catch (Throwable th) {
-                logger.error("Bundling error", th);
-                JOptionPane.showMessageDialog(jFlowMap,
-                        "Bundling error: [" + th.getClass().getSimpleName()+ "] " + th.getMessage()
-                );
-            }
-            return null;
-        }
-    }
+//    public void aggregateBundledEdges() {
+//        if (!isBundled()) {
+//            return;
+//        }
+////        final ProgressTracker pt = new ProgressTracker();
+////        AggregatedEdges agg = new AggregatedEdges();
+////        agg.aggregate();
+//    }
 
     public ClusterNode<VisualNode> getRootCluster() {
         return rootCluster;
@@ -548,6 +559,10 @@ public class VisualFlowMap extends PNode {
     public boolean hasJoinedEdges() {
         return flowMapBeforeJoining != null;        
     }
+    
+    public VisualNodeCluster getNodeCluster(VisualNode node) {
+        return nodesToClusters.get(node);
+    }
 
     public void updateClusters() {
         removeClusterTags();  // to remove cluster tags for those nodes which were excluded from clustering
@@ -567,6 +582,13 @@ public class VisualFlowMap extends PNode {
             clusters = VisualNodeCluster.createClusters(nodeClusterLists, clusterDistanceThreshold);
         }
         this.visualNodeClusters = clusters;
+        
+        this.nodesToClusters = Maps.newHashMap();
+        for (VisualNodeCluster cluster : clusters) {
+            for (VisualNode node : cluster) {
+                nodesToClusters.put(node, cluster);
+            }
+        }
     }
     
     public List<VisualNodeCluster> getVisualNodeClusters() {
@@ -639,7 +661,7 @@ public class VisualFlowMap extends PNode {
         this.flowMapBeforeJoining = originalVisualFlowMap;
     }
 
-    public void joinEdgesToClusters() {
+    public void joinClusterEdges() {
 //        for (VisualNodeCluster cluster : visualNodeClusters) {
 //            Point2D centroid = GeomUtils.centroid(
 //                    Iterators.transform(
@@ -693,6 +715,7 @@ public class VisualFlowMap extends PNode {
             }
             cluster.setVisible(visible);
         }
+        updateEdgeVisibility();
     }
 
 }

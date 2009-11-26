@@ -79,7 +79,13 @@ public abstract class VisualEdge extends PNode {
 //                x1 - SELF_LOOP_CIRCLE_SIZE/2, y1, 
 //                SELF_LOOP_CIRCLE_SIZE, SELF_LOOP_CIRCLE_SIZE);
 
-        final double size = SELF_LOOP_CIRCLE_SIZE;
+//        final double size = SELF_LOOP_CIRCLE_SIZE;
+        final double size = visualFlowMap.getGraphStats().getEdgeLengthStats().getAvg() / 5;
+//        MinMax xstats = visualFlowMap.getGraphStats().getNodeXStats();
+//        MinMax ystats = visualFlowMap.getGraphStats().getNodeYStats();
+//        
+//        final double xsize = (xstats.getMax() - xstats.getMin()) / 20;
+//        final double ysize = (ystats.getMax() - ystats.getMin()) / 20;
         shape = new BSplinePath(Arrays.asList(new Point2D[] {
                 new Point2D.Double(x1, y1),
                 new Point2D.Double(x1 - size/2, y1 + size/2),
@@ -131,7 +137,7 @@ public abstract class VisualEdge extends PNode {
 
 //    public abstract void updateEdgeMarkerColors();
 
-    public void updateVisibiliy() {
+    public void updateVisibility() {
         final FlowMapParams model = visualFlowMap.getParams();
         double weightFilterMin = model.getEdgeWeightFilterMin();
         double weightFilterMax = model.getEdgeWeightFilterMax();
@@ -140,14 +146,22 @@ public abstract class VisualEdge extends PNode {
         double edgeLengthFilterMax = model.getEdgeLengthFilterMax();
         final double weight = getEdgeWeight();
         double length = getEdgeLength();
-        final boolean visible =
+        
+        boolean visible =
                 weightFilterMin <= weight && weight <= weightFilterMax    &&
                 edgeLengthFilterMin <= length && length <= edgeLengthFilterMax
         ;
-//        System.out.println(this + "  " + visible  + 
-//        		"  weight filter:[" + weightFilterMin + "-" + weightFilterMax + "] value = " + weight + "; " +
-//        		"  length filter:[" + edgeLengthFilterMin + "-" + edgeLengthFilterMax + "] value = " + length
-//        );
+
+        if (visible) {
+            if (visualFlowMap.hasClusters()) {
+                VisualNodeCluster srcCluster = visualFlowMap.getNodeCluster(getSourceNode());
+                VisualNodeCluster targetCluster = visualFlowMap.getNodeCluster(getTargetNode());
+                
+                // TODO: why do we need these null checks here?
+                visible = (srcCluster == null  ||  srcCluster.getTag().isVisible())  ||  
+                          (targetCluster == null  ||  targetCluster.getTag().isVisible());
+            }
+        }
         setVisible(visible);
         setPickable(visible);
         setChildrenPickable(visible);
@@ -360,7 +374,7 @@ public abstract class VisualEdge extends PNode {
         updateEdgeColors();
 //        updateEdgeMarkerColors();
         updateEdgeWidth();
-        updateVisibiliy();
+        updateVisibility();
     }
 
     private static final PInputEventListener visualEdgeListener = new PBasicInputEventHandler() {
