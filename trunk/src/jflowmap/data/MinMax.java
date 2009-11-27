@@ -1,4 +1,4 @@
-package jflowmap.util;
+package jflowmap.data;
 
 import java.util.Iterator;
 

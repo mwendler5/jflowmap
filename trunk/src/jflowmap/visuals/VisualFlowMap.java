@@ -16,13 +16,13 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import jflowmap.JFlowMap;
-import jflowmap.aggregation.AggregatedEdges;
 import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.bundling.ForceDirectedEdgeBundler;
 import jflowmap.clustering.NodeDistanceMeasure;
+import jflowmap.data.GraphStats;
+import jflowmap.data.MinMax;
+import jflowmap.geom.Point;
 import jflowmap.models.FlowMapParams;
-import jflowmap.util.GraphStats;
-import jflowmap.util.MinMax;
 
 import org.apache.log4j.Logger;
 
@@ -178,7 +178,7 @@ public class VisualFlowMap extends PNode {
         }
     }
     
-    private void createEdges(Point2D[][] edgeSplinePoints, boolean showPoints) {
+    private void createEdges(Point[][] edgeSplinePoints, boolean showPoints) {
         edgeLayer.removeAllChildren();
         
 //      for (int i = 0; i < graph.getEdgeTable().getColumnCount(); i++) {

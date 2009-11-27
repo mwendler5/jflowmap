@@ -3,7 +3,7 @@ package jflowmap.clustering;
 import java.util.ArrayList;
 import java.util.List;
 
-import jflowmap.util.GeomUtils;
+import jflowmap.geom.GeomUtils;
 import jflowmap.visuals.VisualEdge;
 import jflowmap.visuals.VisualNode;
 import ch.unifr.dmlib.cluster.DistanceMeasure;

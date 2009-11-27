@@ -4,10 +4,10 @@ import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
 import java.util.Arrays;
 
-import jflowmap.util.BSplinePath;
+import jflowmap.geom.BSplinePath;
+import jflowmap.geom.Point;
 import prefuse.data.Edge;
 import edu.umd.cs.piccolo.nodes.PPath;
 
@@ -21,16 +21,16 @@ public class BSplineVisualEdge extends VisualEdge {
     private static final long serialVersionUID = 1L;
     
     public BSplineVisualEdge(VisualFlowMap visualFlowMap, Edge edge,
-            VisualNode sourceNode, VisualNode targetNode, Point2D[] points,
+            VisualNode sourceNode, VisualNode targetNode, Point[] points,
             boolean showSplinePoints) {
         super(visualFlowMap, edge, sourceNode, targetNode);
 
-        Point2D start = points[0];
-        Point2D end = points[points.length - 1];
-        assert(start.getX() == sourceNode.getValueX());
-        assert(start.getY() == sourceNode.getValueY());
-        assert(end.getX() == targetNode.getValueX());
-        assert(end.getY() == targetNode.getValueY());
+        Point start = points[0];
+        Point end = points[points.length - 1];
+        assert(start.x() == sourceNode.getValueX());
+        assert(start.y() == sourceNode.getValueY());
+        assert(end.x() == targetNode.getValueX());
+        assert(end.y() == targetNode.getValueY());
         
         Shape shape;
         if (isSelfLoop()) {
@@ -39,9 +39,9 @@ public class BSplineVisualEdge extends VisualEdge {
             Path2D path;
             if (points.length < 4) {
                 path = new Path2D.Double();
-                path.moveTo(points[0].getX(), points[0].getY());
+                path.moveTo(points[0].x(), points[0].y());
                 for (int i = 1; i < points.length; i++) {
-                    path.lineTo(points[i].getX(), points[i].getY());
+                    path.lineTo(points[i].x(), points[i].y());
                 }
             } else {
                 path = new BSplinePath(Arrays.asList(points));
@@ -50,8 +50,8 @@ public class BSplineVisualEdge extends VisualEdge {
             // add spline points
             if (showSplinePoints) {
                 int cnt = 0;
-                for (Point2D p : points) {
-                    PPath ell = new PPath(new Ellipse2D.Double(p.getX()-.2, p.getY()-.2, .4, .4));
+                for (Point p : points) {
+                    PPath ell = new PPath(new Ellipse2D.Double(p.x()-.2, p.y()-.2, .4, .4));
                     ell.setStrokePaint(DOT_COLOR);
                     ell.setPaint(DOT_COLOR);
                     ell.moveToFront();

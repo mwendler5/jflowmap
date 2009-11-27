@@ -1,6 +1,7 @@
-package jflowmap.util;
+package jflowmap.data;
 
 import java.util.Iterator;
+
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;

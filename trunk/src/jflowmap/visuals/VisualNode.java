@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import jflowmap.util.GeomUtils;
+import jflowmap.geom.GeomUtils;
 
 import org.apache.log4j.Logger;
 

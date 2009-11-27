@@ -5,13 +5,13 @@ import java.awt.LinearGradientPaint;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.geom.Point2D;
 import java.util.Arrays;
 
+import jflowmap.data.MinMax;
+import jflowmap.geom.BSplinePath;
+import jflowmap.geom.GeomUtils;
+import jflowmap.geom.Point;
 import jflowmap.models.FlowMapParams;
-import jflowmap.util.BSplinePath;
-import jflowmap.util.GeomUtils;
-import jflowmap.util.MinMax;
 
 import org.apache.log4j.Logger;
 
@@ -86,12 +86,12 @@ public abstract class VisualEdge extends PNode {
 //        
 //        final double xsize = (xstats.getMax() - xstats.getMin()) / 20;
 //        final double ysize = (ystats.getMax() - ystats.getMin()) / 20;
-        shape = new BSplinePath(Arrays.asList(new Point2D[] {
-                new Point2D.Double(x1, y1),
-                new Point2D.Double(x1 - size/2, y1 + size/2),
-                new Point2D.Double(x1, y1 + size),
-                new Point2D.Double(x1 + size/2, y1 + size/2),
-                new Point2D.Double(x1, y1)
+        shape = new BSplinePath(Arrays.asList(new Point[] {
+                new Point(x1, y1),
+                new Point(x1 - size/2, y1 + size/2),
+                new Point(x1, y1 + size),
+                new Point(x1 + size/2, y1 + size/2),
+                new Point(x1, y1)
         }));
         
         

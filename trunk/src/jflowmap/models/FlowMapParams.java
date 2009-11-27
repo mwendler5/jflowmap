@@ -5,8 +5,8 @@ import java.beans.PropertyChangeSupport;
 
 import prefuse.data.Graph;
 
-import jflowmap.util.GraphStats;
-import jflowmap.util.MinMax;
+import jflowmap.data.GraphStats;
+import jflowmap.data.MinMax;
 
 /**
  * @author Ilya Boyandin

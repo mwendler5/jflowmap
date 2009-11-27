@@ -1,8 +1,8 @@
 package jflowmap.bundling;
 
 import at.fhj.utils.graphics.AxisMarks;
-import jflowmap.util.GraphStats;
-import jflowmap.util.MinMax;
+import jflowmap.data.GraphStats;
+import jflowmap.data.MinMax;
 
 /**
  * @author Ilya Boyandin

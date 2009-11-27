@@ -1,8 +1,9 @@
-package jflowmap.util;
+package jflowmap.data;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 
 import prefuse.data.Edge;
 import prefuse.data.Graph;

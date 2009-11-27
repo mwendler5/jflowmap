@@ -1,6 +1,7 @@
-package jflowmap.util;
+package jflowmap.geom;
 
 import java.awt.geom.Point2D;
+
 
 /**
  * @author Ilya Boyandin
@@ -74,6 +75,10 @@ public class Vector2D {
 
     public static Vector2D valueOf(Point2D.Double startPoint, Point2D.Double endPoint) {
         return new Vector2D(endPoint.getX() - startPoint.getX(), endPoint.getY() - startPoint.getY());
+    }
+    
+    public static Vector2D valueOf(Point startPoint, Point endPoint) {
+        return new Vector2D(endPoint.x() - startPoint.x(), endPoint.y() - startPoint.y());
     }
 
     public Point2D.Double movePoint(Point2D.Double point) {

@@ -6,8 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import jflowmap.aggregation.AggregatedEdges;
-import jflowmap.util.GeomUtils;
-import jflowmap.util.Vector2D;
+import jflowmap.geom.GeomUtils;
+import jflowmap.geom.Point;
+import jflowmap.geom.Vector2D;
 
 import org.apache.log4j.Logger;
 
@@ -28,7 +29,7 @@ public class ForceDirectedEdgeBundler {
 
     private static Logger logger = Logger.getLogger(ForceDirectedEdgeBundler.class);
     
-    private Point2D.Double[][] edgePoints;
+    private Point[][] edgePoints;
     private double[] edgeLengths;
     private final String xNodeAttr;
     private final String yNodeAttr;
@@ -36,8 +37,8 @@ public class ForceDirectedEdgeBundler {
     private final Graph graph;
 
     private List<CompatibleEdge>[] compatibleEdgeLists;
-    private Point2D.Double[] edgeStarts;
-    private Point2D.Double[] edgeEnds;
+    private Point[] edgeStarts;
+    private Point[] edgeEnds;
     private double[] edgeValues;
     private double edgeValueMax, edgeValueMin;
     private int numEdges;
@@ -68,8 +69,8 @@ public class ForceDirectedEdgeBundler {
         return progressTracker;
     }
     
-    public Point2D[][] getEdgePoints() {
-        Point2D[][] points = new Point2D[numEdges][P + 2];
+    public Point[][] getEdgePoints() {
+        Point[][] points = new Point[numEdges][P + 2];
         for (int i = 0; i < numEdges; i++) {
             points[i][0] = edgeStarts[i];
             System.arraycopy(edgePoints[i], 0, points[i], 1, P);
@@ -79,7 +80,7 @@ public class ForceDirectedEdgeBundler {
     }
 
     public AggregatedEdges getAggregatedEdges() {
-        return AggregatedEdges.createFrom(getEdgePoints());
+        return AggregatedEdges.createFrom(graph, getEdgePoints());
     }
     
 
@@ -114,17 +115,17 @@ public class ForceDirectedEdgeBundler {
         this.progressTracker = progressTracker;
         numEdges = graph.getEdgeCount();
         edgeLengths = new double[numEdges];
-        edgeStarts = new Point2D.Double[numEdges];
-        edgeEnds = new Point2D.Double[numEdges];
+        edgeStarts = new Point[numEdges];
+        edgeEnds = new Point[numEdges];
         double evMin = Double.POSITIVE_INFINITY, evMax = Double.NEGATIVE_INFINITY;
         if (params.getEdgeValueAffectsAttraction()) {
             edgeValues = new double[numEdges];
         }
         for (int i = 0; i < numEdges; i++) {
             Edge edge = graph.getEdge(i);
-            edgeStarts[i] = new Point2D.Double(getSourceX(edge), getSourceY(edge));
-            edgeEnds[i] = new Point2D.Double(getTargetX(edge), getTargetY(edge));
-            double length = edgeStarts[i].distance(edgeEnds[i]);
+            edgeStarts[i] = new Point(getSourceX(edge), getSourceY(edge));
+            edgeEnds[i] = new Point(getTargetX(edge), getTargetY(edge));
+            double length = edgeStarts[i].distanceTo(edgeEnds[i]);
             if (Math.abs(length) < EPS) length = 0.0;
             edgeLengths[i] = length;
             if (params.getEdgeValueAffectsAttraction()) {
@@ -238,8 +239,8 @@ public class ForceDirectedEdgeBundler {
 
         double l_avg = (edgeLengths[i] + edgeLengths[j])/2;
         return l_avg / (l_avg + 
-                edgeStarts[i].distance(edgeStarts[j]) + 
-                edgeEnds[i].distance(edgeEnds[j]));
+                edgeStarts[i].distanceTo(edgeStarts[j]) + 
+                edgeEnds[i].distanceTo(edgeEnds[j]));
     }
 
     private double calcStandardEdgeCompatibility(int i, int j) {
@@ -249,8 +250,8 @@ public class ForceDirectedEdgeBundler {
         
         Vector2D p = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
         Vector2D q = Vector2D.valueOf(edgeStarts[j], edgeEnds[j]);
-        Point2D pm = GeomUtils.midpoint(edgeStarts[i], edgeEnds[i]);
-        Point2D qm = GeomUtils.midpoint(edgeStarts[j], edgeEnds[j]);
+        Point pm = GeomUtils.midpoint(edgeStarts[i], edgeEnds[i]);
+        Point qm = GeomUtils.midpoint(edgeStarts[j], edgeEnds[j]);
         double l_avg = (edgeLengths[i] + edgeLengths[j])/2;
         
         // angle compatibility
@@ -270,7 +271,7 @@ public class ForceDirectedEdgeBundler {
         );
         
         // position compatibility
-        double Cp = l_avg / (l_avg + pm.distance(qm));
+        double Cp = l_avg / (l_avg + pm.distanceTo(qm));
         
         // visibility compatibility
         double Cv;
@@ -301,14 +302,14 @@ public class ForceDirectedEdgeBundler {
         return Ca * Cs * Cp * Cv;
     }
     
-    private static double visibilityCompatibility(Point2D p0, Point2D p1, Point2D q0, Point2D q1) {
-        Point2D i0 = GeomUtils.projectPointToLine(p0, p1, q0);
-        Point2D i1 = GeomUtils.projectPointToLine(p0, p1, q1);
-        Point2D im = GeomUtils.midpoint(i0, i1);
-        Point2D pm = GeomUtils.midpoint(p0, p1);
+    private static double visibilityCompatibility(Point p0, Point p1, Point q0, Point q1) {
+        Point i0 = GeomUtils.projectPointToLine(p0, p1, q0);
+        Point i1 = GeomUtils.projectPointToLine(p0, p1, q1);
+        Point im = GeomUtils.midpoint(i0, i1);
+        Point pm = GeomUtils.midpoint(p0, p1);
         return Math.max(
                 0,
-                1 - 2 * pm.distance(im) / i0.distance(i1)
+                1 - 2 * pm.distanceTo(im) / i0.distanceTo(i1)
         );
     }
     
@@ -343,8 +344,7 @@ public class ForceDirectedEdgeBundler {
         
         // Perform simulation steps
         
-        Point2D.Double[][] tmpEdgePoints = new Point2D.Double[numEdges][P];
-//        Point2D.Double[][] tmpEdgePoints = edgePoints;
+        Point[][] tmpEdgePoints = new Point[numEdges][P];
         
         for (int step = 0; step < I; step++) {
             if (progressTracker.isCancelled()) {
@@ -356,8 +356,8 @@ public class ForceDirectedEdgeBundler {
                 if (progressTracker.isCancelled()) {
                     return;
                 }
-                Point2D.Double[] p = edgePoints[pe];
-                Point2D.Double[] newP = tmpEdgePoints[pe];
+                Point[] p = edgePoints[pe];
+                Point[] newP = tmpEdgePoints[pe];
                 if (isSelfLoop(pe)) {
                     continue;       // ignore self-loops
                 }
@@ -369,11 +369,11 @@ public class ForceDirectedEdgeBundler {
                                 
                 for (int i = 0; i < P; i++) {
                     // spring forces
-                    Point2D p_i = p[i];
-                    Point2D p_prev = (i == 0 ? edgeStarts[pe] : p[i - 1]);
-                    Point2D p_next = (i == P - 1 ? edgeEnds[pe] : p[i + 1]);
-                    double Fsi_x = (p_prev.getX() - p_i.getX()) + (p_next.getX() - p_i.getX());
-                    double Fsi_y = (p_prev.getY() - p_i.getY()) + (p_next.getY() - p_i.getY());
+                    Point p_i = p[i];
+                    Point p_prev = (i == 0 ? edgeStarts[pe] : p[i - 1]);
+                    Point p_next = (i == P - 1 ? edgeEnds[pe] : p[i + 1]);
+                    double Fsi_x = (p_prev.x() - p_i.x()) + (p_next.x() - p_i.x());
+                    double Fsi_y = (p_prev.y() - p_i.y()) + (p_next.y() - p_i.y());
                     
                     if (Math.abs(k_p) < 1.0) {
                         Fsi_x *= k_p;
@@ -387,10 +387,10 @@ public class ForceDirectedEdgeBundler {
                         CompatibleEdge ce = compatible.get(ci);
                         final int qe = ce.edgeIdx;
                         final double C = ce.C;
-                        Point2D q_i = edgePoints[qe][i];
+                        Point q_i = edgePoints[qe][i];
                         
-                        double v_x = q_i.getX() - p_i.getX();
-                        double v_y = q_i.getY() - p_i.getY();
+                        double v_x = q_i.x() - p_i.x();
+                        double v_y = q_i.y() - p_i.y();
                         if (Math.abs(v_x) > EPS  ||  Math.abs(v_y) > EPS) {  // zero vector has no direction
                             double d = Math.sqrt(v_x * v_x + v_y * v_y);  // shouldn't be zero
                             double m;
@@ -425,11 +425,11 @@ public class ForceDirectedEdgeBundler {
                     double Fpi_x = Fsi_x + Fei_x;
                     double Fpi_y = Fsi_y + Fei_y;
 
-                    Point2D.Double np = newP[i];
+                    Point np = newP[i];
                     if (np == null) {
-                        np = new Point2D.Double(p[i].getX(), p[i].getY());
+                        np = new Point(p[i].x(), p[i].y());
                     }
-                    np.setLocation(np.getX() + Fpi_x * S, np.getY() + Fpi_y * S);
+                    np = new Point(np.x() + Fpi_x * S, np.y() + Fpi_y * S);
                     newP[i] = np;
                 }
                 progressTracker.incSubtaskProgress();
@@ -460,19 +460,19 @@ public class ForceDirectedEdgeBundler {
         logger.debug("Adding subdivision points: " + prevP + " -> " + P);
         
         // bigger array for subdivision points of the next cycle
-        Point2D.Double[][] newEdgePoints = new Point2D.Double[numEdges][P];
+        Point[][] newEdgePoints = new Point[numEdges][P];
 
         // Add subdivision points
         for (int i = 0, numEdges = newEdgePoints.length; i < numEdges; i++) {
             if (isSelfLoop(i)) {
                 continue;   // ignore self-loops
             }
-            Point2D[] newPoints = newEdgePoints[i];
+            Point[] newPoints = newEdgePoints[i];
             if (cycle == 0) {
                 assert(P == 1);
                 newPoints[0] = GeomUtils.midpoint(edgeStarts[i], edgeEnds[i]);
             } else {
-                List<Point2D> points = new ArrayList<Point2D>(Arrays.asList(edgePoints[i]));
+                List<Point> points = new ArrayList<Point>(Arrays.asList(edgePoints[i]));
                 points.add(0, edgeStarts[i]);
                 points.add(edgeEnds[i]);
                 
@@ -481,7 +481,7 @@ public class ForceDirectedEdgeBundler {
                 double polylineLen = 0;
                 double[] segmentLen = new double[prevP + 1];
                 for (int j = 0; j < prevP + 1; j++) {
-                    double segLen = points.get(j).distance(points.get(j + 1));
+                    double segLen = points.get(j).distanceTo(points.get(j + 1));
                     segmentLen[j] = segLen;
                     polylineLen += segLen;
                 }
@@ -489,8 +489,8 @@ public class ForceDirectedEdgeBundler {
                 double L = polylineLen / (P + 1);
                 int curSegment = 0;
                 double prevSegmentsLen = 0;
-                Point2D p = points.get(0);
-                Point2D nextP = points.get(1);
+                Point p = points.get(0);
+                Point nextP = points.get(1);
                 for (int j = 0; j < P; j++) {
                     while (segmentLen[curSegment] < L * (j + 1) - prevSegmentsLen) {
                         prevSegmentsLen += segmentLen[curSegment];
@@ -507,18 +507,18 @@ public class ForceDirectedEdgeBundler {
         edgePoints = newEdgePoints;
     }
     
-    private void copy(Point2D.Double[][] src, Point2D.Double[][] dest) {
+    private void copy(Point[][] src, Point[][] dest) {
         if (src.length != dest.length) {
             throw new RuntimeException("Src and dest array sizes mismatch");
         }
         for (int i = 0; i < src.length; i++) {
 //            System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
             for (int j = 0, len = src[i].length; j < len; j++) {
-                Point2D.Double ps = src[i][j];
+                Point ps = src[i][j];
                 if (ps == null)
                     dest[i][j] = null;
                 else
-                    dest[i][j] = new Point2D.Double(ps.getX(), ps.getY());
+                    dest[i][j] = new Point(ps.x(), ps.y());
 //                Point2D.Double pd = dest[i][j];
 //                pd.setLocation(ps.getX(), ps.getY());
             }

@@ -1,8 +1,8 @@
 package jflowmap.util;
 
-import java.awt.geom.Point2D;
-
 import static org.junit.Assert.assertEquals;
+import jflowmap.geom.GeomUtils;
+import jflowmap.geom.Point;
 
 import org.junit.Test;
 
@@ -22,9 +22,9 @@ public class GeomUtilsTest {
         assertPointEquals(-3, 0, GeomUtils.projectPointToLine(-2, 1,  -5, -2,   -2, -1));
     }
     
-    private void assertPointEquals(double expectedX, double expectedY, Point2D actual) {
-        assertEquals(expectedX, actual.getX(), EPS);
-        assertEquals(expectedY, actual.getY(), EPS);
+    private void assertPointEquals(double expectedX, double expectedY, Point actual) {
+        assertEquals(expectedX, actual.x(), EPS);
+        assertEquals(expectedY, actual.y(), EPS);
     }
 
 }

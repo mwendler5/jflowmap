@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import jflowmap.util.MinMax;
+import jflowmap.data.MinMax;
 
 /**
  * @author Ilya Boyandin
