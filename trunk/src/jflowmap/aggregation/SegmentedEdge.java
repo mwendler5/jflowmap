@@ -1,6 +1,7 @@
 package jflowmap.aggregation;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import prefuse.data.Edge;
@@ -36,6 +37,30 @@ public class SegmentedEdge {
             }
         }
         segments.add(segment);
+    }
+
+    public EdgeSegment getLeftAdjacent(EdgeSegment segment) {
+        EdgeSegment prev = null;
+        for (EdgeSegment seg : segments) {
+            if (seg.equals(segment)) {
+                return prev;
+            }
+        }
+        return null;
+    }
+
+    public EdgeSegment getRightAdjacent(EdgeSegment segment) {
+        for (Iterator<EdgeSegment> it = segments.iterator(); it.hasNext(); ) {
+            EdgeSegment seg = it.next();
+            if (seg.equals(segment)) {
+                if (it.hasNext()) {
+                    return it.next();
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
     @Override

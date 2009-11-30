@@ -359,7 +359,10 @@ public class FlowMapModel {
     public void removeAllEdgeSubdivisionPoints() {
         int numEdges = graph.getEdgeCount();
         for (int i = 0; i < numEdges; i++) {
-            graph.getEdge(i).set(FlowMapModel.SUBDIVISION_POINTS_ATTR_NAME, null);
+            Edge edge = graph.getEdge(i);
+            if (hasEdgeSubdivisionPoints(edge)) {
+                edge.set(FlowMapModel.SUBDIVISION_POINTS_ATTR_NAME, null);
+            }
         }
     }
 

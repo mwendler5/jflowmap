@@ -511,11 +511,12 @@ public class VisualFlowMap extends PNode {
             public Object construct() {
                 try {
                     aggregator.aggregate(pt);
-
                     List<EdgeSegment> segments = aggregator.getAggregatedSegments();
                     for (EdgeSegment seg : segments) {
                         Line2D.Double line = new Line2D.Double(seg.getA().asPoint2D(), seg.getB().asPoint2D());
-                        PPath ppath = new PPath(line, new PFixedWidthStroke((float)seg.getWeight()));
+                        double nv = getStats().getEdgeWeightStats().normalizeLog(seg.getWeight());
+                        double width = 1 + nv * getModel().getMaxEdgeWidth();
+                        PPath ppath = new PPath(line, new PFixedWidthStroke((float)width));
                         ppath.setPaint(Color.white);
                         ppath.setStrokePaint(Color.white);
                         addChild(ppath);

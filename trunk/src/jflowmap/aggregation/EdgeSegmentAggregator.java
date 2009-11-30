@@ -19,7 +19,6 @@ import ch.unifr.dmlib.cluster.Linkage;
 
 import com.google.common.collect.Lists;
 
-
 /**
  *
      Q: How to take the directions into account (not to aggregate edges going into opposite directions)?

@@ -25,7 +25,13 @@ class EdgeSegmentDistanceMatrix extends DefaultDistanceMatrix<EdgeSegment> {
         EdgeSegment rightItem = right.getItem();
         EdgeSegment aggregatedItem = leftItem.aggregateWith(rightItem);
 
+
         // TODO: update adjacent segments (and corresponding ClusterNodes)
+//        for (EdgeSegment ladj : leftItem.getLeftAdjacentSegments()) {
+//            // Create new and replace
+//            ladj.set
+//        }
+
 
         // TODO: ? somehow let the corresponding SegmentedEdges know that the segments were merged
 

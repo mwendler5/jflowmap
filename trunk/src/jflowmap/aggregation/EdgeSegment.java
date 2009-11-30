@@ -53,6 +53,25 @@ public class EdgeSegment {
         return parents;
     }
 
+    public List<EdgeSegment> getLeftAdjacentSegments() {
+        return ImmutableList.copyOf(Iterables.transform(parents, new Function<SegmentedEdge, EdgeSegment>() {
+            // TODO: remove nulls from the list of adjacent segments
+            @Override
+            public EdgeSegment apply(SegmentedEdge se) {
+                return se.getLeftAdjacent(EdgeSegment.this);
+            }
+        }));
+    }
+
+    public List<EdgeSegment> getRightAdjacentSegments() {
+        return ImmutableList.copyOf(Iterables.transform(parents, new Function<SegmentedEdge, EdgeSegment>() {
+            @Override
+            public EdgeSegment apply(SegmentedEdge se) {
+                return se.getRightAdjacent(EdgeSegment.this);
+            }
+        }));
+    }
+
     public boolean sharesAParentWith(EdgeSegment other) {
         List<SegmentedEdge> otherParents = other.getParents();
         for (SegmentedEdge parent : getParents()) {
@@ -105,11 +124,11 @@ public class EdgeSegment {
 
     public static final Function<EdgeSegment, List<SegmentedEdge>> TRANSFORM_TO_PARENTS =
         new Function<EdgeSegment, List<SegmentedEdge>>() {
-            @Override
-            public List<SegmentedEdge> apply(EdgeSegment segment) {
-                return segment.getParents();
-            }
-        };
+        @Override
+        public List<SegmentedEdge> apply(EdgeSegment segment) {
+            return segment.getParents();
+        }
+    };
 
     @Override
     public String toString() {
