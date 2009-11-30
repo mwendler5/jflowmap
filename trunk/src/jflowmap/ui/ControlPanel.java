@@ -35,9 +35,9 @@ import javax.swing.table.TableColumnModel;
 import jflowmap.JFlowMap;
 import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.clustering.NodeDistanceMeasure;
-import jflowmap.data.GraphStats;
+import jflowmap.data.FlowMapStats;
 import jflowmap.data.MinMax;
-import jflowmap.models.FlowMapParams;
+import jflowmap.models.FlowMapModel;
 import jflowmap.util.Pair;
 import jflowmap.visuals.VisualFlowMap;
 import jflowmap.visuals.VisualNode;
@@ -46,6 +46,7 @@ import at.fhj.utils.graphics.AxisMarks;
 import at.fhj.utils.swing.FancyTable;
 import at.fhj.utils.swing.TableSorter;
 import ch.unifr.dmlib.cluster.Linkage;
+import ch.unifr.dmlib.cluster.Linkages;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -123,7 +124,7 @@ public class ControlPanel {
     private JLabel numberOfClustersLabel;
     private JButton resetJoinedEdgesButton;
     private JTable clustersTable;
-    private JCheckBox aggregateEdgesCheckBox;
+    private JButton aggregateEdgesButton;
     private final JFlowMap jFlowMap;
     private boolean initializing;
     private ForceDirectedBundlerParameters fdBundlingParams;
@@ -160,13 +161,13 @@ public class ControlPanel {
         attachVisualFlowMapListeners(newVisualFlowMap);
 
         // load data
-        fdBundlingParams = new ForceDirectedBundlerParameters(visualFlowMap.getGraphStats());
+        fdBundlingParams = new ForceDirectedBundlerParameters(visualFlowMap.getModel());
         if (!modelsInitialized) {
             initModelsOnce();
             modelsInitialized = true;
         }
         initModels();
-        setData(visualFlowMap.getParams());
+        setData(visualFlowMap.getModel());
     }
 
     private void updateRepulsionSpinner() {
@@ -271,7 +272,7 @@ public class ControlPanel {
     }
 
     private void initFilterModels() {
-        GraphStats stats = getGraphStats();
+        FlowMapStats stats = getGraphStats();
 
         MinMax weightStats = stats.getEdgeWeightStats();
 
@@ -314,7 +315,7 @@ public class ControlPanel {
         maxLengthFilterSlider.setModel(maxLengthFilterModels.second());
     }
 
-    public void setData(FlowMapParams data) {
+    public void setData(FlowMapModel data) {
         autoAdjustColorScaleCheckBox.setSelected(data.getAutoAdjustColorScale());
         useLogWidthScaleCheckbox.setSelected(data.isUseLogWidthScale());
         useLogColorScaleCheckbox.setSelected(data.isUseLogColorScale());
@@ -515,6 +516,11 @@ public class ControlPanel {
                 updateRepulsionSpinner();
             }
         });
+        aggregateEdgesButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                getVisualFlowMap().aggregateBundledEdges();
+            }
+        });
     }
 
     private void initNodeClusterListeners() {
@@ -523,7 +529,7 @@ public class ControlPanel {
             public void actionPerformed(ActionEvent e) {
                 getVisualFlowMap().clusterNodes(
                         (NodeDistanceMeasure) distanceMeasureCombo.getSelectedItem(),
-                        (Linkage) linkageComboBox.getSelectedItem(),
+                        (Linkage<VisualNode>) linkageComboBox.getSelectedItem(),
                         combineWithEuclideanClustersCheckBox.isSelected()
                 );
                 initNodeClusteringModels();
@@ -611,16 +617,16 @@ public class ControlPanel {
         visualFlowMapListeners.clear();
     }
 
-    public FlowMapParams getFlowMapModel() {
-        return getVisualFlowMap().getParams();
+    public FlowMapModel getFlowMapModel() {
+        return getVisualFlowMap().getModel();
     }
 
     private VisualFlowMap getVisualFlowMap() {
         return jFlowMap.getVisualFlowMap();
     }
 
-    private GraphStats getGraphStats() {
-        return getVisualFlowMap().getGraphStats();
+    private FlowMapStats getGraphStats() {
+        return getVisualFlowMap().getStats();
     }
 
     public JPanel getPanel() {
@@ -717,7 +723,9 @@ public class ControlPanel {
 
 
         distanceMeasureCombo = new JComboBox(NodeDistanceMeasure.values());
-        linkageComboBox = new JComboBox(new Linkage[]{Linkage.AVERAGE, Linkage.COMPLETE, Linkage.SINGLE});
+        linkageComboBox = new JComboBox(new Linkage[]{
+                Linkages.average(), Linkages.complete(), Linkages.single()
+        });
     }
 
     private void initNodeClusteringModels() {
@@ -1085,21 +1093,21 @@ public class ControlPanel {
         panel7.add(inverseQuadraticModelCheckBox, cc.xyw(11, 8, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JSeparator separator11 = new JSeparator();
         panel7.add(separator11, cc.xyw(1, 7, 2, CellConstraints.FILL, CellConstraints.FILL));
-        binaryCompatibilityCheckBox = new JCheckBox();
-        binaryCompatibilityCheckBox.setText("Binary compatibility");
-        panel7.add(binaryCompatibilityCheckBox, cc.xy(17, 10, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        simpleCompatibilityMeasureCheckBox = new JCheckBox();
-        simpleCompatibilityMeasureCheckBox.setText("Simple compatibility measure");
-        panel7.add(simpleCompatibilityMeasureCheckBox, cc.xy(17, 8, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        edgeValueAffectsAttractionCheckBox = new JCheckBox();
-        edgeValueAffectsAttractionCheckBox.setText("Edge value affects attraction");
-        panel7.add(edgeValueAffectsAttractionCheckBox, cc.xy(17, 5));
+        aggregateEdgesButton = new JButton();
+        aggregateEdgesButton.setText("Aggregate edges");
+        panel7.add(aggregateEdgesButton, cc.xy(1, 8));
         directionAffectsCompatibilityCheckBox = new JCheckBox();
         directionAffectsCompatibilityCheckBox.setText("Direction affects compatibility");
-        panel7.add(directionAffectsCompatibilityCheckBox, cc.xy(17, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        aggregateEdgesCheckBox = new JCheckBox();
-        aggregateEdgesCheckBox.setText("Aggregate edges");
-        panel7.add(aggregateEdgesCheckBox, cc.xy(17, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        panel7.add(directionAffectsCompatibilityCheckBox, cc.xy(17, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        edgeValueAffectsAttractionCheckBox = new JCheckBox();
+        edgeValueAffectsAttractionCheckBox.setText("Edge value affects attraction");
+        panel7.add(edgeValueAffectsAttractionCheckBox, cc.xy(17, 3));
+        simpleCompatibilityMeasureCheckBox = new JCheckBox();
+        simpleCompatibilityMeasureCheckBox.setText("Simple compatibility measure");
+        panel7.add(simpleCompatibilityMeasureCheckBox, cc.xy(17, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        binaryCompatibilityCheckBox = new JCheckBox();
+        binaryCompatibilityCheckBox.setText("Binary compatibility");
+        panel7.add(binaryCompatibilityCheckBox, cc.xy(17, 8, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JPanel panel8 = new JPanel();
         panel8.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:20px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:noGrow,left:4dlu:noGrow,fill:max(d;4px):grow,left:4dlu:noGrow,fill:max(p;75px):noGrow,left:10dlu:noGrow,fill:1px:noGrow,left:10dlu:noGrow,fill:max(p;200px):noGrow", "center:max(p;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:m:noGrow,top:d:noGrow,center:max(d;6px):noGrow,center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:min(p;200px):grow"));
         tabbedPane1.addTab("Node clustering", panel8);

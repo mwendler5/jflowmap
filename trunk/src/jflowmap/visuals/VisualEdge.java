@@ -11,7 +11,7 @@ import jflowmap.data.MinMax;
 import jflowmap.geom.BSplinePath;
 import jflowmap.geom.GeomUtils;
 import jflowmap.geom.Point;
-import jflowmap.models.FlowMapParams;
+import jflowmap.models.FlowMapModel;
 
 import org.apache.log4j.Logger;
 
@@ -28,14 +28,13 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
  */
 public abstract class VisualEdge extends PNode {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 	private static Logger logger = Logger.getLogger(VisualEdge.class);
 
+	private static final int MIN_COLOR_INTENSITY = 25;
 	private static final float[] DEFAULT_GRADIENT_FRACTIONS = new float[] { 0.0f, 1.0f };
     private static final float MIN_FRACTION_DIFF = 1e-5f;
-
-    private static final double SELF_LOOP_CIRCLE_SIZE = 10;
 
     private static final Color STROKE_HIGHLIGHTED_PAINT = new Color(0, 0, 255, 200);
     private static final Color STROKE_HIGHLIGHTED_INCOMING_PAINT = new Color(255, 0, 0, 200);
@@ -80,7 +79,7 @@ public abstract class VisualEdge extends PNode {
 //                SELF_LOOP_CIRCLE_SIZE, SELF_LOOP_CIRCLE_SIZE);
 
 //        final double size = SELF_LOOP_CIRCLE_SIZE;
-        final double size = visualFlowMap.getGraphStats().getEdgeLengthStats().getAvg() / 5;
+        final double size = visualFlowMap.getStats().getEdgeLengthStats().getAvg() / 5;
 //        MinMax xstats = visualFlowMap.getGraphStats().getNodeXStats();
 //        MinMax ystats = visualFlowMap.getGraphStats().getNodeYStats();
 //        
@@ -138,7 +137,7 @@ public abstract class VisualEdge extends PNode {
 //    public abstract void updateEdgeMarkerColors();
 
     public void updateVisibility() {
-        final FlowMapParams model = visualFlowMap.getParams();
+        final FlowMapModel model = visualFlowMap.getModel();
         double weightFilterMin = model.getEdgeWeightFilterMin();
         double weightFilterMax = model.getEdgeWeightFilterMax();
 
@@ -181,7 +180,7 @@ public abstract class VisualEdge extends PNode {
     }
 
     public double getEdgeWeight() {
-        return edge.getDouble(visualFlowMap.getParams().getEdgeWeightAttr());
+        return edge.getDouble(visualFlowMap.getModel().getEdgeWeightAttr());
     }
 
     public double getEdgeLength() {
@@ -227,7 +226,7 @@ public abstract class VisualEdge extends PNode {
     }
 
     public double getNormalizedLogValue() {
-        FlowMapParams model = getVisualFlowMap().getParams();
+        FlowMapModel model = getVisualFlowMap().getModel();
         double value = getEdgeWeight();
         double nv;
         if (model.getAutoAdjustEdgeColorScale()) {
@@ -239,7 +238,7 @@ public abstract class VisualEdge extends PNode {
                 nv = (Math.log(value - model.getEdgeWeightFilterMin()) - minLog) / (maxLog - minLog);
             }
         } else {
-            MinMax stats = visualFlowMap.getGraphStats().getEdgeWeightStats();
+            MinMax stats = visualFlowMap.getStats().getEdgeWeightStats();
             nv = stats.normalizeLog(value);
         }
         if (Double.isNaN(nv)) {
@@ -251,7 +250,7 @@ public abstract class VisualEdge extends PNode {
     public double getNormalizedValue() {
         double nv;
     
-        MinMax stats = visualFlowMap.getGraphStats().getEdgeWeightStats();
+        MinMax stats = visualFlowMap.getStats().getEdgeWeightStats();
         nv = stats.normalize(getEdgeWeight());
 
         if (Double.isNaN(nv)) {
@@ -263,9 +262,9 @@ public abstract class VisualEdge extends PNode {
    
     protected Paint createPaint() {
 		// TODO: use colors from color scheme
-        FlowMapParams model = getVisualFlowMap().getParams();
+        FlowMapModel model = getVisualFlowMap().getModel();
         final double normalizedValue = getNormalizedLogValue();
-        int intensity = (int)Math.round(255 * normalizedValue);
+        int intensity = (int)Math.round(MIN_COLOR_INTENSITY + (255 - MIN_COLOR_INTENSITY) * normalizedValue);
         int alpha = model.getEdgeAlpha();
         if (isSelfLoop()) {
             return new Color(intensity, intensity, 0, alpha);	// mix of red and green
@@ -290,7 +289,7 @@ public abstract class VisualEdge extends PNode {
 		        	if (model.getUseProportionalDirectionMarkers()) {
 		        		markerSize = (float)model.getDirectionMarkerSize();
 		        	} else {
-		        		MinMax lstats = visualFlowMap.getGraphStats().getEdgeLengthStats();
+		        		MinMax lstats = visualFlowMap.getStats().getEdgeLengthStats();
 						markerSize = (float)Math.min(
 								.5 - MIN_FRACTION_DIFF,	 // the markers must not be longer than half of an edge
 								((lstats.getMin() + model.getDirectionMarkerSize() * (lstats.getMax() - lstats.getMin())) 
@@ -365,7 +364,7 @@ public abstract class VisualEdge extends PNode {
 
     protected Stroke createStroke() {
         double nv = getNormalizedValue();
-        float width = (float)(1 + nv * getVisualFlowMap().getMaxEdgeWidth());
+        float width = (float)(1 + nv * getVisualFlowMap().getModel().getMaxEdgeWidth());
         return new PFixedWidthStroke(width);
 //        return new BasicStroke(width);
     }

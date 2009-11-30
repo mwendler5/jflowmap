@@ -45,10 +45,10 @@
       </edge>
 
       <edge source="C" target="D" id="2">
-         <data key="data">1</data>
+         <data key="data">5</data>
       </edge>
       <edge source="E" target="F" id="2">
-         <data key="data">1</data>
+         <data key="data">5</data>
       </edge>
    </graph>
 </graphml>

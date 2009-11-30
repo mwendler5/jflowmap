@@ -843,49 +843,49 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
+              <component id="3f52c" class="javax.swing.JButton" binding="aggregateEdgesButton" default-binding="true">
                 <constraints>
-                  <grid row="9" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Binary compatibility"/>
-                </properties>
-              </component>
-              <component id="83fa4" class="javax.swing.JCheckBox" binding="simpleCompatibilityMeasureCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="7" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Simple compatibility measure"/>
-                </properties>
-              </component>
-              <component id="26269" class="javax.swing.JCheckBox" binding="edgeValueAffectsAttractionCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="4" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Edge value affects attraction"/>
+                  <text value="Aggregate edges"/>
                 </properties>
               </component>
               <component id="500e9" class="javax.swing.JCheckBox" binding="directionAffectsCompatibilityCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="2" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="Direction affects compatibility"/>
                 </properties>
               </component>
-              <component id="8525" class="javax.swing.JCheckBox" binding="aggregateEdgesCheckBox" default-binding="true">
+              <component id="26269" class="javax.swing.JCheckBox" binding="edgeValueAffectsAttractionCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="0" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Edge value affects attraction"/>
+                </properties>
+              </component>
+              <component id="83fa4" class="javax.swing.JCheckBox" binding="simpleCompatibilityMeasureCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="4" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <text value="Aggregate edges"/>
+                  <text value="Simple compatibility measure"/>
+                </properties>
+              </component>
+              <component id="3a159" class="javax.swing.JCheckBox" binding="binaryCompatibilityCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="7" column="16" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Binary compatibility"/>
                 </properties>
               </component>
             </children>

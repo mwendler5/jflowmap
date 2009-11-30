@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-
+import jflowmap.models.FlowMapModel;
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
@@ -13,43 +13,37 @@ import prefuse.data.Node;
  * @author Ilya Boyandin
  *         Date: 21-Sep-2009
  */
-public class GraphStats {
-
-    private Graph graph;
+public class FlowMapStats {
 
     private final Map<String, MinMax> statsCache = new HashMap<String, MinMax>();
-    private String edgeWeightAttr;
-    private String xNodeAttr;
-    private String yNodeAttr;
+    private FlowMapModel flowMapModel;
     private MinMax edgeLengthStats;
 
-    private GraphStats(Graph graph, String edgeWeightAttr, String xNodeAttr, String yNodeAttr) {
-        this.graph = graph;
-        this.edgeWeightAttr = edgeWeightAttr;
-        this.xNodeAttr = xNodeAttr;
-        this.yNodeAttr = yNodeAttr;
+    private FlowMapStats(FlowMapModel flowMapModel) {
+        this.flowMapModel = flowMapModel;
+        // TODO: add property change listeners
     }
 
-    public static GraphStats createFor(Graph graph, String edgeWeightAttr, String xNodeAttr, String yNodeAttr) {
-        return new GraphStats(graph, edgeWeightAttr, xNodeAttr, yNodeAttr);
+    public static FlowMapStats createFor(FlowMapModel flowMapModel) {
+        return new FlowMapStats(flowMapModel);
     }
 
-    
     public MinMax getEdgeWeightStats() {
-        return getEdgeWeightStats(edgeWeightAttr);
+        return getEdgeWeightStats(flowMapModel.getEdgeWeightAttr());
     }
 
     private double[] getEdgeLengths() {
+        Graph graph = flowMapModel.getGraph();
         int numEdges = graph.getEdgeCount();
         double[] edgeLengths = new double[numEdges];
         for (int i = 0; i < numEdges; i++) {
             Edge edge = graph.getEdge(i);
             Node src = edge.getSourceNode();
             Node target = edge.getTargetNode();
-            double x1 = src.getDouble(xNodeAttr);
-            double y1 = src.getDouble(yNodeAttr);
-            double x2 = target.getDouble(xNodeAttr);
-            double y2 = target.getDouble(yNodeAttr);
+            double x1 = src.getDouble(flowMapModel.getXNodeAttr());
+            double y1 = src.getDouble(flowMapModel.getYNodeAttr());
+            double x2 = target.getDouble(flowMapModel.getXNodeAttr());
+            double y2 = target.getDouble(flowMapModel.getYNodeAttr());
             double d = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
             edgeLengths[i] = d;
         }
@@ -79,7 +73,7 @@ public class GraphStats {
         String key = "edge-" + attrName;
         MinMax stats = statsCache.get(key);
         if (stats == null) {
-            stats = TupleStats.createFor(graph.getEdges(), attrName);
+            stats = TupleStats.createFor(flowMapModel.getGraph().getEdges(), attrName);
             statsCache.put(key, stats);
         }
         return stats;
@@ -89,44 +83,18 @@ public class GraphStats {
     	String key = "node-" + attrName;
     	MinMax stats = statsCache.get(key);
     	if (stats == null) {
-            stats = TupleStats.createFor(graph.getNodes(), attrName);
+            stats = TupleStats.createFor(flowMapModel.getGraph().getNodes(), attrName);
             statsCache.put(key, stats);
     	}
     	return stats;
     }
     
     public MinMax getNodeXStats() {
-        return getNodeAttrStats(xNodeAttr);
+        return getNodeAttrStats(flowMapModel.getXNodeAttr());
     }
 
     public MinMax getNodeYStats() {
-        return getNodeAttrStats(yNodeAttr);
-    }
-
-    /**
-     * Constructs a <code>String</code> with all attributes
-     * in name = value format.
-     *
-     * @return a <code>String</code> representation 
-     * of this object.
-     */
-    public String toString()
-    {
-        final String TAB = "    ";
-        
-        String retValue = "";
-        
-        retValue = "GraphStats ( "
-            + super.toString() + TAB
-            + "graph = " + this.graph + TAB
-            + "statsCache = " + this.statsCache + TAB
-            + "edgeWeightAttr = " + this.edgeWeightAttr + TAB
-            + "xNodeAttr = " + this.xNodeAttr + TAB
-            + "yNodeAttr = " + this.yNodeAttr + TAB
-            + "edgeLengthStats = " + this.edgeLengthStats + TAB
-            + " )";
-    
-        return retValue;
+        return getNodeAttrStats(flowMapModel.getYNodeAttr());
     }
 
 }

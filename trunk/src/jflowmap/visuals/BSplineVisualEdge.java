@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
-import java.util.Arrays;
+import java.util.List;
 
 import jflowmap.geom.BSplinePath;
 import jflowmap.geom.Point;
@@ -19,14 +19,20 @@ public class BSplineVisualEdge extends VisualEdge {
     private static final Color DOT_COLOR = new Color(255,0,0,100);
 
     private static final long serialVersionUID = 1L;
+
+//    private List<Point> subdivisionPoints;
     
     public BSplineVisualEdge(VisualFlowMap visualFlowMap, Edge edge,
-            VisualNode sourceNode, VisualNode targetNode, Point[] points,
+            VisualNode sourceNode, VisualNode targetNode, List<Point> points,
             boolean showSplinePoints) {
         super(visualFlowMap, edge, sourceNode, targetNode);
+        
+        int numPoints = points.size();
+        assert numPoints >= 2;
 
-        Point start = points[0];
-        Point end = points[points.length - 1];
+//        subdivisionPoints = ImmutableList.copyOf(Arrays.asList(points));
+        Point start = points.get(0);
+        Point end = points.get(numPoints - 1);
         assert(start.x() == sourceNode.getValueX());
         assert(start.y() == sourceNode.getValueY());
         assert(end.x() == targetNode.getValueX());
@@ -37,14 +43,15 @@ public class BSplineVisualEdge extends VisualEdge {
             shape = createSelfLoopShape();
         } else {
             Path2D path;
-            if (points.length < 4) {
+            if (numPoints < 4) {
                 path = new Path2D.Double();
-                path.moveTo(points[0].x(), points[0].y());
-                for (int i = 1; i < points.length; i++) {
-                    path.lineTo(points[i].x(), points[i].y());
+                path.moveTo(start.x(), start.y());
+                for (int i = 1; i < numPoints; i++) {
+                    Point point = points.get(i);
+                    path.lineTo(point.x(), point.y());
                 }
             } else {
-                path = new BSplinePath(Arrays.asList(points));
+                path = new BSplinePath(points);
             }
             
             // add spline points

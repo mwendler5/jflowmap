@@ -1,13 +1,16 @@
 package jflowmap.bundling;
 
-import at.fhj.utils.graphics.AxisMarks;
-import jflowmap.data.GraphStats;
+import jflowmap.data.FlowMapStats;
 import jflowmap.data.MinMax;
+import jflowmap.models.FlowMapModel;
+import at.fhj.utils.graphics.AxisMarks;
 
 /**
  * @author Ilya Boyandin
  */
 public class ForceDirectedBundlerParameters {
+    private FlowMapModel flowMapModel;
+
     private int numCycles;
     private int P;        // initial number of subdivision points
     private double S;   // step size - shouldn't be higher than 1.0
@@ -22,21 +25,21 @@ public class ForceDirectedBundlerParameters {
     private boolean useRepulsionForOppositeEdges; // for compatible edges going into opposite directions
     private boolean useSimpleCompatibilityMeasure;
     private boolean edgeValueAffectsAttraction;
-    private boolean joinCloseSubdivisionPoints;
+//    private boolean joinCloseSubdivisionPoints;
     private double repulsionAmount;
     private double subdivisionPointsCycleIncreaseRate;
-    private GraphStats graphStats;
     
-    public ForceDirectedBundlerParameters(GraphStats graphStats) {
-        this.graphStats = graphStats;
+    public ForceDirectedBundlerParameters(FlowMapModel flowMapModel) {
+        this.flowMapModel = flowMapModel;
         resetToDefaults();
     }
     
     public void resetToDefaults() {
         numCycles = 10;
         P = 1;
-        MinMax xStats = graphStats.getNodeXStats();
-        MinMax yStats = graphStats.getNodeYStats();
+        FlowMapStats stats = flowMapModel.getStats();
+        MinMax xStats = stats.getNodeXStats();
+        MinMax yStats = stats.getNodeYStats();
 //        MinMax lenStats = graphStats.getEdgeLengthStats();
 //        S = 0.4;
 //        S = AxisMarks.ordAlpha(Math.min(xStats.getMax() - xStats.getMin(), yStats.getMax() - yStats.getMin()) / 1000) * 4;
@@ -55,7 +58,7 @@ public class ForceDirectedBundlerParameters {
         useRepulsionForOppositeEdges = false;
         useSimpleCompatibilityMeasure = false;
         edgeValueAffectsAttraction = false;
-        joinCloseSubdivisionPoints = true;
+//        joinCloseSubdivisionPoints = true;
         subdivisionPointsCycleIncreaseRate = 1.3;
     }
     
@@ -68,23 +71,19 @@ public class ForceDirectedBundlerParameters {
         this.subdivisionPointsCycleIncreaseRate = subdivisionPointsCycleIncreaseRate;
     }
 
-    public GraphStats getGraphStats() {
-        return graphStats;
-    }
-    
     private void ensureDirectionAffectsCompatibilityValueIsValid() {
         if (useSimpleCompatibilityMeasure  ||  useRepulsionForOppositeEdges) {
             directionAffectsCompatibility = false;
         }
     }
     
-    public boolean getJoinCloseSubdivisionPoints() {
-        return joinCloseSubdivisionPoints;
-    }
-    
-    public void setJoinCloseSubdivisionPoints(boolean joinCloseSubdivisionPoints) {
-        this.joinCloseSubdivisionPoints = joinCloseSubdivisionPoints;
-    }
+//    public boolean getJoinCloseSubdivisionPoints() {
+//        return joinCloseSubdivisionPoints;
+//    }
+//    
+//    public void setJoinCloseSubdivisionPoints(boolean joinCloseSubdivisionPoints) {
+//        this.joinCloseSubdivisionPoints = joinCloseSubdivisionPoints;
+//    }
     
     public int getNumCycles() {
         return numCycles;
@@ -229,10 +228,9 @@ public class ForceDirectedBundlerParameters {
             + "useRepulsionForOppositeEdges = " + this.useRepulsionForOppositeEdges + TAB
             + "useSimpleCompatibilityMeasure = " + this.useSimpleCompatibilityMeasure + TAB
             + "edgeValueAffectsAttraction = " + this.edgeValueAffectsAttraction + TAB
-            + "joinCloseSubdivisionPoints = " + this.joinCloseSubdivisionPoints + TAB
+//            + "joinCloseSubdivisionPoints = " + this.joinCloseSubdivisionPoints + TAB
             + "repulsionAmount = " + this.repulsionAmount + TAB
             + "subdivisionPointsCycleIncreaseRate = " + this.subdivisionPointsCycleIncreaseRate + TAB
-            + "graphStats = " + this.graphStats + TAB
             + " )";
     
         return retValue;

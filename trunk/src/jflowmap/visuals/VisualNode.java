@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import jflowmap.geom.GeomUtils;
+import jflowmap.geom.Point;
 
 import org.apache.log4j.Logger;
 
@@ -116,7 +117,7 @@ public class VisualNode extends PNode {
 
     public void updateVisibility() {
         boolean visibility = 
-            visualFlowMap.getParams().getShowNodes()  ||  isHighlighted()  ||  isSelected();
+            visualFlowMap.getModel().getShowNodes()  ||  isHighlighted()  ||  isSelected();
         marker.setVisible(visibility);
         if (clusterMembers != null) {
             clusterMembers.setVisible(visibility);
@@ -412,9 +413,9 @@ public class VisualNode extends PNode {
         }
     };
 
-    public static final Function<VisualNode, Point2D> TRANSFORM_NODE_TO_POSITION = new Function<VisualNode, Point2D>() {
-        public Point2D apply(VisualNode node) {
-            return new Point2D.Double(node.getX(), node.getY());
+    public static final Function<VisualNode, Point> TRANSFORM_NODE_TO_POSITION = new Function<VisualNode, Point>() {
+        public Point apply(VisualNode node) {
+            return new Point(node.getX(), node.getY());
         }
     };
 }

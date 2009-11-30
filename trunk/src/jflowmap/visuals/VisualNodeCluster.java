@@ -2,16 +2,15 @@ package jflowmap.visuals;
 
 import java.awt.Color;
 import java.awt.Paint;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import jflowmap.geom.GeomUtils;
+import jflowmap.geom.Point;
 import jflowmap.models.FlowMapGraphBuilder;
 import jflowmap.util.ColorUtils;
 import jflowmap.util.Pair;
@@ -158,7 +157,7 @@ public class VisualNodeCluster implements Iterable<VisualNode> {
         // Create (visualNode->cluster node) mapping
         Map<VisualNode, Node> visualToNode = Maps.newHashMap();
         for (VisualNodeCluster cluster : clusters) {
-            Point2D centroid = GeomUtils.centroid(
+            Point centroid = GeomUtils.centroid(
                     Iterators.transform(
                         cluster.iterator(), VisualNode.TRANSFORM_NODE_TO_POSITION
                     )

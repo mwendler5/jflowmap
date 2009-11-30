@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import ch.unifr.dmlib.cluster.HierarchicalClusterer.DistanceMatrix;
+import ch.unifr.dmlib.cluster.DistanceMatrix;
 
 /**
  * @author Ilya Boyandin
@@ -40,7 +40,7 @@ public class VisualNodeDistance implements Comparable<VisualNodeDistance> {
     public static List<VisualNodeDistance> makeDistanceList(List<VisualNode> items,
             DistanceMatrix<VisualNode> distMatrix) {
         List<VisualNodeDistance> list = new ArrayList<VisualNodeDistance>();
-        for (int i = 0; i < distMatrix.getNumOfElements(); i++)
+        for (int i = 0; i < distMatrix.getNumOfItems(); i++)
         for (int j = 0; j < i; j++) {
             list.add(new VisualNodeDistance(items.get(i), items.get(j), distMatrix.distance(i, j)));
         }

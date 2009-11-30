@@ -12,18 +12,18 @@ public final class GeomUtils {
     private GeomUtils() {
     }
     
-    public static Point2D centroid(Iterator<Point2D> points) {
-        Point2D.Double centroid = new Point2D.Double(0, 0);
+    public static Point centroid(Iterator<Point> points) {
+        double x = 0, y = 0;
         int count = 0;
         while (points.hasNext()) {
-            Point2D p = points.next();
-            centroid.x += p.getX();
-            centroid.y += p.getY();
+            Point p = points.next();
+            x += p.x();
+            y += p.y();
             count++;
         }
-        centroid.x /= (double)count;
-        centroid.y /= (double)count;
-        return centroid;
+        x /= (double)count;
+        y /= (double)count;
+        return new Point(x, y);
     }
 
     public static double distance(double x1, double y1, double x2, double y2) {

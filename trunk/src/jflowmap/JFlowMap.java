@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import jflowmap.data.GraphFileFormats;
-import jflowmap.models.FlowMapParams;
+import jflowmap.models.FlowMapModel;
 import jflowmap.models.map.AreaMap;
 import jflowmap.ui.ControlPanel;
 import jflowmap.util.PanHandler;
@@ -35,11 +35,6 @@ public class JFlowMap extends JComponent {
     private static final long serialVersionUID = -1898747650184999568L;
 
     private static Logger logger = Logger.getLogger(JFlowMap.class);
-
-    public static final String DEFAULT_NODE_X_ATTR_NAME = "x";
-    public static final String DEFAULT_NODE_Y_ATTR_NAME = "y";
-    public static final String DEFAULT_EDGE_WEIGHT_ATTR_NAME = "value";
-    public static final String DEFAULT_NODE_LABEL_ATTR_NAME = "label";
 
     private final PCanvas canvas;
     private final ControlPanel controlPanel;
@@ -128,11 +123,11 @@ public class JFlowMap extends JComponent {
     
     public VisualFlowMap createVisualFlowMap(String weightAttrName, String nodeLabelAttrName,
             String xNodeAttr, String yNodeAttr, double weightFilterMin, Graph graph, VisualAreaMap areaMap) {
-        FlowMapParams params = new FlowMapParams(graph, weightAttrName, xNodeAttr, yNodeAttr, nodeLabelAttrName);
+        FlowMapModel params = new FlowMapModel(graph, weightAttrName, xNodeAttr, yNodeAttr, nodeLabelAttrName);
         if (!Double.isNaN(weightFilterMin)) {
             params.setEdgeWeightFilterMin(weightFilterMin);
         }
-        VisualFlowMap visualFlowMap = new VisualFlowMap(this, graph, params.getGraphStats(), params);
+        VisualFlowMap visualFlowMap = new VisualFlowMap(this, graph, params.getStats(), params);
         if (areaMap != null) {
             visualFlowMap.setAreaMap(areaMap);
         }
@@ -223,11 +218,11 @@ public class JFlowMap extends JComponent {
     }
     
     public static final DatasetSpec[] datasetSpecs = new DatasetSpec[] {
+            new DatasetSpec("data/bundling-test2.xml", "data", "x", "y", "name", null),
             new DatasetSpec("data/migrations-unique.xml", "value", "x", "y", "tooltip", null, 1000),
             new DatasetSpec("data/refugees-2008-no-various.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
             new DatasetSpec("C:/Data/uni-konstanz/PhotoTrails/sline_test_1.csv", "value", "x", "y", null, null),
             new DatasetSpec("data/airlines.xml", "value", "x", "y", "tooltip", null),
-            new DatasetSpec("data/bundling-test2.xml", "data", "x", "y", "name", null),
             new DatasetSpec("data/refugees-2008.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
             new DatasetSpec("data/refugees-2007.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
             new DatasetSpec("data/refugees-2006.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),

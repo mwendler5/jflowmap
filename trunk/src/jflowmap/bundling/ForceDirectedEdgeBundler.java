@@ -1,20 +1,21 @@
 package jflowmap.bundling;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import jflowmap.aggregation.AggregatedEdges;
 import jflowmap.geom.GeomUtils;
 import jflowmap.geom.Point;
 import jflowmap.geom.Vector2D;
+import jflowmap.models.FlowMapModel;
 
 import org.apache.log4j.Logger;
 
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import at.fhj.utils.misc.ProgressTracker;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * This is an implementation of the algorithm described in the paper
@@ -31,10 +32,6 @@ public class ForceDirectedEdgeBundler {
     
     private Point[][] edgePoints;
     private double[] edgeLengths;
-    private final String xNodeAttr;
-    private final String yNodeAttr;
-    private final String edgeWeightAttr;
-    private final Graph graph;
 
     private List<CompatibleEdge>[] compatibleEdgeLists;
     private Point[] edgeStarts;
@@ -49,19 +46,15 @@ public class ForceDirectedEdgeBundler {
     private double S;   // step size
     private int I;      // number of iteration steps performed during a cycle
     
+    private FlowMapModel flowMapModel;
     private final ForceDirectedBundlerParameters params;
     
     private ProgressTracker progressTracker;
 
-    
     public ForceDirectedEdgeBundler(
-            Graph graph, 
-            String xNodeAttr, String yNodeAttr, String edgeWeightAttr,
+            FlowMapModel flowMapModel,
             ForceDirectedBundlerParameters params) {
-        this.graph = graph;
-        this.xNodeAttr = xNodeAttr;
-        this.yNodeAttr = yNodeAttr;
-        this.edgeWeightAttr = edgeWeightAttr;
+        this.flowMapModel = flowMapModel;
         this.params = params;
     }
 
@@ -69,20 +62,16 @@ public class ForceDirectedEdgeBundler {
         return progressTracker;
     }
     
-    public Point[][] getEdgePoints() {
-        Point[][] points = new Point[numEdges][P + 2];
-        for (int i = 0; i < numEdges; i++) {
-            points[i][0] = edgeStarts[i];
-            System.arraycopy(edgePoints[i], 0, points[i], 1, P);
-            points[i][P + 1] = edgeEnds[i];
-        }
-        return points;
+    public List<Point> getSubdivisionPoints(int edgeIndex) {
+        return ImmutableList.copyOf(Arrays.asList(edgePoints[edgeIndex]));
     }
 
-    public AggregatedEdges getAggregatedEdges() {
-        return AggregatedEdges.createFrom(graph, getEdgePoints());
+    private void addGraphSubdivisionPoints() {
+        Graph graph = flowMapModel.getGraph();
+        for (int i = 0; i < numEdges; i++) {
+            flowMapModel.setEdgeSubdivisionPoints(graph.getEdge(i), getSubdivisionPoints(i));
+        }
     }
-    
 
     public void bundle(ProgressTracker pt) {
         logger.info("FDE bundling started with the following parameters: " + params);
@@ -103,6 +92,10 @@ public class ForceDirectedEdgeBundler {
             }
         }
 
+        if (!pt.isCancelled()) {
+            addGraphSubdivisionPoints();
+        }
+        
         if (pt.isCancelled()) {
             logger.info("FDE bundling cancelled");
         } else {
@@ -113,6 +106,7 @@ public class ForceDirectedEdgeBundler {
 
     private void init(ProgressTracker progressTracker) {
         this.progressTracker = progressTracker;
+        Graph graph = flowMapModel.getGraph();
         numEdges = graph.getEdgeCount();
         edgeLengths = new double[numEdges];
         edgeStarts = new Point[numEdges];
@@ -123,13 +117,13 @@ public class ForceDirectedEdgeBundler {
         }
         for (int i = 0; i < numEdges; i++) {
             Edge edge = graph.getEdge(i);
-            edgeStarts[i] = new Point(getSourceX(edge), getSourceY(edge));
-            edgeEnds[i] = new Point(getTargetX(edge), getTargetY(edge));
+            edgeStarts[i] = flowMapModel.getEdgeSourcePoint(edge);
+            edgeEnds[i] = flowMapModel.getEdgeTargetPoint(edge);
             double length = edgeStarts[i].distanceTo(edgeEnds[i]);
             if (Math.abs(length) < EPS) length = 0.0;
             edgeLengths[i] = length;
             if (params.getEdgeValueAffectsAttraction()) {
-                double value = getWeight(edge);
+                double value = flowMapModel.getEdgeWeight(edge);
                 edgeValues[i] = value;
                 if (value > evMax) {
                     evMax = value;
@@ -523,25 +517,5 @@ public class ForceDirectedEdgeBundler {
 //                pd.setLocation(ps.getX(), ps.getY());
             }
         }
-    }
-    
-    private double getWeight(Edge edge) {
-        return edge.getDouble(edgeWeightAttr);
-    }
-
-    private double getSourceX(Edge edge) {
-        return edge.getSourceNode().getDouble(xNodeAttr);
-    }
-    
-    private double getSourceY(Edge edge) {
-        return edge.getSourceNode().getDouble(yNodeAttr);
-    }
-    
-    private double getTargetX(Edge edge) {
-        return edge.getTargetNode().getDouble(xNodeAttr);
-    }
-
-    private double getTargetY(Edge edge) {
-        return edge.getTargetNode().getDouble(yNodeAttr);
     }
 }
