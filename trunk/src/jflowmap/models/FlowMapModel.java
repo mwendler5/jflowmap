@@ -23,7 +23,7 @@ public class FlowMapModel {
     public static final String DEFAULT_NODE_Y_ATTR_NAME = "y";
     public static final String DEFAULT_EDGE_WEIGHT_ATTR_NAME = "value";
     public static final String DEFAULT_NODE_LABEL_ATTR_NAME = "label";
-    
+
     private static final String SUBDIVISION_POINTS_ATTR_NAME = "_subdivp";
 
     private boolean autoAdjustColorScale;
@@ -34,9 +34,9 @@ public class FlowMapModel {
     private boolean fillEdgesWithGradient = true;
     private boolean useProportionalDirectionMarkers = true;
 
-    private String edgeWeightAttr;
-    private String xNodeAttr;
-    private String yNodeAttr;
+    private final String edgeWeightAttr;
+    private final String xNodeAttr;
+    private final String yNodeAttr;
     private String nodeLabelAttr = "tooltip";
 
     private int edgeAlpha = 150;
@@ -50,13 +50,13 @@ public class FlowMapModel {
 
     private boolean autoAdjustEdgeColorScale;
     private double maxEdgeWidth = 1.0;
-    private double directionMarkerSize = 0.1; 
+    private double directionMarkerSize = 0.1;
 
-    private PropertyChangeSupport changes = new PropertyChangeSupport(this);
-    private FlowMapStats stats;
-    private Graph graph;
+    private final PropertyChangeSupport changes = new PropertyChangeSupport(this);
+    private final FlowMapStats stats;
+    private final Graph graph;
 
-    public FlowMapModel(Graph graph, String edgeWeightAttr, 
+    public FlowMapModel(Graph graph, String edgeWeightAttr,
     		String xNodeAttr, String yNodeAttr, String nodeLabelAttr) {
         this.graph = graph;
         this.edgeWeightAttr = edgeWeightAttr;
@@ -82,11 +82,11 @@ public class FlowMapModel {
             maxEdgeWidth = Math.floor(weightStats.getMax() - weightStats.getMin());
         }
     }
-    
+
     public Graph getGraph() {
         return graph;
     }
-    
+
     public FlowMapStats getStats() {
         return stats;
     }
@@ -274,7 +274,7 @@ public class FlowMapModel {
 			throw new IllegalArgumentException(
 					"Direction marker size must be between 0.0 and 0.5: attempted to set " + markerSize);
 		}
-		if (this.directionMarkerSize != markerSize) { 
+		if (this.directionMarkerSize != markerSize) {
 			double old = directionMarkerSize;
 			this.directionMarkerSize = markerSize;
 			changes.firePropertyChange(PROPERTY_DIRECTION_MARKER_SIZE, old, markerSize);
@@ -339,7 +339,7 @@ public class FlowMapModel {
             edge.canGet(FlowMapModel.SUBDIVISION_POINTS_ATTR_NAME, List.class)  &&
             // the above will return true after calling removeAllEdgeSubdivisionPoints(),
             // so we need to add the following null check:
-            (edge.get(FlowMapModel.SUBDIVISION_POINTS_ATTR_NAME) != null); 
+            (edge.get(FlowMapModel.SUBDIVISION_POINTS_ATTR_NAME) != null);
     }
 
     @SuppressWarnings("unchecked")
@@ -355,7 +355,7 @@ public class FlowMapModel {
         }
         edge.set(FlowMapModel.SUBDIVISION_POINTS_ATTR_NAME, points);
     }
-    
+
     public void removeAllEdgeSubdivisionPoints() {
         int numEdges = graph.getEdgeCount();
         for (int i = 0; i < numEdges; i++) {

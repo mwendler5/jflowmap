@@ -2,6 +2,7 @@ package jflowmap.bundling;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import jflowmap.geom.GeomUtils;
@@ -21,7 +22,7 @@ import com.google.common.collect.ImmutableList;
  * This is an implementation of the algorithm described in the paper
  * "Force-Directed Edge Bundling for Graph Visualization" by
  * Danny Holten and Jarke J. van Wijk.
- * 
+ *
  * @author Ilya Boyandin
  */
 public class ForceDirectedEdgeBundler {
@@ -29,7 +30,7 @@ public class ForceDirectedEdgeBundler {
     private static final double EPS = 1e-7;
 
     private static Logger logger = Logger.getLogger(ForceDirectedEdgeBundler.class);
-    
+
     private Point[][] edgePoints;
     private double[] edgeLengths;
 
@@ -42,13 +43,13 @@ public class ForceDirectedEdgeBundler {
     private int cycle;
 
     private int P;      // number of subdivision points (will increase with every cycle)
-    private double Pdouble; // used to keep the double value to keep the stable increase rate 
+    private double Pdouble; // used to keep the double value to keep the stable increase rate
     private double S;   // step size
     private int I;      // number of iteration steps performed during a cycle
-    
-    private FlowMapModel flowMapModel;
+
+    private final FlowMapModel flowMapModel;
     private final ForceDirectedBundlerParameters params;
-    
+
     private ProgressTracker progressTracker;
 
     public ForceDirectedEdgeBundler(
@@ -61,8 +62,11 @@ public class ForceDirectedEdgeBundler {
     public ProgressTracker getProgressTracker() {
         return progressTracker;
     }
-    
+
     public List<Point> getSubdivisionPoints(int edgeIndex) {
+        if (isSelfLoop(edgeIndex)) {
+            return Collections.emptyList();
+        }
         return ImmutableList.copyOf(Arrays.asList(edgePoints[edgeIndex]));
     }
 
@@ -79,23 +83,20 @@ public class ForceDirectedEdgeBundler {
         init(pt);
         if (!pt.isCancelled()) {
             pt.taskCompleted();
-            
+
             // iterative refinement scheme
             int numCycles = params.getNumCycles();
             for (int cycle = 0; cycle < numCycles; cycle++) {
                 pt.startTask("Bundling cycle " + (cycle + 1) + " of " + numCycles, cycle, .95 / numCycles);
                 nextCycle();
-                pt.taskCompleted();
                 if (pt.isCancelled()) {
                     break;
                 }
+                pt.taskCompleted();
+                addGraphSubdivisionPoints();
             }
         }
 
-        if (!pt.isCancelled()) {
-            addGraphSubdivisionPoints();
-        }
-        
         if (pt.isCancelled()) {
             logger.info("FDE bundling cancelled");
         } else {
@@ -142,21 +143,21 @@ public class ForceDirectedEdgeBundler {
         this.P = params.getP();
         this.Pdouble = this.P;
         this.S = params.getS();
-        
+
         calcEdgeCompatibilityMeasures();
-        
+
         cycle = 0;
     }
-    
+
     private void calcEdgeCompatibilityMeasures() {
         progressTracker.startSubtask("Allocating memory", .05);
         progressTracker.subtaskCompleted();
-        
+
         logger.info("Calculating compatibility measures");
         logger.info("Using " + (params.getUseSimpleCompatibilityMeasure() ? "simple" : "standard") + " compatibility measure");
         progressTracker.startSubtask("Precalculating edge compatibility measures", .95);
         progressTracker.setSubtaskIncUnit(100.0 / numEdges);
-        
+
         compatibleEdgeLists = new List[numEdges];
         for (int i = 0; i < numEdges; i++) {
             compatibleEdgeLists[i] = new ArrayList<CompatibleEdge>();
@@ -170,7 +171,7 @@ public class ForceDirectedEdgeBundler {
                     compatibleEdgeLists = null;
                     return;
                 }
-                
+
                 double C = calcEdgeCompatibility(i, j);
                 if (Math.abs(C) >= params.getEdgeCompatibilityThreshold()) {
                     compatibleEdgeLists[i].add(new CompatibleEdge(j, C));
@@ -190,7 +191,7 @@ public class ForceDirectedEdgeBundler {
             compatibleEdgeLists = null;
         }
     }
-    
+
     private static class CompatibleEdge {
         public CompatibleEdge(int edgeIdx, double c) {
             this.edgeIdx = edgeIdx;
@@ -225,15 +226,15 @@ public class ForceDirectedEdgeBundler {
         }
         return C;
     }
-    
+
     private double calcSimpleEdgeCompatibility(int i, int j) {
         if (isSelfLoop(i)  ||  isSelfLoop(j)) {
             return 0.0;
         }
 
         double l_avg = (edgeLengths[i] + edgeLengths[j])/2;
-        return l_avg / (l_avg + 
-                edgeStarts[i].distanceTo(edgeStarts[j]) + 
+        return l_avg / (l_avg +
+                edgeStarts[i].distanceTo(edgeStarts[j]) +
                 edgeEnds[i].distanceTo(edgeEnds[j]));
     }
 
@@ -241,13 +242,13 @@ public class ForceDirectedEdgeBundler {
         if (isSelfLoop(i)  ||  isSelfLoop(j)) {
             return 0.0;
         }
-        
+
         Vector2D p = Vector2D.valueOf(edgeStarts[i], edgeEnds[i]);
         Vector2D q = Vector2D.valueOf(edgeStarts[j], edgeEnds[j]);
         Point pm = GeomUtils.midpoint(edgeStarts[i], edgeEnds[i]);
         Point qm = GeomUtils.midpoint(edgeStarts[j], edgeEnds[j]);
         double l_avg = (edgeLengths[i] + edgeLengths[j])/2;
-        
+
         // angle compatibility
         double Ca;
         if (params.getDirectionAffectsCompatibility()) {
@@ -257,34 +258,34 @@ public class ForceDirectedEdgeBundler {
         }
         if (Math.abs(Ca) < EPS) { Ca = 0.0; }       // this led to errors (when Ca == -1e-12)
         if (Math.abs(Math.abs(Ca) - 1.0) < EPS) { Ca = 1.0; }
-        
+
         // scale compatibility
         double Cs = 2 / (
-                (l_avg / Math.min(edgeLengths[i], edgeLengths[j]))  + 
+                (l_avg / Math.min(edgeLengths[i], edgeLengths[j]))  +
                 (Math.max(edgeLengths[i], edgeLengths[j]) / l_avg)
         );
-        
+
         // position compatibility
         double Cp = l_avg / (l_avg + pm.distanceTo(qm));
-        
+
         // visibility compatibility
         double Cv;
         if (Ca * Cs * Cp > .9) {
-            // this compatibility measure is only applied if the edges are 
+            // this compatibility measure is only applied if the edges are
             // (almost) parallel, equal in length and close together
             Cv = Math.min(
-                    visibilityCompatibility(edgeStarts[i], edgeEnds[i], edgeStarts[j], edgeEnds[j]), 
-                    visibilityCompatibility(edgeStarts[j], edgeEnds[j], edgeStarts[i], edgeEnds[i]) 
+                    visibilityCompatibility(edgeStarts[i], edgeEnds[i], edgeStarts[j], edgeEnds[j]),
+                    visibilityCompatibility(edgeStarts[j], edgeEnds[j], edgeStarts[i], edgeEnds[i])
             );
         } else {
             Cv = 1.0;
         }
-        
+
         assert(Ca >= 0  &&  Ca <= 1);
         assert(Cs >= 0  &&  Cs <= 1);
         assert(Cp >= 0  &&  Cp <= 1);
         assert(Cv >= 0  &&  Cv <= 1);
-        
+
         if (params.getBinaryCompatibility()) {
             double threshold = params.getEdgeCompatibilityThreshold();
             Ca = Ca >= threshold ? 1.0 : 0.0;
@@ -295,7 +296,7 @@ public class ForceDirectedEdgeBundler {
 
         return Ca * Cs * Cp * Cv;
     }
-    
+
     private static double visibilityCompatibility(Point p0, Point p1, Point q0, Point q1) {
         Point i0 = GeomUtils.projectPointToLine(p0, p1, q0);
         Point i1 = GeomUtils.projectPointToLine(p0, p1, q1);
@@ -306,20 +307,20 @@ public class ForceDirectedEdgeBundler {
                 1 - 2 * pm.distanceTo(im) / i0.distanceTo(i1)
         );
     }
-    
+
     private boolean isSelfLoop(int edgeIdx) {
         return edgeLengths[edgeIdx] == 0.0;
     }
 
     public void nextCycle() {
         logger.info("FDE bundling cycle " + (cycle + 1));
-        
+
         double Pdouble = this.Pdouble;
         int P = this.P;
         double S = this.S;
         int I = this.I;
-        
-        
+
+
         // Set parameters for the next cycle
         if (cycle > 0) {
 //            P *= 2;
@@ -328,18 +329,18 @@ public class ForceDirectedEdgeBundler {
             S *= (1.0 - params.getStepDampingFactor());
             I = (I * 2) / 3;
         }
-        
+
         if (progressTracker.isCancelled()) {
             return;
         }
         progressTracker.startSubtask("Adding subdivision points", .1);
         addSubdivisionPoints(P);
         progressTracker.subtaskCompleted();
-        
+
         // Perform simulation steps
-        
+
         Point[][] tmpEdgePoints = new Point[numEdges][P];
-        
+
         for (int step = 0; step < I; step++) {
             if (progressTracker.isCancelled()) {
                 return;
@@ -358,9 +359,9 @@ public class ForceDirectedEdgeBundler {
 
                 final int numOfSegments = P + 1;
                 double k_p = params.getK() / (edgeLengths[pe] * numOfSegments);
-                
+
                 List<CompatibleEdge> compatible = compatibleEdgeLists[pe];
-                                
+
                 for (int i = 0; i < P; i++) {
                     // spring forces
                     Point p_i = p[i];
@@ -368,10 +369,10 @@ public class ForceDirectedEdgeBundler {
                     Point p_next = (i == P - 1 ? edgeEnds[pe] : p[i + 1]);
                     double Fsi_x = (p_prev.x() - p_i.x()) + (p_next.x() - p_i.x());
                     double Fsi_y = (p_prev.y() - p_i.y()) + (p_next.y() - p_i.y());
-                    
+
                     if (Math.abs(k_p) < 1.0) {
                         Fsi_x *= k_p;
-                        Fsi_y *= k_p; 
+                        Fsi_y *= k_p;
                     }
 
                     // attracting electrostatic forces (for each other compatible edge)
@@ -382,7 +383,7 @@ public class ForceDirectedEdgeBundler {
                         final int qe = ce.edgeIdx;
                         final double C = ce.C;
                         Point q_i = edgePoints[qe][i];
-                        
+
                         double v_x = q_i.x() - p_i.x();
                         double v_y = q_i.y() - p_i.y();
                         if (Math.abs(v_x) > EPS  ||  Math.abs(v_y) > EPS) {  // zero vector has no direction
@@ -405,7 +406,7 @@ public class ForceDirectedEdgeBundler {
                                                             // point which attracts it
                                 m = Math.signum(m) / S;
                                                             // TODO: this force difference shouldn't be neglected
-                                                            // instead it should make it more difficult to move the 
+                                                            // instead it should make it more difficult to move the
                                                             // point from it's current position: this should reduce
                                                             // the effect even more
                             }
@@ -431,14 +432,14 @@ public class ForceDirectedEdgeBundler {
             copy(tmpEdgePoints, edgePoints);
             progressTracker.subtaskCompleted();
         }
-        
+
         if (!progressTracker.isCancelled()) {
             // update params only in case of success (i.e. no exception)
             this.P = P;
             this.Pdouble = Pdouble;
             this.S = S;
             this.I = I;
-            
+
             cycle++;
         }
     }
@@ -452,7 +453,7 @@ public class ForceDirectedEdgeBundler {
         }
 
         logger.debug("Adding subdivision points: " + prevP + " -> " + P);
-        
+
         // bigger array for subdivision points of the next cycle
         Point[][] newEdgePoints = new Point[numEdges][P];
 
@@ -469,9 +470,9 @@ public class ForceDirectedEdgeBundler {
                 List<Point> points = new ArrayList<Point>(Arrays.asList(edgePoints[i]));
                 points.add(0, edgeStarts[i]);
                 points.add(edgeEnds[i]);
-                
+
 //                final int prevP = edgePoints[i].length;
-                
+
                 double polylineLen = 0;
                 double[] segmentLen = new double[prevP + 1];
                 for (int j = 0; j < prevP + 1; j++) {
@@ -479,7 +480,7 @@ public class ForceDirectedEdgeBundler {
                     segmentLen[j] = segLen;
                     polylineLen += segLen;
                 }
-                
+
                 double L = polylineLen / (P + 1);
                 int curSegment = 0;
                 double prevSegmentsLen = 0;
@@ -495,12 +496,12 @@ public class ForceDirectedEdgeBundler {
                     double d = L * (j + 1) - prevSegmentsLen;
                     newPoints[j] = GeomUtils.between(p, nextP, d / segmentLen[curSegment]);
                 }
-                
+
             }
         }
         edgePoints = newEdgePoints;
     }
-    
+
     private void copy(Point[][] src, Point[][] dest) {
         if (src.length != dest.length) {
             throw new RuntimeException("Src and dest array sizes mismatch");
