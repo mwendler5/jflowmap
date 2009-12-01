@@ -642,22 +642,22 @@ public class VisualFlowMap extends PNode {
             boolean combineWithEuclideanClusters) {
         logger.info("Clustering nodes");
         HierarchicalClusterer<VisualNode> clusterer =
-//            new HierarchicalClusterer<VisualNode>(distanceMeasure, Linkage.SINGLE);
-            new HierarchicalClusterer<VisualNode>(distanceMeasure, linkage);
+            HierarchicalClusterer.createWith(distanceMeasure, linkage).build();
 
         List<VisualNode> items = distanceMeasure.filterNodes(visualNodes);
 
         ProgressTracker tracker = new ProgressTracker();
         DistanceMatrix<VisualNode> distances = clusterer.makeDistanceMatrix(items, tracker);
         nodeDistanceList = VisualNodeDistance.makeDistanceList(items, distances);
-        rootCluster = clusterer.cluster(items, distances, tracker);
+        rootCluster = clusterer.clusterToRoot(items, distances, tracker);
         maxNodeDistance = findMaxClusterDist(rootCluster);
         clusterDistanceThreshold = maxNodeDistance / 2;
         if (combineWithEuclideanClusters) {
-            euclideanRootCluster = HierarchicalClusterer.cluster(
-                    items, NodeDistanceMeasure.EUCLIDEAN,
-                    Linkages.<VisualNode>complete(), new ProgressTracker()
-            );
+            euclideanRootCluster = HierarchicalClusterer
+                .createWith(NodeDistanceMeasure.EUCLIDEAN, Linkages.<VisualNode>complete())
+                .build()
+                .clusterToRoot(items, new ProgressTracker());
+
             euclideanMaxNodeDistance = findMaxClusterDist(euclideanRootCluster);
             euclideanClusterDistanceThreshold = euclideanMaxNodeDistance / 2;
         } else {

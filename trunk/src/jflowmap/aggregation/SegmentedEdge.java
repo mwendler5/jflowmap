@@ -1,9 +1,9 @@
 package jflowmap.aggregation;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
+import jflowmap.geom.Point;
 import prefuse.data.Edge;
 
 import com.google.common.collect.Iterables;
@@ -36,32 +36,68 @@ public class SegmentedEdge {
                 throw new IllegalArgumentException("Segments are not subsequent");
             }
         }
+        System.out.println("Add segment " + System.identityHashCode(segment) + " to edge " + System.identityHashCode(this));
         segments.add(segment);
     }
 
-    public EdgeSegment getLeftAdjacent(EdgeSegment segment) {
-        EdgeSegment prev = null;
-        for (EdgeSegment seg : segments) {
-            if (seg.equals(segment)) {
-                return prev;
+    public void replaceSegment(EdgeSegment oldSegment, EdgeSegment newSegment) {
+        int index = indexOf(oldSegment);
+//        if (index == -1) {
+//            System.out.println(oldSegment);
+//            System.out.println(newSegment);
+//            return;
+//         }
+        segments.set(index, newSegment);
+        if (index > 0) {
+            EdgeSegment prev = segments.get(index - 1);
+            Point newB = newSegment.getA();
+            if (!prev.getB().equals(newB)) {
+                prev.replaceWith(prev.withB(newB));
             }
         }
-        return null;
+        int size = segments.size();
+        if (index < size - 1) {
+            EdgeSegment next = segments.get(index + 1);
+            Point newA = newSegment.getB();
+            if (!next.getA().equals(newA)) {
+                next.replaceWith(next.withA(newA));
+            }
+        }
     }
 
-    public EdgeSegment getRightAdjacent(EdgeSegment segment) {
-        for (Iterator<EdgeSegment> it = segments.iterator(); it.hasNext(); ) {
-            EdgeSegment seg = it.next();
-            if (seg.equals(segment)) {
-                if (it.hasNext()) {
-                    return it.next();
-                } else {
-                    return null;
-                }
+    private int indexOf(EdgeSegment segment) {
+        int index = -1;
+        for (int i = 0, size = segments.size(); i < size; i++) {
+            if (segments.get(i) == segment) {
+                index = i;
             }
         }
-        return null;
+        return index;
     }
+
+//    public EdgeSegment getLeftAdjacent(EdgeSegment segment) {
+//        EdgeSegment prev = null;
+//        for (EdgeSegment seg : segments) {
+//            if (seg.equals(segment)) {
+//                return prev;
+//            }
+//        }
+//        return null;
+//    }
+//
+//    public EdgeSegment getRightAdjacent(EdgeSegment segment) {
+//        for (Iterator<EdgeSegment> it = segments.iterator(); it.hasNext(); ) {
+//            EdgeSegment seg = it.next();
+//            if (seg.equals(segment)) {
+//                if (it.hasNext()) {
+//                    return it.next();
+//                } else {
+//                    return null;
+//                }
+//            }
+//        }
+//        return null;
+//    }
 
     @Override
     public String toString() {
@@ -73,8 +109,7 @@ public class SegmentedEdge {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((edge == null) ? 0 : edge.hashCode());
-        result = prime * result
-                + ((segments == null) ? 0 : segments.hashCode());
+        result = prime * result + ((segments == null) ? 0 : segments.hashCode());
         return result;
     }
 

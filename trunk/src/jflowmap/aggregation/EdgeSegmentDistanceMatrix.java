@@ -14,28 +14,24 @@ class EdgeSegmentDistanceMatrix extends DefaultDistanceMatrix<EdgeSegment> {
 
     public EdgeSegmentDistanceMatrix(List<EdgeSegment> items,
             DistanceMeasure<EdgeSegment> distanceMeasure,
-            Linkage<EdgeSegment> linkage) {
-        super(items, distanceMeasure, linkage);
+            Linkage<EdgeSegment> linkage, double maxMergeableDistance) {
+        super(items, distanceMeasure, linkage, maxMergeableDistance);
     }
 
     @Override
     protected ClusterNode<EdgeSegment> mergeClusterNodes(
-            ClusterNode<EdgeSegment> left, ClusterNode<EdgeSegment> right, double dist) {
-        EdgeSegment leftItem = left.getItem();
-        EdgeSegment rightItem = right.getItem();
-        EdgeSegment aggregatedItem = leftItem.aggregateWith(rightItem);
+            ClusterNode<EdgeSegment> cn1, ClusterNode<EdgeSegment> cn2, double dist) {
+        EdgeSegment item1 = cn1.getItem();
+        EdgeSegment item2 = cn2.getItem();
+        EdgeSegment aggregate = item1.aggregateWith(item2);
 
+        System.out.println("Merge item " + System.identityHashCode(item1) + " with " + System.identityHashCode(item2));
+        item1.replaceWith(aggregate);
+        item2.replaceWith(aggregate);
 
-        // TODO: update adjacent segments (and corresponding ClusterNodes)
-//        for (EdgeSegment ladj : leftItem.getLeftAdjacentSegments()) {
-//            // Create new and replace
-//            ladj.set
-//        }
+        // TODO: update changed items in cluster nodes or make edge segments mutable
 
-
-        // TODO: ? somehow let the corresponding SegmentedEdges know that the segments were merged
-
-        return new ClusterNode<EdgeSegment>(aggregatedItem, left, right, dist);
+        return new ClusterNode<EdgeSegment>(aggregate, cn1, cn2, dist);
     }
 
 }
