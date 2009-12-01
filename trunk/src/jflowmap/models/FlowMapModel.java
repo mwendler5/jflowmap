@@ -334,6 +334,17 @@ public class FlowMapModel {
         return points;
     }
 
+    public boolean isSelfLoop(Edge edge) {
+        Node src = edge.getSourceNode();
+        Node target = edge.getTargetNode();
+        if (src == target) {
+            return true;
+        }
+        return
+            (src.getDouble(xNodeAttr) == target.getDouble(xNodeAttr))  &&
+            (src.getDouble(yNodeAttr) == target.getDouble(yNodeAttr));
+    }
+
     public boolean hasEdgeSubdivisionPoints(Edge edge) {
         return
             edge.canGet(FlowMapModel.SUBDIVISION_POINTS_ATTR_NAME, List.class)  &&

@@ -45,18 +45,19 @@ public abstract class VisualEdge extends PNode {
     private final VisualNode sourceNode;
     private final VisualNode targetNode;
     private final Edge edge;
+    private final boolean isSelfLoop;
 
     private final double edgeLength;
 
     private PPath edgePPath;
-    
+
     public VisualEdge(VisualFlowMap visualFlowMap, Edge edge, VisualNode sourceNode, VisualNode targetNode) {
         this.edge = edge;
         this.sourceNode = sourceNode;
         this.targetNode = targetNode;
         this.visualFlowMap = visualFlowMap;
-    
-        if (isSelfLoop()) {
+        this.isSelfLoop = visualFlowMap.getModel().isSelfLoop(edge);
+        if (isSelfLoop) {
             this.edgeLength = 0;
         } else {
             final double x1 = sourceNode.getValueX();
@@ -69,20 +70,24 @@ public abstract class VisualEdge extends PNode {
         addInputEventListener(visualEdgeListener);
     }
 
+    public boolean isSelfLoop() {
+        return isSelfLoop;
+    }
+
     protected Shape createSelfLoopShape() {
         Shape shape;
         final double x1 = sourceNode.getValueX();
         final double y1 = sourceNode.getValueY();
-        
+
 //        shape = new Ellipse2D.Double(
-//                x1 - SELF_LOOP_CIRCLE_SIZE/2, y1, 
+//                x1 - SELF_LOOP_CIRCLE_SIZE/2, y1,
 //                SELF_LOOP_CIRCLE_SIZE, SELF_LOOP_CIRCLE_SIZE);
 
 //        final double size = SELF_LOOP_CIRCLE_SIZE;
         final double size = visualFlowMap.getStats().getEdgeLengthStats().getAvg() / 5;
 //        MinMax xstats = visualFlowMap.getGraphStats().getNodeXStats();
 //        MinMax ystats = visualFlowMap.getGraphStats().getNodeYStats();
-//        
+//
 //        final double xsize = (xstats.getMax() - xstats.getMin()) / 20;
 //        final double ysize = (ystats.getMax() - ystats.getMin()) / 20;
         shape = new BSplinePath(Arrays.asList(new Point[] {
@@ -92,41 +97,37 @@ public abstract class VisualEdge extends PNode {
                 new Point(x1 + size/2, y1 + size/2),
                 new Point(x1, y1)
         }));
-        
-        
+
+
         return shape;
     }
 
 
-    
+
     public double getSourceX() {
         return sourceNode.getValueX();
     }
-    
+
     public double getSourceY() {
         return sourceNode.getValueY();
     }
-    
+
     public double getTargetX() {
         return targetNode.getValueX();
     }
-    
+
     public double getTargetY() {
         return targetNode.getValueY();
     }
-    
+
     protected void setEdgePPath(PPath ppath) {
         this.edgePPath = ppath;
-    }    
-    
+    }
+
     protected PPath getEdgePPath() {
         return edgePPath;
     }
-    
-    public boolean isSelfLoop() {
-        return sourceNode == targetNode;
-    }
-    
+
     public void updateEdgeWidth() {
         PPath ppath = getEdgePPath();
         if (ppath != null) {
@@ -145,7 +146,7 @@ public abstract class VisualEdge extends PNode {
         double edgeLengthFilterMax = model.getEdgeLengthFilterMax();
         final double weight = getEdgeWeight();
         double length = getEdgeLength();
-        
+
         boolean visible =
                 weightFilterMin <= weight && weight <= weightFilterMax    &&
                 edgeLengthFilterMin <= length && length <= edgeLengthFilterMax
@@ -155,9 +156,9 @@ public abstract class VisualEdge extends PNode {
             if (visualFlowMap.hasClusters()) {
                 VisualNodeCluster srcCluster = visualFlowMap.getNodeCluster(getSourceNode());
                 VisualNodeCluster targetCluster = visualFlowMap.getNodeCluster(getTargetNode());
-                
+
                 // TODO: why do we need these null checks here?
-                visible = (srcCluster == null  ||  srcCluster.getTag().isVisible())  ||  
+                visible = (srcCluster == null  ||  srcCluster.getTag().isVisible())  ||
                           (targetCluster == null  ||  targetCluster.getTag().isVisible());
             }
         }
@@ -249,24 +250,24 @@ public abstract class VisualEdge extends PNode {
 
     public double getNormalizedValue() {
         double nv;
-    
+
         MinMax stats = visualFlowMap.getStats().getEdgeWeightStats();
         nv = stats.normalize(getEdgeWeight());
 
         if (Double.isNaN(nv)) {
             logger.error("NaN normalized value for edge: " + this);
         }
-    
+
         return nv;
     }
-   
+
     protected Paint createPaint() {
 		// TODO: use colors from color scheme
         FlowMapModel model = getVisualFlowMap().getModel();
         final double normalizedValue = getNormalizedLogValue();
         int intensity = (int)Math.round(MIN_COLOR_INTENSITY + (255 - MIN_COLOR_INTENSITY) * normalizedValue);
         int alpha = model.getEdgeAlpha();
-        if (isSelfLoop()) {
+        if (isSelfLoop) {
             return new Color(intensity, intensity, 0, alpha);	// mix of red and green
         } else {
         	if (!model.getShowDirectionMarkers()  &&  !model.getFillEdgesWithGradient()) {
@@ -292,8 +293,8 @@ public abstract class VisualEdge extends PNode {
 		        		MinMax lstats = visualFlowMap.getStats().getEdgeLengthStats();
 						markerSize = (float)Math.min(
 								.5 - MIN_FRACTION_DIFF,	 // the markers must not be longer than half of an edge
-								((lstats.getMin() + model.getDirectionMarkerSize() * (lstats.getMax() - lstats.getMin())) 
-								/ 2)			
+								((lstats.getMin() + model.getDirectionMarkerSize() * (lstats.getMax() - lstats.getMin()))
+								/ 2)
 								/ edgeLength	// the markers must be of equal length for every edge
 												// (excepting the short ones)
 						);
@@ -308,8 +309,8 @@ public abstract class VisualEdge extends PNode {
 		        	Color startMarkerColor = new Color(intensity, 0, 0, markerAlpha);
 		        	Color endMarkerColor = new Color(0, intensity, 0, markerAlpha);
 					fractions = new float[] {
-							markerSize - MIN_FRACTION_DIFF,			// start marker 
-							markerSize, 1.0f - markerSize,			// line 
+							markerSize - MIN_FRACTION_DIFF,			// start marker
+							markerSize, 1.0f - markerSize,			// line
 							1.0f - markerSize + MIN_FRACTION_DIFF	// end marker
 					};
 					colors = new Color[] {
@@ -329,7 +330,7 @@ public abstract class VisualEdge extends PNode {
 	                    colors
 	            );
         	}
-        	
+
         }
     }
 

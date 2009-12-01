@@ -18,8 +18,8 @@ import com.google.common.collect.Lists;
  */
 public class EdgeSegment {
 
-    private final Point a;
-    private final Point b;
+    private Point a;
+    private Point b;
     private final boolean aFixed;
     private final boolean bFixed;
     private final double weight;
@@ -60,6 +60,20 @@ public class EdgeSegment {
 
     public boolean isbFixed() {
         return bFixed;
+    }
+
+    public void setA(Point newA) {
+        if (aFixed) {
+            throw new IllegalStateException("A is a fixed point");
+        }
+        this.a = newA;
+    }
+
+    public void setB(Point newB) {
+        if (bFixed) {
+            throw new IllegalStateException("B is a fixed point");
+        }
+        this.b = newB;
     }
 
     public double getWeight() {
@@ -110,20 +124,6 @@ public class EdgeSegment {
 
     public double length() {
         return length;
-    }
-
-    public EdgeSegment withA(Point newA) {
-        if (aFixed) {
-            throw new IllegalStateException("A is a fixed point");
-        }
-        return new EdgeSegment(newA, false, b, bFixed, weight, parents);
-    }
-
-    public EdgeSegment withB(Point newB) {
-        if (bFixed) {
-            throw new IllegalStateException("B is a fixed point");
-        }
-        return new EdgeSegment(a, aFixed, newB, false, weight, parents);
     }
 
     public EdgeSegment aggregateWith(EdgeSegment other) {

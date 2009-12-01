@@ -134,6 +134,9 @@ public class EdgeSegmentAggregator {
 
         for (int i = 0; i < numEdges; i++) {
             Edge edge = flowMapModel.getGraph().getEdge(i);
+            if (flowMapModel.isSelfLoop(edge)) {
+                continue;
+            }
             List<Point> points = flowMapModel.getEdgeSubdivisionPoints(edge);
             SegmentedEdge segmentedEdge = new SegmentedEdge(edge);
             for (int pi = 0, psize = points.size(); pi <= psize; pi++) {

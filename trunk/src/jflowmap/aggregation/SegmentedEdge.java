@@ -50,7 +50,7 @@ public class SegmentedEdge {
             EdgeSegment prev = segments.get(index - 1);
             Point newB = newSegment.getA();
             if (!prev.getB().equals(newB)) {
-                prev.replaceWith(prev.withB(newB));
+                prev.setB(newB);
             }
         }
         int size = segments.size();
@@ -58,7 +58,7 @@ public class SegmentedEdge {
             EdgeSegment next = segments.get(index + 1);
             Point newA = newSegment.getB();
             if (!next.getA().equals(newA)) {
-                next.replaceWith(next.withA(newA));
+                next.setA(newA);
             }
         }
     }
