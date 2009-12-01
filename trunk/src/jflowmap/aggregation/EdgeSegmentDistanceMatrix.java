@@ -29,7 +29,7 @@ class EdgeSegmentDistanceMatrix extends DefaultDistanceMatrix<EdgeSegment> {
         item1.replaceWith(aggregate);
         item2.replaceWith(aggregate);
 
-        // TODO: update changed items in cluster nodes or make edge segments mutable
+        // TODO: update changed items in cluster nodes or make edge segments mutable and update them in-place
 
         return new ClusterNode<EdgeSegment>(aggregate, cn1, cn2, dist);
     }

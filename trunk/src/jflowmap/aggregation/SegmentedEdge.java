@@ -43,10 +43,8 @@ public class SegmentedEdge {
     public void replaceSegment(EdgeSegment oldSegment, EdgeSegment newSegment) {
         int index = indexOf(oldSegment);
 //        if (index == -1) {
-//            System.out.println(oldSegment);
-//            System.out.println(newSegment);
 //            return;
-//         }
+//        }
         segments.set(index, newSegment);
         if (index > 0) {
             EdgeSegment prev = segments.get(index - 1);

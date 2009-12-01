@@ -19,6 +19,16 @@
          <data key="y">0</data>
          <data key="name">B</data>
       </node>
+      <node id="A1">
+         <data key="x">5</data>
+         <data key="y">2</data>
+         <data key="name">A1</data>
+      </node>
+      <node id="B1">
+         <data key="x">58</data>
+         <data key="y">-2</data>
+         <data key="name">B1</data>
+      </node>
       <node id="C">
          <data key="x">10</data>
          <data key="y">100</data>
@@ -42,6 +52,9 @@
 
       <edge source="A" target="B" id="1">
          <data key="data">1</data>
+      </edge>
+      <edge source="A1" target="B1" id="1">
+         <data key="data">2</data>
       </edge>
 
       <edge source="C" target="D" id="2">

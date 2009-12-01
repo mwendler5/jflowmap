@@ -11,6 +11,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 /**
+ * EdgeSegment should be mutable, otherwise it's difficult to propagate
+ * to the cluster tree  the changes made to the segments adjacent to the merged ones.
+ *
  * @author Ilya Boyandin
  */
 public class EdgeSegment {
