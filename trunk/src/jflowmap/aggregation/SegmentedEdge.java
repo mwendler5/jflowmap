@@ -30,13 +30,21 @@ public class SegmentedEdge {
         return Collections.unmodifiableList(segments);
     }
 
-    public void add(EdgeSegment segment) {
+    /**
+     * Adds {@code segment} to the edge. The {@code segment} must be
+     * consecutive to the last segment of the edge (its start point
+     * must be the same as the end point of the last segment of the edge).
+     *
+     * @throws IllegalArgumentException If the segment is not consecutive
+     *         to the last segment of the edge.
+     */
+    public void addConsecutiveSegment(EdgeSegment segment) {
         if (segments.size() > 0) {
-            if (!Iterables.getLast(segments).getB().equals(segment.getA())) {
-                throw new IllegalArgumentException("Segments are not subsequent");
+            if (!segment.isConsecutiveFor(Iterables.getLast(segments))) {
+                throw new IllegalArgumentException("Segments are not consecutive");
             }
         }
-        System.out.println("Add segment " + System.identityHashCode(segment) + " to edge " + System.identityHashCode(this));
+//        System.out.println("Add segment " + System.identityHashCode(segment) + " to edge " + System.identityHashCode(this));
         segments.add(segment);
     }
 
@@ -46,19 +54,29 @@ public class SegmentedEdge {
 //            return;
 //        }
         segments.set(index, newSegment);
+
+        // update adjacent segments
+        // prev
         if (index > 0) {
             EdgeSegment prev = segments.get(index - 1);
             Point newB = newSegment.getA();
             if (!prev.getB().equals(newB)) {
                 prev.setB(newB);
+                if (newSegment.isaFixed()) {
+                    prev.setbFixed(true);
+                }
             }
         }
+        // next
         int size = segments.size();
         if (index < size - 1) {
             EdgeSegment next = segments.get(index + 1);
             Point newA = newSegment.getB();
             if (!next.getA().equals(newA)) {
                 next.setA(newA);
+                if (newSegment.isbFixed()) {
+                    next.setaFixed(true);
+                }
             }
         }
     }

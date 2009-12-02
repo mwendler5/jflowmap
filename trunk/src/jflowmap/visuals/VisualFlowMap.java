@@ -219,7 +219,7 @@ public class VisualFlowMap extends PNode {
                 VisualEdge visualEdge;
                 if (flowMapModel.hasEdgeSubdivisionPoints(edge)) {
                     visualEdge = new BSplineVisualEdge(
-                            this, edge, fromNode, toNode, flowMapModel.getEdgePoints(edge), true);
+                            this, edge, fromNode, toNode, flowMapModel.getEdgePoints(edge), false);
                 } else {
                     visualEdge = new LineVisualEdge(this, edge, fromNode, toNode);
                 }

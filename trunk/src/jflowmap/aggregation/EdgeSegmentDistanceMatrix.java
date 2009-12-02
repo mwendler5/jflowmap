@@ -25,7 +25,7 @@ class EdgeSegmentDistanceMatrix extends DefaultDistanceMatrix<EdgeSegment> {
         EdgeSegment item2 = cn2.getItem();
         EdgeSegment aggregate = item1.aggregateWith(item2);
 
-        System.out.println("Merge item " + System.identityHashCode(item1) + " with " + System.identityHashCode(item2));
+//        System.out.println("Merge item " + System.identityHashCode(item1) + " with " + System.identityHashCode(item2));
         item1.replaceWith(aggregate);
         item2.replaceWith(aggregate);
 

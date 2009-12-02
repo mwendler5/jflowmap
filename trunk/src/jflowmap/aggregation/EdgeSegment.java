@@ -12,7 +12,8 @@ import com.google.common.collect.Lists;
 
 /**
  * EdgeSegment should be mutable, otherwise it's difficult to propagate
- * to the cluster tree  the changes made to the segments adjacent to the merged ones.
+ * to the cluster tree  the changes made to the segments adjacent to
+ * those which are merged.
  *
  * @author Ilya Boyandin
  */
@@ -20,8 +21,8 @@ public class EdgeSegment {
 
     private Point a;
     private Point b;
-    private final boolean aFixed;
-    private final boolean bFixed;
+    private boolean aFixed;
+    private boolean bFixed;
     private final double weight;
     private final List<SegmentedEdge> parents;
     private final double length;
@@ -54,12 +55,20 @@ public class EdgeSegment {
         return aFixed;
     }
 
+    public void setaFixed(boolean aFixed) {
+        this.aFixed = aFixed;
+    }
+
     public Point getB() {
         return b;
     }
 
     public boolean isbFixed() {
         return bFixed;
+    }
+
+    public void setbFixed(boolean bFixed) {
+        this.bFixed = bFixed;
     }
 
     public void setA(Point newA) {
@@ -84,11 +93,15 @@ public class EdgeSegment {
         return parents;
     }
 
+    public boolean isConsecutiveFor(EdgeSegment seg) {
+        return seg.getB().equals(getA());
+    }
+
     public void replaceWith(EdgeSegment newSegment) {
-        System.out.println("Replace segment " + System.identityHashCode(this) + " with " + System.identityHashCode(newSegment));
+//        System.out.println("Replace segment " + System.identityHashCode(this) + " with " + System.identityHashCode(newSegment));
         for (SegmentedEdge se : parents) {
-            System.out.println(" >> Replace segment " + System.identityHashCode(this) + " with " + System.identityHashCode(newSegment) +
-                    " in edge " + System.identityHashCode(se));
+//            System.out.println(" >> Replace segment " + System.identityHashCode(this) + " with " + System.identityHashCode(newSegment) +
+//                    " in edge " + System.identityHashCode(se));
             se.replaceSegment(this, newSegment);
         }
     }
@@ -126,8 +139,17 @@ public class EdgeSegment {
         return length;
     }
 
+    public boolean canBeAggregatedWith(EdgeSegment other) {
+        return  !(isaFixed()  &&  other.isaFixed())  &&
+                !(isbFixed()  &&  other.isbFixed())  &&
+                !sharesAParentWith(other);
+    }
+
     public EdgeSegment aggregateWith(EdgeSegment other) {
 //        return aggregate(Arrays.asList(this, other));
+        if (!canBeAggregatedWith(other)) {
+            throw new IllegalArgumentException("Segments cannot be aggregated");
+        }
 
         Pair<Point, Boolean> newA = aggregate(a, aFixed, other.getA(), other.isaFixed());
         Pair<Point, Boolean> newB = aggregate(b, bFixed, other.getB(), other.isbFixed());

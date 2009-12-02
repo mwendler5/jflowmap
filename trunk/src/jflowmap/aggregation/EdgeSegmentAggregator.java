@@ -163,7 +163,7 @@ public class EdgeSegmentAggregator {
                         flowMapModel.getEdgeWeight(edge), segmentedEdge
                 );
                 segments.add(seg);
-                segmentedEdge.add(seg);
+                segmentedEdge.addConsecutiveSegment(seg);
             }
             segmentedEdges.add(segmentedEdge);
         }
@@ -190,10 +190,7 @@ public class EdgeSegmentAggregator {
     private static DistanceMeasure<EdgeSegment> DISTANCE_MEASURE = new DistanceMeasure<EdgeSegment>() {
         @Override
         public double distance(EdgeSegment seg1, EdgeSegment seg2) {
-            if (seg1.sharesAParentWith(seg2)) {
-                return Double.POSITIVE_INFINITY;
-            }
-            if ((seg1.isaFixed()  &&  seg2.isaFixed()) ||  ((seg1.isbFixed()  &&  seg2.isbFixed()))) {
+            if (!seg1.canBeAggregatedWith(seg2)) {
                 return Double.POSITIVE_INFINITY;
             }
 //            double l_avg = (seg1.length() + seg2.length())/2;
