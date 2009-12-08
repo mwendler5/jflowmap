@@ -26,10 +26,12 @@ class EdgeSegmentDistanceMatrix extends DefaultDistanceMatrix<EdgeSegment> {
         EdgeSegment aggregate = item1.aggregateWith(item2);
 
 //        System.out.println("Merge item " + System.identityHashCode(item1) + " with " + System.identityHashCode(item2));
+
         item1.replaceWith(aggregate);
         item2.replaceWith(aggregate);
+        // TODO: update distances for adjacent segments which were changed after replacing with aggregate
+        // Problem: how to find the cluster node which corresponds to the adjacent segments?
 
-        // TODO: update changed items in cluster nodes or make edge segments mutable and update them in-place
 
         return new ClusterNode<EdgeSegment>(aggregate, cn1, cn2, dist);
     }

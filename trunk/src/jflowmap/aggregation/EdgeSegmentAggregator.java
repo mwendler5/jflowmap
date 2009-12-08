@@ -24,6 +24,12 @@ import com.google.common.collect.Lists;
 
      Q: How to show directions with color after aggregation?
 
+
+     Q: Problem: What happens if the length of a segment becomes equal to zero? This can be problematic
+        as it means that the segment will not be visible -> problem the flow differs much from the adjacent
+        segments
+
+
  * @author Ilya Boyandin
  */
 public class EdgeSegmentAggregator {
@@ -181,7 +187,8 @@ public class EdgeSegmentAggregator {
 //            ;
             return
                 DISTANCE_MEASURE.distance(
-                        mergedNode.getItem(),
+                        mergedNode.getItem(),   // exploits the fact that the
+                                                // merged node has an (aggregated) item
                         node.getItem()
                 );
         }

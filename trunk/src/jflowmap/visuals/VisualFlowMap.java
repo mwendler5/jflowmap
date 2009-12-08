@@ -2,6 +2,7 @@ package jflowmap.visuals;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -25,6 +26,7 @@ import jflowmap.bundling.ForceDirectedEdgeBundler;
 import jflowmap.clustering.NodeDistanceMeasure;
 import jflowmap.data.FlowMapStats;
 import jflowmap.data.MinMax;
+import jflowmap.geom.Point;
 import jflowmap.models.FlowMapModel;
 
 import org.apache.log4j.Logger;
@@ -57,6 +59,7 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
  */
 public class VisualFlowMap extends PNode {
 
+    private static final boolean SHOW_SPLINE_POINTS = true;
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(VisualFlowMap.class);
     public enum Attributes {
@@ -219,7 +222,7 @@ public class VisualFlowMap extends PNode {
                 VisualEdge visualEdge;
                 if (flowMapModel.hasEdgeSubdivisionPoints(edge)) {
                     visualEdge = new BSplineVisualEdge(
-                            this, edge, fromNode, toNode, flowMapModel.getEdgePoints(edge), false);
+                            this, edge, fromNode, toNode, flowMapModel.getEdgePoints(edge), SHOW_SPLINE_POINTS);
                 } else {
                     visualEdge = new LineVisualEdge(this, edge, fromNode, toNode);
                 }
@@ -510,16 +513,29 @@ public class VisualFlowMap extends PNode {
             @Override
             public Object construct() {
                 try {
+                    Color jointPtColor = new Color(0, 0, 255, 150);
                     aggregator.aggregate(pt);
                     List<EdgeSegment> segments = aggregator.getAggregatedSegments();
                     for (EdgeSegment seg : segments) {
-                        Line2D.Double line = new Line2D.Double(seg.getA().asPoint2D(), seg.getB().asPoint2D());
+                        Point src = seg.getA();
+                        Point dest = seg.getB();
+                        Line2D.Double line = new Line2D.Double(src.asPoint2D(), dest.asPoint2D());
                         double nv = getStats().getEdgeWeightStats().normalizeLog(seg.getWeight());
                         double width = 1 + nv * getModel().getMaxEdgeWidth();
                         PPath ppath = new PPath(line, new PFixedWidthStroke((float)width));
                         ppath.setPaint(Color.white);
                         ppath.setStrokePaint(Color.white);
                         addChild(ppath);
+
+                        double d = .5;
+                        PPath srcp = new PPath(new Ellipse2D.Double(src.x() - d/2, src.y() - d/2, d, d));
+                        PPath dstp = new PPath(new Ellipse2D.Double(dest.x() - d/2, dest.y() - d/2, d, d));
+                        addChild(srcp);
+                        addChild(dstp);
+                        srcp.setPaint(jointPtColor);
+                        dstp.setPaint(jointPtColor);
+                        srcp.setStroke(null);
+                        dstp.setStroke(null);
                     }
                     repaint();
                 } catch (Throwable th) {
