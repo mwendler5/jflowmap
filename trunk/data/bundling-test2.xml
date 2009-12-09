@@ -29,6 +29,26 @@
          <data key="y">-2</data>
          <data key="name">B1</data>
       </node>
+      <node id="A2">
+         <data key="x">15</data>
+         <data key="y">5</data>
+         <data key="name">A2</data>
+      </node>
+      <node id="B2">
+         <data key="x">52</data>
+         <data key="y">-10</data>
+         <data key="name">B2</data>
+      </node>
+      <node id="A3">
+         <data key="x">5</data>
+         <data key="y">-5</data>
+         <data key="name">A3</data>
+      </node>
+      <node id="B3">
+         <data key="x">80</data>
+         <data key="y">0</data>
+         <data key="name">B3</data>
+      </node>
       <node id="C">
          <data key="x">10</data>
          <data key="y">100</data>
@@ -51,10 +71,16 @@
       </node>
 
       <edge source="A" target="B" id="1">
-         <data key="data">1</data>
+         <data key="data">3</data>
       </edge>
       <edge source="A1" target="B1" id="1">
          <data key="data">2</data>
+      </edge>
+      <edge source="A2" target="B2" id="1">
+         <data key="data">5</data>
+      </edge>
+      <edge source="A3" target="B3" id="1">
+         <data key="data">4</data>
       </edge>
 
       <edge source="C" target="D" id="2">

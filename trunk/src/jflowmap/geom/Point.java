@@ -4,10 +4,10 @@ import java.awt.geom.Point2D;
 
 /**
  * Immutable Point implementation.
- * 
+ *
  * @author Ilya Boyandin
  */
-public class Point {
+public final class Point {
 
     private final double x;
     private final double y;
@@ -30,11 +30,11 @@ public class Point {
         double dy = point.y() - y;
         return Math.sqrt(dx * dx + dy * dy);
     }
-    
+
     public Point2D asPoint2D() {
         return new Point2D.Double(x, y);
     }
-    
+
     public static Point valueOf(Point2D point) {
         return new Point(point.getX(), point.getY());
     }

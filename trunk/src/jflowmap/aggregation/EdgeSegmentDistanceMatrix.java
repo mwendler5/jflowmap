@@ -2,20 +2,20 @@ package jflowmap.aggregation;
 
 import java.util.List;
 
+import at.fhj.utils.misc.ProgressTracker;
+import ch.unifr.dmlib.cluster.AbstractDistanceMatrix;
 import ch.unifr.dmlib.cluster.ClusterNode;
-import ch.unifr.dmlib.cluster.DefaultDistanceMatrix;
 import ch.unifr.dmlib.cluster.DistanceMeasure;
-import ch.unifr.dmlib.cluster.Linkage;
 
 /**
  * @author Ilya Boyandin
  */
-class EdgeSegmentDistanceMatrix extends DefaultDistanceMatrix<EdgeSegment> {
+class EdgeSegmentDistanceMatrix extends AbstractDistanceMatrix<EdgeSegment> {
 
     public EdgeSegmentDistanceMatrix(List<EdgeSegment> items,
             DistanceMeasure<EdgeSegment> distanceMeasure,
-            Linkage<EdgeSegment> linkage, double maxMergeableDistance) {
-        super(items, distanceMeasure, linkage, maxMergeableDistance);
+            double maxMergeableDistance) {
+        super(items, distanceMeasure, null, maxMergeableDistance);
     }
 
     @Override
@@ -35,5 +35,20 @@ class EdgeSegmentDistanceMatrix extends DefaultDistanceMatrix<EdgeSegment> {
 
         return new ClusterNode<EdgeSegment>(aggregate, cn1, cn2, dist);
     }
+
+    @Override
+    public void calc(ProgressTracker progress) {
+    }
+
+    @Override
+    protected double getDistanceBetweenClusterNodes(int i, int j) {
+        return getDistanceMeasure().distance(getNode(i).getItem(), getNode(j).getItem());
+    }
+
+    @Override
+    protected void updateDistances(int mergedNode1, int mergedNode2,
+            ClusterNode<EdgeSegment> newNode) {
+    }
+
 
 }

@@ -26,7 +26,7 @@ import jflowmap.bundling.ForceDirectedEdgeBundler;
 import jflowmap.clustering.NodeDistanceMeasure;
 import jflowmap.data.FlowMapStats;
 import jflowmap.data.MinMax;
-import jflowmap.geom.Point;
+import jflowmap.geom.FPoint;
 import jflowmap.models.FlowMapModel;
 
 import org.apache.log4j.Logger;
@@ -517,10 +517,12 @@ public class VisualFlowMap extends PNode {
                     aggregator.aggregate(pt);
                     List<EdgeSegment> segments = aggregator.getAggregatedSegments();
                     for (EdgeSegment seg : segments) {
-                        Point src = seg.getA();
-                        Point dest = seg.getB();
+                        FPoint src = seg.getA();
+                        FPoint dest = seg.getB();
                         Line2D.Double line = new Line2D.Double(src.asPoint2D(), dest.asPoint2D());
                         double nv = getStats().getEdgeWeightStats().normalizeLog(seg.getWeight());
+//                        double nv = getStats().getEdgeWeightStats().normalize(seg.getWeight());
+//                        double nv = seg.getWeight();
                         double width = 1 + nv * getModel().getMaxEdgeWidth();
                         PPath ppath = new PPath(line, new PFixedWidthStroke((float)width));
                         ppath.setPaint(Color.white);

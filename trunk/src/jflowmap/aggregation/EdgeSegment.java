@@ -3,8 +3,7 @@ package jflowmap.aggregation;
 import java.util.List;
 
 import jflowmap.geom.GeomUtils;
-import jflowmap.geom.Point;
-import jflowmap.util.Pair;
+import jflowmap.geom.FPoint;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -19,67 +18,48 @@ import com.google.common.collect.Lists;
  */
 public class EdgeSegment {
 
-    private Point a;
-    private Point b;
-    private boolean aFixed;
-    private boolean bFixed;
+    private FPoint a;
+    private FPoint b;
     private final double weight;
     private final List<SegmentedEdge> parents;
-    private final double length;
 
-    public EdgeSegment(Point a, boolean aFixed, Point b, boolean bFixed, double weight, SegmentedEdge parent) {
+    public EdgeSegment(FPoint a, FPoint b, double weight, SegmentedEdge parent) {
         this.a = a;
         this.b = b;
-        this.aFixed = aFixed;
-        this.bFixed = bFixed;
         this.weight = weight;
-        this.length = a.distanceTo(b);
         this.parents = ImmutableList.of(parent);
     }
 
-    public EdgeSegment(Point a, boolean aFixed, Point b, boolean bFixed, double weight, Iterable<SegmentedEdge> parents) {
+    public EdgeSegment(FPoint a, FPoint b, double weight, Iterable<SegmentedEdge> parents) {
         this.a = a;
         this.b = b;
-        this.aFixed = aFixed;
-        this.bFixed = bFixed;
         this.weight = weight;
-        this.length = a.distanceTo(b);
         this.parents = ImmutableList.copyOf(parents);
     }
 
-    public Point getA() {
+    public FPoint getA() {
         return a;
     }
 
-    public boolean isaFixed() {
-        return aFixed;
-    }
-
-    public void setaFixed(boolean aFixed) {
-        this.aFixed = aFixed;
-    }
-
-    public Point getB() {
+    public FPoint getB() {
         return b;
     }
 
-    public boolean isbFixed() {
-        return bFixed;
-    }
-
-    public void setbFixed(boolean bFixed) {
-        this.bFixed = bFixed;
-    }
-
-    public void setA(Point newA) {
-        if (aFixed) {
+    public void setA(FPoint newA) {
+        if (newA.equals(a)) {
+            return;
+        }
+        if (a.isFixed()) {
             throw new IllegalStateException("A is a fixed point");
         }
         this.a = newA;
     }
 
-    public void setB(Point newB) {
-        if (bFixed) {
+    public void setB(FPoint newB) {
+        if (newB.equals(b)) {
+            return;
+        }
+        if (b.isFixed()) {
             throw new IllegalStateException("B is a fixed point");
         }
         this.b = newB;
@@ -136,12 +116,13 @@ public class EdgeSegment {
     }
 
     public double length() {
-        return length;
+        return a.distanceTo(b);
     }
 
     public boolean canBeAggregatedWith(EdgeSegment other) {
-        return  !(isaFixed()  &&  other.isaFixed())  &&
-                !(isbFixed()  &&  other.isbFixed())  &&
+        return  !(a.isFixed()  &&  other.a.isFixed()  &&  !a.equals(other.getA()))  &&
+                !(b.isFixed()  &&  other.b.isFixed()  &&  !b.equals(other.b))  &&
+//                (length() != 0  &&  other.length() != 0)  &&
                 !sharesAParentWith(other);
     }
 
@@ -151,33 +132,24 @@ public class EdgeSegment {
             throw new IllegalArgumentException("Segments cannot be aggregated");
         }
 
-        Pair<Point, Boolean> newA = aggregate(a, aFixed, other.getA(), other.isaFixed());
-        Pair<Point, Boolean> newB = aggregate(b, bFixed, other.getB(), other.isbFixed());
-
         return new EdgeSegment(
-                newA.first(), newA.second(), newB.first(), newB.second(), weight + other.weight,
+                aggregate(a, other.getA()), aggregate(b, other.getB()), weight + other.weight,
 //                Iterables.concat(getParents(), other.getParents())
                 getParentsOf(this, other)
         );
     }
 
-    private Pair<Point, Boolean> aggregate(Point p1, boolean p1Fixed, Point p2, boolean p2Fixed) {
-        if (p1Fixed  &&  p2Fixed) {
+    private FPoint aggregate(FPoint p1, FPoint p2) {
+        if (p1.isFixed()  &&  p2.isFixed()  &&  !p1.equals(p2)) {
             throw new IllegalArgumentException("Both points are fixed; cannot aggregate");
         }
-        Point newP;
-        boolean newFixed;
-        if (p1Fixed) {
-            newP = p1;
-            newFixed = true;
-        } else if (p2Fixed) {
-            newP = p2;
-            newFixed = true;
+        if (p1.isFixed()) {
+            return p1;
+        } else if (p2.isFixed()) {
+            return p2;
         } else {
-            newP = GeomUtils.midpoint(p1, p2);
-            newFixed = false;
+            return new FPoint(GeomUtils.midpoint(p1.getPoint(), p2.getPoint()), false);
         }
-        return Pair.of(newP, newFixed);
     }
 
     private static List<SegmentedEdge> getParentsOf(EdgeSegment ... segs) {
@@ -197,8 +169,8 @@ public class EdgeSegment {
 //        for (EdgeSegment seg : segments) {
 //            sumWeight += seg.getWeight();
 //        }
-//        Point newA = null;
-//        Point newB = null;
+//        SPoint newA = null;
+//        SPoint newB = null;
 //        boolean aFixed = false;
 //        boolean bFixed = false;
 //        for (EdgeSegment seg : segments) {
@@ -233,16 +205,16 @@ public class EdgeSegment {
 //        );
 //    }
 
-    public static final Function<EdgeSegment, Point> TRANSFORM_TO_A = new Function<EdgeSegment, Point>() {
+    public static final Function<EdgeSegment, FPoint> TRANSFORM_TO_A = new Function<EdgeSegment, FPoint>() {
         @Override
-        public Point apply(EdgeSegment segment) {
+        public FPoint apply(EdgeSegment segment) {
             return segment.getA();
         }
     };
 
-    public static final Function<EdgeSegment, Point> TRANSFORM_TO_B = new Function<EdgeSegment, Point>() {
+    public static final Function<EdgeSegment, FPoint> TRANSFORM_TO_B = new Function<EdgeSegment, FPoint>() {
         @Override
-        public Point apply(EdgeSegment segment) {
+        public FPoint apply(EdgeSegment segment) {
             return segment.getB();
         }
     };
@@ -257,63 +229,11 @@ public class EdgeSegment {
 
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((a == null) ? 0 : a.hashCode());
-        result = prime * result + (aFixed ? 1231 : 1237);
-        result = prime * result + ((b == null) ? 0 : b.hashCode());
-        result = prime * result + (bFixed ? 1231 : 1237);
-        long temp;
-        temp = Double.doubleToLongBits(length);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(weight);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-//        result = prime * result + ((parents == null) ? 0 : parents.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        EdgeSegment other = (EdgeSegment) obj;
-        if (a == null) {
-            if (other.a != null)
-                return false;
-        } else if (!a.equals(other.a))
-            return false;
-        if (aFixed != other.aFixed)
-            return false;
-        if (b == null) {
-            if (other.b != null)
-                return false;
-        } else if (!b.equals(other.b))
-            return false;
-        if (bFixed != other.bFixed)
-            return false;
-        if (Double.doubleToLongBits(length) != Double
-                .doubleToLongBits(other.length))
-            return false;
-        if (Double.doubleToLongBits(weight) != Double
-                .doubleToLongBits(other.weight))
-            return false;
-//        if (parents == null) {
-//            if (other.parents != null)
-//                return false;
-//        } else if (!parents.equals(other.parents))
-//            return false;
-        return true;
-    }
-
-    @Override
     public String toString() {
-        return "EdgeSegment [a=" + a + ", b=" + b + ", length=" + length
-                + ", parents.size=" + parents.size() + ", weight=" + weight + "]";
+        return "EdgeSegment [" +
+                "a=" + a + ", b=" + b +
+                ", parents.size=" + parents.size() + ", weight=" + weight +
+                "]";
     }
 
 }

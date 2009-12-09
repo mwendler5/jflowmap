@@ -3,7 +3,7 @@ package jflowmap.aggregation;
 import java.util.Collections;
 import java.util.List;
 
-import jflowmap.geom.Point;
+import jflowmap.geom.FPoint;
 import prefuse.data.Edge;
 
 import com.google.common.collect.Iterables;
@@ -45,6 +45,9 @@ public class SegmentedEdge {
             }
         }
 //        System.out.println("Add segment " + System.identityHashCode(segment) + " to edge " + System.identityHashCode(this));
+        if (!segment.getParents().contains(this)) {
+            throw new IllegalArgumentException();
+        }
         segments.add(segment);
     }
 
@@ -59,11 +62,11 @@ public class SegmentedEdge {
         // prev
         if (index > 0) {
             EdgeSegment prev = segments.get(index - 1);
-            Point newB = newSegment.getA();
+            FPoint newB = newSegment.getA();
             if (!prev.getB().equals(newB)) {
                 prev.setB(newB);
-                if (newSegment.isaFixed()) {
-                    prev.setbFixed(true);
+                if (newSegment.getA().isFixed()) {
+                    prev.setB(prev.getB().withFixed(true));
                 }
             }
         }
@@ -71,11 +74,11 @@ public class SegmentedEdge {
         int size = segments.size();
         if (index < size - 1) {
             EdgeSegment next = segments.get(index + 1);
-            Point newA = newSegment.getB();
+            FPoint newA = newSegment.getB();
             if (!next.getA().equals(newA)) {
                 next.setA(newA);
-                if (newSegment.isbFixed()) {
-                    next.setaFixed(true);
+                if (newSegment.getB().isFixed()) {
+                    next.setA(next.getA().withFixed(true));
                 }
             }
         }

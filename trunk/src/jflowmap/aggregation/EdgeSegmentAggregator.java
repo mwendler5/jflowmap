@@ -3,6 +3,7 @@ package jflowmap.aggregation;
 import java.util.List;
 
 import jflowmap.geom.Point;
+import jflowmap.geom.FPoint;
 import jflowmap.models.FlowMapModel;
 
 import org.apache.log4j.Logger;
@@ -51,7 +52,8 @@ public class EdgeSegmentAggregator {
         initSegments();
         List<ClusterNode<EdgeSegment>> nodes =
             HierarchicalClusterer
-                .createWith(DISTANCE_MEASURE, LINKAGE)
+//                .createWith(DISTANCE_MEASURE, LINKAGE)
+                .createWith(DISTANCE_MEASURE, null)
                 .withDistanceMatrixFactory(DISTANCE_MATRIX_FACTORY)
 //                .withMaxMergeableDistance(Double.MAX_VALUE)  // disallows POSITIVE_INFINITY
 //                .withMaxMergeableDistance(.9575)
@@ -165,7 +167,7 @@ public class EdgeSegmentAggregator {
                     bFixed = false;
                 }
                 EdgeSegment seg = new EdgeSegment(
-                        a, aFixed, b, bFixed,
+                        new FPoint(a, aFixed), new FPoint(b, bFixed),
                         flowMapModel.getEdgeWeight(edge), segmentedEdge
                 );
                 segments.add(seg);
@@ -175,24 +177,24 @@ public class EdgeSegmentAggregator {
         }
     }
 
-    private static Linkage<EdgeSegment> LINKAGE = new Linkage<EdgeSegment>() {
-        @Override
-        public double link(
-                ClusterNode<EdgeSegment> mergedNode,
-                ClusterNode<EdgeSegment> node, double distanceToLeft,
-                double distanceToRight, DistanceMatrix<EdgeSegment> distances) {
-//            return DISTANCE_MEASURE.distance(
-//                    EdgeSegment.aggregate(mergedNode.listItems()),
-//                    EdgeSegment.aggregate(node.listItems()))
-//            ;
-            return
-                DISTANCE_MEASURE.distance(
-                        mergedNode.getItem(),   // exploits the fact that the
-                                                // merged node has an (aggregated) item
-                        node.getItem()
-                );
-        }
-    };
+//    private static Linkage<EdgeSegment> LINKAGE = new Linkage<EdgeSegment>() {
+//        @Override
+//        public double link(
+//                ClusterNode<EdgeSegment> mergedNode,
+//                ClusterNode<EdgeSegment> node, double distanceToLeft,
+//                double distanceToRight, DistanceMatrix<EdgeSegment> distances) {
+////            return DISTANCE_MEASURE.distance(
+////                    EdgeSegment.aggregate(mergedNode.listItems()),
+////                    EdgeSegment.aggregate(node.listItems()))
+////            ;
+//            return
+//                DISTANCE_MEASURE.distance(
+//                        mergedNode.getItem(),   // exploits the fact that the
+//                                                // merged node has an (aggregated) item
+//                        node.getItem()
+//                );
+//        }
+//    };
 
     private static DistanceMeasure<EdgeSegment> DISTANCE_MEASURE = new DistanceMeasure<EdgeSegment>() {
         @Override
@@ -219,7 +221,7 @@ public class EdgeSegmentAggregator {
                     Linkage<EdgeSegment> linkage,
                     DistanceMeasure<EdgeSegment> measure,
                     double maxMergeableDistance) {
-                return new EdgeSegmentDistanceMatrix(items, measure, linkage, maxMergeableDistance);
+                return new EdgeSegmentDistanceMatrix(items, measure, /*linkage,*/ maxMergeableDistance);
             }
         };
 
