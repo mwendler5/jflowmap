@@ -218,6 +218,7 @@ public class JFlowMap extends JComponent {
     }
 
     public static final DatasetSpec[] datasetSpecs = new DatasetSpec[] {
+        new DatasetSpec("data/bundling-test1.xml", "data", "x", "y", "name", null),
         new DatasetSpec("data/bundling-test2.xml", "data", "x", "y", "name", null),
         new DatasetSpec("data/bundling-test6.xml", "data", "x", "y", "name", null),
         new DatasetSpec("data/migrations-unique.xml", "value", "x", "y", "tooltip", null, 1000),

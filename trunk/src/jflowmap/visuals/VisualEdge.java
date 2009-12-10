@@ -157,9 +157,9 @@ public abstract class VisualEdge extends PNode {
                 VisualNodeCluster srcCluster = visualFlowMap.getNodeCluster(getSourceNode());
                 VisualNodeCluster targetCluster = visualFlowMap.getNodeCluster(getTargetNode());
 
-                // TODO: why do we need these null checks here?
-                visible = (srcCluster == null  ||  srcCluster.getTag().isVisible())  ||
-                          (targetCluster == null  ||  targetCluster.getTag().isVisible());
+                // TODO: why do we need these null checks here? i.e. why some countries don't have a cluster
+                visible = (srcCluster != null  &&  srcCluster.getTag().isVisible())  ||
+                          (targetCluster != null  &&  targetCluster.getTag().isVisible());
             }
         }
         setVisible(visible);

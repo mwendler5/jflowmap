@@ -513,10 +513,15 @@ public class VisualFlowMap extends PNode {
             @Override
             public Object construct() {
                 try {
-                    Color jointPtColor = new Color(0, 0, 255, 150);
                     aggregator.aggregate(pt);
                     List<EdgeSegment> segments = aggregator.getAggregatedSegments();
+                    Color jointPtColor = new Color(0, 0, 255, 150);
+//                    Color[] jointPtColors = ColorUtils.createCategoryColors(segments.size(), .9, 200);
+                    int cnt = 0;
                     for (EdgeSegment seg : segments) {
+//                        if (seg.length() == 0) {
+//                            logger.warn("Zero-length segment: " + seg);
+//                        }
                         FPoint src = seg.getA();
                         FPoint dest = seg.getB();
                         Line2D.Double line = new Line2D.Double(src.asPoint2D(), dest.asPoint2D());
@@ -538,6 +543,7 @@ public class VisualFlowMap extends PNode {
                         dstp.setPaint(jointPtColor);
                         srcp.setStroke(null);
                         dstp.setStroke(null);
+                        cnt++;
                     }
                     repaint();
                 } catch (Throwable th) {

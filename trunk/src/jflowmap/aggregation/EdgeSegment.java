@@ -1,12 +1,13 @@
 package jflowmap.aggregation;
 
+import java.util.Collections;
 import java.util.List;
 
-import jflowmap.geom.GeomUtils;
 import jflowmap.geom.FPoint;
+import jflowmap.geom.GeomUtils;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
@@ -21,20 +22,22 @@ public class EdgeSegment {
     private FPoint a;
     private FPoint b;
     private final double weight;
-    private final List<SegmentedEdge> parents;
+    private final List<SegmentedEdge> parents = Lists.newArrayList();
 
-    public EdgeSegment(FPoint a, FPoint b, double weight, SegmentedEdge parent) {
+    public EdgeSegment(FPoint a, FPoint b, double weight) {
         this.a = a;
         this.b = b;
         this.weight = weight;
-        this.parents = ImmutableList.of(parent);
+    }
+
+    public EdgeSegment(FPoint a, FPoint b, double weight, SegmentedEdge parent) {
+        this(a, b, weight);
+        this.parents.add(parent);
     }
 
     public EdgeSegment(FPoint a, FPoint b, double weight, Iterable<SegmentedEdge> parents) {
-        this.a = a;
-        this.b = b;
-        this.weight = weight;
-        this.parents = ImmutableList.copyOf(parents);
+        this(a, b, weight);
+        Iterables.addAll(this.parents, parents);
     }
 
     public FPoint getA() {
@@ -53,6 +56,12 @@ public class EdgeSegment {
             throw new IllegalStateException("A is a fixed point");
         }
         this.a = newA;
+        for (SegmentedEdge se : parents) {
+            EdgeSegment prev = se.getPrev(this);
+            if (prev != null) {
+                prev.setB(newA);
+            }
+        }
     }
 
     public void setB(FPoint newB) {
@@ -63,6 +72,12 @@ public class EdgeSegment {
             throw new IllegalStateException("B is a fixed point");
         }
         this.b = newB;
+        for (SegmentedEdge se : parents) {
+            EdgeSegment next = se.getNext(this);
+            if (next != null) {
+                next.setA(newB);
+            }
+        }
     }
 
     public double getWeight() {
@@ -70,7 +85,17 @@ public class EdgeSegment {
     }
 
     public List<SegmentedEdge> getParents() {
-        return parents;
+        return Collections.unmodifiableList(parents);
+    }
+
+    public void addParent(SegmentedEdge parent) {
+        if (!parents.contains(parent)) {
+            parents.add(parent);
+        }
+    }
+
+    public void removeParent(SegmentedEdge parent) {
+        parents.remove(parent);
     }
 
     public boolean isConsecutiveFor(EdgeSegment seg) {

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import jflowmap.geom.FPoint;
+import jflowmap.util.Pair;
 import prefuse.data.Edge;
 
 import com.google.common.collect.Iterables;
@@ -45,43 +46,87 @@ public class SegmentedEdge {
             }
         }
 //        System.out.println("Add segment " + System.identityHashCode(segment) + " to edge " + System.identityHashCode(this));
-        if (!segment.getParents().contains(this)) {
-            throw new IllegalArgumentException();
-        }
+//        if (!segment.getParents().contains(this)) {
+//            throw new IllegalArgumentException();
+//        }
         segments.add(segment);
+        segment.addParent(this);
     }
 
     public void replaceSegment(EdgeSegment oldSegment, EdgeSegment newSegment) {
         int index = indexOf(oldSegment);
-//        if (index == -1) {
-//            return;
-//        }
         segments.set(index, newSegment);
+        newSegment.addParent(this);
 
         // update adjacent segments
         // prev
-        if (index > 0) {
-            EdgeSegment prev = segments.get(index - 1);
+        EdgeSegment prev = getPrev(index);
+        if (prev != null) {
             FPoint newB = newSegment.getA();
             if (!prev.getB().equals(newB)) {
                 prev.setB(newB);
-                if (newSegment.getA().isFixed()) {
-                    prev.setB(prev.getB().withFixed(true));
-                }
             }
         }
         // next
-        int size = segments.size();
-        if (index < size - 1) {
-            EdgeSegment next = segments.get(index + 1);
+        EdgeSegment next = getNext(index);
+        if (next != null) {
             FPoint newA = newSegment.getB();
             if (!next.getA().equals(newA)) {
                 next.setA(newA);
-                if (newSegment.getB().isFixed()) {
-                    next.setA(next.getA().withFixed(true));
-                }
             }
         }
+    }
+
+    /**
+     * Will throw IllegalArgumentException if edge is not a part of the edge.
+     */
+    public Pair<EdgeSegment, EdgeSegment> getPrevAndNext(EdgeSegment seg) {
+        return getPrevAndNext(indexOf(seg));
+    }
+
+    /**
+     * Will throw IllegalArgumentException if edge is not a part of the edge.
+     */
+    public EdgeSegment getPrev(EdgeSegment seg) {
+        return getPrev(indexOf(seg));
+    }
+
+    /**
+     * Will throw IllegalArgumentException if edge is not a part of the edge.
+     */
+    public EdgeSegment getNext(EdgeSegment seg) {
+        return getNext(indexOf(seg));
+    }
+
+    private Pair<EdgeSegment, EdgeSegment> getPrevAndNext(int index) {
+        return Pair.of(getPrev(index), getNext(index));
+    }
+
+    private EdgeSegment getPrev(int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("Segment not found in the edge: " + index);
+        }
+        EdgeSegment prev;
+        if (index > 0) {
+            prev = segments.get(index - 1);
+        } else {
+            prev = null;
+        }
+        return prev;
+    }
+
+    private EdgeSegment getNext(int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("Segment not found in the edge: " + index);
+        }
+        int size = segments.size();
+        EdgeSegment next;
+        if (index < size - 1) {
+            next = segments.get(index + 1);
+        } else {
+            next = null;
+        }
+        return next;
     }
 
     private int indexOf(EdgeSegment segment) {

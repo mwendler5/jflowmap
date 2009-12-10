@@ -1,11 +1,14 @@
 package jflowmap.aggregation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import jflowmap.geom.FPoint;
 
 import org.junit.Test;
 
 import prefuse.data.tuple.TableEdge;
+
+import com.google.common.collect.Iterables;
 
 
 public class SegmentedEdgeTest {
@@ -13,7 +16,7 @@ public class SegmentedEdgeTest {
     private static final double EPS = 1e-7;
 
     @Test
-    public void testReplaceSegment() {
+    public void testReplaceSegment_withAggregate() {
         SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
         SegmentedEdge edge2 = new SegmentedEdge(new TableEdge());
         EdgeSegment
@@ -53,6 +56,86 @@ public class SegmentedEdgeTest {
 
         assertEquals(new FPoint(1.75, 0.5, false), seg1_3.getA());
         assertEquals(new FPoint(1.75, 0.5, false), seg2_3.getA());
+    }
+
+
+    @Test
+    public void testReplaceSegment() {
+
+        /*             edge1
+                        *
+                       /
+                      1
+                     /
+  edge1,2,3 *===0===*--2---* edge2            replacing #2 with #5
+                     \
+                      3
+                       \
+                        *
+                        edge3
+
+
+         */
+        SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
+        SegmentedEdge edge2 = new SegmentedEdge(new TableEdge());
+        SegmentedEdge edge3 = new SegmentedEdge(new TableEdge());
+
+        EdgeSegment seg0 = new EdgeSegment(new FPoint(0, 0, false), new FPoint(1, 0, false), 3.0);
+        edge1.addConsecutiveSegment(seg0);
+        edge2.addConsecutiveSegment(seg0);
+        edge3.addConsecutiveSegment(seg0);
+        assertEquals(3, seg0.getParents().size());
+
+        EdgeSegment seg1 = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, -1, false), 1.0);
+        edge1.addConsecutiveSegment(seg1);
+
+        EdgeSegment seg2 = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, 0, false), 1.0);
+        edge2.addConsecutiveSegment(seg2);
+
+        EdgeSegment seg3 = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, +1, false), 1.0);
+        edge3.addConsecutiveSegment(seg3);
+
+
+        // check prev/next
+        assertEquals(seg0, edge1.getPrev(seg1)); assertEquals(seg1, edge1.getNext(seg0));
+        assertEquals(seg0, edge2.getPrev(seg2)); assertEquals(seg2, edge2.getNext(seg0));
+        assertEquals(seg0, edge3.getPrev(seg3)); assertEquals(seg3, edge3.getNext(seg0));
+
+        // check parents
+        assertEquals(edge1, Iterables.getOnlyElement(seg1.getParents()));
+        assertEquals(edge2, Iterables.getOnlyElement(seg2.getParents()));
+        assertEquals(edge3, Iterables.getOnlyElement(seg3.getParents()));
+
+
+        // REPLACE seg2 with seg5
+        EdgeSegment seg5 = new EdgeSegment(new FPoint(1.1, 0.1, false), new FPoint(2.1, 0.1, false), 2.5);
+        edge2.replaceSegment(seg2, seg5);
+
+
+        // check prev/next
+        try {
+            edge2.getPrev(seg2);
+            fail("IllegalArgumentException was expected");
+        } catch (IllegalArgumentException iae) {
+            // this is expected
+        }
+
+        assertEquals(seg0, edge1.getPrev(seg1)); assertEquals(seg1, edge1.getNext(seg0));
+        assertEquals(seg0, edge2.getPrev(seg5)); assertEquals(seg5, edge2.getNext(seg0));
+        assertEquals(seg0, edge3.getPrev(seg3)); assertEquals(seg3, edge3.getNext(seg0));
+
+
+        // check parents
+        assertEquals(edge1, Iterables.getOnlyElement(seg1.getParents()));
+        assertEquals(edge2, Iterables.getOnlyElement(seg5.getParents()));
+        assertEquals(edge3, Iterables.getOnlyElement(seg3.getParents()));
+
+
+        // check that all segments were updated properly
+        assertEquals(seg5.getA(),  seg0.getB());
+        assertEquals(seg5.getA(),  seg1.getA());
+        assertEquals(seg5.getA(),  seg3.getA());
+
     }
 
 }

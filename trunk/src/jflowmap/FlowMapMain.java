@@ -9,7 +9,9 @@ import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.metal.MetalTabbedPaneUI;
 
 import org.apache.log4j.Logger;
 
@@ -21,7 +23,7 @@ import at.fhj.utils.swing.JMemoryIndicator;
 public class FlowMapMain extends JFrame {
 
     private static Logger logger = Logger.getLogger(FlowMapMain.class);
-    
+
     private static final long serialVersionUID = 1L;
     public static final String OS_NAME = System.getProperty("os.name");
     public static boolean IS_OS_MAC = getOSMatches("Mac");
@@ -33,7 +35,7 @@ public class FlowMapMain extends JFrame {
         return OS_NAME.startsWith(osNamePrefix);
     }
 
-    private JFlowMap flowMap;
+    private final JFlowMap flowMap;
 
     public FlowMapMain() {
         setTitle("JFlowMap");
@@ -60,6 +62,7 @@ public class FlowMapMain extends JFrame {
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent e) {
                 dispose();
                 shutdown();
