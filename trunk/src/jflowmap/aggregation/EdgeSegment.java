@@ -103,11 +103,42 @@ public class EdgeSegment {
     }
 
     public void replaceWith(EdgeSegment newSegment) {
+        EdgeSegment oldSegment = this;
 //        System.out.println("Replace segment " + System.identityHashCode(this) + " with " + System.identityHashCode(newSegment));
         for (SegmentedEdge se : parents) {
 //            System.out.println(" >> Replace segment " + System.identityHashCode(this) + " with " + System.identityHashCode(newSegment) +
 //                    " in edge " + System.identityHashCode(se));
-            se.replaceSegment(this, newSegment);
+//            se.replaceSegment(this, newSegment);
+
+            int index = se.indexOf(oldSegment);
+            if (index < 0) {
+                throw new IllegalArgumentException();
+            }
+            se.setSegment(index, newSegment);
+            newSegment.addParent(se);
+        }
+
+        for (SegmentedEdge se : parents) {
+            int index = se.indexOf(newSegment);
+
+            // update adjacent segments
+            // prev
+            EdgeSegment prev = se.getPrev(index);
+            if (prev != null) {
+                FPoint newB = newSegment.getA();
+                if (!prev.getB().equals(newB)) {
+                    prev.setB(newB);
+                }
+            }
+            // next
+            EdgeSegment next = se.getNext(index);
+            if (next != null) {
+                FPoint newA = newSegment.getB();
+                if (!next.getA().equals(newA)) {
+                    next.setA(newA);
+                }
+            }
+
         }
     }
 

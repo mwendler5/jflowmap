@@ -46,8 +46,10 @@ public class SegmentedEdgeTest {
 
 
         // replace
-        edge1.replaceSegment(seg1_2, agg);
-        edge2.replaceSegment(seg2_2, agg);
+//        edge1.replaceSegment(seg1_2, agg);
+//        edge2.replaceSegment(seg2_2, agg);
+        seg1_2.replaceWith(agg);
+        seg2_2.replaceWith(agg);
 
 
         // test that adjacent segments were properly changed
@@ -60,9 +62,10 @@ public class SegmentedEdgeTest {
 
 
     @Test
-    public void testReplaceSegment() {
+    public void testReplaceSegment_replaceOneOfSubflows() {
 
-        /*             edge1
+        /*
+                      edge1
                         *
                        /
                       1
@@ -73,7 +76,6 @@ public class SegmentedEdgeTest {
                        \
                         *
                         edge3
-
 
          */
         SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
@@ -109,7 +111,7 @@ public class SegmentedEdgeTest {
 
         // REPLACE seg2 with seg5
         EdgeSegment seg5 = new EdgeSegment(new FPoint(1.1, 0.1, false), new FPoint(2.1, 0.1, false), 2.5);
-        edge2.replaceSegment(seg2, seg5);
+        seg2.replaceWith(seg5);
 
 
         // check prev/next
@@ -138,4 +140,116 @@ public class SegmentedEdgeTest {
 
     }
 
+
+
+
+    @Test
+    public void testReplaceSegment_replaceBigFlow() {
+
+        /*
+                      edge1
+                        *
+                       /
+                      1
+                     /
+    edge1,2 *===0===*         replacing #0 with #5
+                     \
+                      2
+                       \
+                        *
+                        edge2
+
+         */
+        SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
+        SegmentedEdge edge2 = new SegmentedEdge(new TableEdge());
+
+        EdgeSegment seg0 = new EdgeSegment(new FPoint(0, 0, false), new FPoint(1, 0, false), 3.0);
+        edge1.addConsecutiveSegment(seg0);
+        edge2.addConsecutiveSegment(seg0);
+        assertEquals(2, seg0.getParents().size());
+
+        EdgeSegment seg1 = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, -1, false), 1.0);
+        edge1.addConsecutiveSegment(seg1);
+
+        EdgeSegment seg2 = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, +1, false), 1.0);
+        edge2.addConsecutiveSegment(seg2);
+
+
+        // REPLACE seg2 with seg5
+        EdgeSegment seg5 = new EdgeSegment(new FPoint(0.1, 0.1, false), new FPoint(1.1, 0.1, false), 4.0);
+        seg0.replaceWith(seg5);
+
+
+        assertEquals(seg5.getB(),  seg1.getA());
+        assertEquals(seg5.getB(),  seg2.getA());
+
+        assertEquals(seg5, edge1.getPrev(seg1)); assertEquals(seg1, edge1.getNext(seg5));
+        assertEquals(seg5, edge2.getPrev(seg2)); assertEquals(seg2, edge2.getNext(seg5));
+    }
+
+
+
+
+    @Test
+    public void testReplaceSegment_replaceOneOfCommonSeq() {
+        /*
+
+
+    edge1,2 *===A===*===B===*       replacing B with D
+
+
+        */
+        SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
+        SegmentedEdge edge2 = new SegmentedEdge(new TableEdge());
+
+        EdgeSegment segA = new EdgeSegment(new FPoint(0, 0, false), new FPoint(1, 0, false), 2.0);
+        EdgeSegment segB = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, 0, false), 2.0);
+
+        edge1.addConsecutiveSegment(segA);
+        edge1.addConsecutiveSegment(segB);
+
+        edge2.addConsecutiveSegment(segA);
+        edge2.addConsecutiveSegment(segB);
+
+
+        EdgeSegment segD = new EdgeSegment(new FPoint(1.1, 0.1, false), new FPoint(1.9, -0.1, false), 2.1);
+        segB.replaceWith(segD);
+
+    }
+
+
+
+    @Test
+    public void testReplaceSegment_replaceOneOfCommonSeq_2sided() {
+        /*
+
+
+    edge1,2 *===A===*===B===*===C===*       replacing B with D
+
+
+        */
+        SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
+        SegmentedEdge edge2 = new SegmentedEdge(new TableEdge());
+
+        EdgeSegment segA = new EdgeSegment(new FPoint(0, 0, false), new FPoint(1, 0, false), 2.0);
+        EdgeSegment segB = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, 0, false), 2.0);
+        EdgeSegment segC = new EdgeSegment(new FPoint(2, 0, false), new FPoint(3, 0, false), 2.0);
+
+        edge1.addConsecutiveSegment(segA);
+        edge1.addConsecutiveSegment(segB);
+        edge1.addConsecutiveSegment(segC);
+
+        edge2.addConsecutiveSegment(segA);
+        edge2.addConsecutiveSegment(segB);
+        edge2.addConsecutiveSegment(segC);
+
+
+        EdgeSegment segD = new EdgeSegment(new FPoint(1.1, 0.1, false), new FPoint(1.9, -0.1, false), 2.1);
+        segB.replaceWith(segD);
+
+    }
+
+
+
 }
+

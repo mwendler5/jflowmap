@@ -3,7 +3,6 @@ package jflowmap.aggregation;
 import java.util.Collections;
 import java.util.List;
 
-import jflowmap.geom.FPoint;
 import jflowmap.util.Pair;
 import prefuse.data.Edge;
 
@@ -53,8 +52,19 @@ public class SegmentedEdge {
         segment.addParent(this);
     }
 
-    public void replaceSegment(EdgeSegment oldSegment, EdgeSegment newSegment) {
+    void setSegment(int index, EdgeSegment newSegment) {
+        segments.set(index, newSegment);
+    }
+
+    /**
+     * Don't call this method directly. Use {@link EdgeSegment#replaceWith} instead.
+     */
+    /*
+    void replaceSegment(EdgeSegment oldSegment, EdgeSegment newSegment) {
         int index = indexOf(oldSegment);
+        if (index < 0) {
+            throw new IllegalArgumentException();
+        }
         segments.set(index, newSegment);
         newSegment.addParent(this);
 
@@ -76,6 +86,7 @@ public class SegmentedEdge {
             }
         }
     }
+    */
 
     /**
      * Will throw IllegalArgumentException if edge is not a part of the edge.
@@ -98,11 +109,11 @@ public class SegmentedEdge {
         return getNext(indexOf(seg));
     }
 
-    private Pair<EdgeSegment, EdgeSegment> getPrevAndNext(int index) {
+    Pair<EdgeSegment, EdgeSegment> getPrevAndNext(int index) {
         return Pair.of(getPrev(index), getNext(index));
     }
 
-    private EdgeSegment getPrev(int index) {
+    EdgeSegment getPrev(int index) {
         if (index < 0) {
             throw new IllegalArgumentException("Segment not found in the edge: " + index);
         }
@@ -115,7 +126,7 @@ public class SegmentedEdge {
         return prev;
     }
 
-    private EdgeSegment getNext(int index) {
+    EdgeSegment getNext(int index) {
         if (index < 0) {
             throw new IllegalArgumentException("Segment not found in the edge: " + index);
         }
@@ -129,7 +140,7 @@ public class SegmentedEdge {
         return next;
     }
 
-    private int indexOf(EdgeSegment segment) {
+    int indexOf(EdgeSegment segment) {
         int index = -1;
         for (int i = 0, size = segments.size(); i < size; i++) {
             if (segments.get(i) == segment) {
