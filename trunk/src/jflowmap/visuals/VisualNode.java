@@ -37,14 +37,16 @@ public class VisualNode extends PNode {
     public enum Attributes {
         SELECTED, HIGHLIGHTED, CLUSTER_TAG
     }
-    
-    private static final Stroke STROKE = new PFixedWidthStroke(1);
+
+    private static final Stroke STROKE = null;
+    private static final Stroke HIGHLIGHTED_STROKE = new PFixedWidthStroke(1);
+    private static final Stroke SELECTED_STROKE = new PFixedWidthStroke(2);
     private static final Color PAINT = new Color(255, 255, 255, 70);
     private static final Color HIGHLIGHTED_PAINT = new Color(200, 200, 0, 200);
     private static final Color SELECTED_PAINT = HIGHLIGHTED_PAINT;
     private static final Color STROKE_PAINT = new Color(255, 255, 255, 200);
     private static final Color SELECTED_STROKE_PAINT = new Color(255, 255, 0, 255);
-    
+
     private final List<VisualEdge> outgoingEdges = new ArrayList<VisualEdge>();
     private final List<VisualEdge> incomingEdges = new ArrayList<VisualEdge>();
 
@@ -54,11 +56,11 @@ public class VisualNode extends PNode {
 
 	private final double valueX;
 	private final double valueY;
-    
+
     private PPath clusterMarker;
 
-    private double markerSize;
-    private PPath marker;
+    private final double markerSize;
+    private final PPath marker;
     private PNode clusterMembers;
 
     public VisualNode(VisualFlowMap visualFlowMap, Node node, double x, double y, double size) {
@@ -85,7 +87,7 @@ public class VisualNode extends PNode {
 //        setVisible(false);
 //        setVisible(true);
         addChild(marker);
-        
+
         VisualNodeCluster cluster = VisualNodeCluster.getJoinedFlowMapNodeCluster(node);
         if (cluster != null) {
             clusterMembers = new PNode();
@@ -94,8 +96,8 @@ public class VisualNode extends PNode {
                 PPath pnode = new PPath(createNodeShape(origNode.getValueX(), origNode.getValueY(), size));
                 pnode.setPaint(origNodePaint);
                 clusterMembers.addChild(pnode);
-                
-                
+
+
                 PPath pline = new PPath(new Line2D.Double(origNode.getPosition(), this.getPosition()));
                 pline.setStrokePaint(origNodePaint);
                 clusterMembers.addChild(pline);
@@ -116,7 +118,7 @@ public class VisualNode extends PNode {
     }
 
     public void updateVisibility() {
-        boolean visibility = 
+        boolean visibility =
             visualFlowMap.getModel().getShowNodes()  ||  isHighlighted()  ||  isSelected();
         marker.setVisible(visibility);
         if (clusterMembers != null) {
@@ -131,7 +133,7 @@ public class VisualNode extends PNode {
     public double getValueY() {
 		return valueY;
 	}
-    
+
 //    public void createNodeShape() {
 //        double sum = 0;
 //        for (VisualEdge vedge : outgoingEdges) {
@@ -140,25 +142,25 @@ public class VisualNode extends PNode {
 //        for (VisualEdge vedge : incomingEdges) {
 //			sum += vedge.getEdge().getDouble("value");
 //		}
-//        
+//
 //        double r = Math.sqrt(sum)/50;
 //        PPath ppath = new PPath(new Ellipse2D.Double(x - r/2, y - r/2, r, r));
 //        ppath.setStrokePaint(STROKE_PAINT);
 //        ppath.setPaint(PAINT);
 //        ppath.setStroke(STROKE);
-//        
+//
 //        addChild(ppath);
 //    }
-    
-    
+
+
 	public Node getNode() {
 		return node;
 	}
-   
+
     public VisualFlowMap getVisualGraph() {
 		return visualFlowMap;
 	}
-    
+
     public String getLabel() {
         StringBuilder sb = new StringBuilder();
         String labelAttr = visualFlowMap.getLabelAttr();
@@ -174,11 +176,11 @@ public class VisualNode extends PNode {
         addAttribute(Attributes.CLUSTER_TAG, tag);
         updateClusterMarker();
     }
-    
+
     public ClusterTag getClusterTag() {
         return (ClusterTag)getAttribute(Attributes.CLUSTER_TAG, null);
     }
-    
+
 	public String getFullLabel() {
 	    String fullLabel;
 	    ClusterTag clusterTag = getClusterTag();
@@ -198,7 +200,7 @@ public class VisualNode extends PNode {
             VisualNode vnode = getParentVisualNode(event.getPickedNode());
             vnode.visualFlowMap.setSelectedNode(vnode.isSelected() ? null : vnode);
         }
-        
+
         @Override
         public void mouseEntered(PInputEvent event) {
             VisualNode vnode = getParentVisualNode(event.getPickedNode());
@@ -225,7 +227,7 @@ public class VisualNode extends PNode {
     public void addOutgoingEdge(VisualEdge flow) {
         outgoingEdges.add(flow);
     }
-    
+
     public List<VisualEdge> getOutgoingEdges() {
         return Collections.unmodifiableList(outgoingEdges);
     }
@@ -233,13 +235,13 @@ public class VisualNode extends PNode {
     public void addIncomingEdge(VisualEdge flow) {
         incomingEdges.add(flow);
     }
-    
+
     public List<VisualEdge> getIncomingEdges() {
         return Collections.unmodifiableList(incomingEdges);
     }
-    
+
     /**
-     * Returns a newly created and modifiable list of 
+     * Returns a newly created and modifiable list of
      * incoming and outgoing edges of the node.
      */
     public List<VisualEdge> getEdges() {
@@ -271,7 +273,7 @@ public class VisualNode extends PNode {
         updateColorsAndStroke();
         updateEdgeColors();
     }
-    
+
     public boolean isHighlighted() {
         return getBooleanAttribute(Attributes.HIGHLIGHTED.name(), false);
     }
@@ -282,25 +284,21 @@ public class VisualNode extends PNode {
         updateColorsAndStroke();
         updateEdgeColors();
     }
-    
+
     private void updateColorsAndStroke() {
         boolean selected = isSelected();
         boolean highlighted = isHighlighted();
-        if (highlighted || selected) {
-            marker.setStroke(STROKE);
-        } else {
-            marker.setStroke(null);
-        }
         if (selected) {
+            marker.setStroke(SELECTED_STROKE);
             marker.setStrokePaint(SELECTED_STROKE_PAINT);
-        } else {
-            marker.setStrokePaint(STROKE_PAINT);
-        }
-        if (highlighted) {
-            marker.setPaint(HIGHLIGHTED_PAINT);
-        } else if (selected) {
             marker.setPaint(SELECTED_PAINT);
+        } else if (highlighted) {
+            marker.setStroke(HIGHLIGHTED_STROKE);
+            marker.setStrokePaint(STROKE_PAINT);
+            marker.setPaint(HIGHLIGHTED_PAINT);
         } else {
+            marker.setStroke(STROKE);
+            marker.setStrokePaint(STROKE_PAINT);
             marker.setPaint(PAINT);
         }
     }
@@ -345,7 +343,7 @@ public class VisualNode extends PNode {
 //        setChildrenPickable(pickable);
     }
 
-    
+
     private void updateClusterMarker() {
         ClusterTag clusterTag = getClusterTag();
         if (clusterTag == null  ||  !clusterTag.isVisible()) {
@@ -364,11 +362,11 @@ public class VisualNode extends PNode {
             clusterMarker.setPaint(clusterTag.getClusterPaint());
         }
     }
-    
+
     /**
-     * Returns a list of the opposite nodes of the node's incoming/outgoing edges. 
+     * Returns a list of the opposite nodes of the node's incoming/outgoing edges.
      * @param ofIncomingEdges False for outgoing edges
-     * @return Opposite nodes of incoming edges if ofIncomingEdges is true or of 
+     * @return Opposite nodes of incoming edges if ofIncomingEdges is true or of
      *         outgoing edges if ofIncomingEdges is false.
      */
     public List<VisualNode> getOppositeNodes(boolean ofIncomingEdges) {

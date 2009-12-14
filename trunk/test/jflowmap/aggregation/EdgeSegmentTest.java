@@ -108,4 +108,40 @@ public class EdgeSegmentTest {
         assertEquals(new FPoint(1.75, 0.5, false), seg2_3.getA());
     }
 
+
+
+
+    @Test
+    public void testAggregate() {
+        /*
+
+    edge1,2 *===A===*===B===*===C===*       replacing B with D
+
+        */
+
+        SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
+        SegmentedEdge edge2 = new SegmentedEdge(new TableEdge());
+
+
+
+//        EdgeSegment segA = new EdgeSegment(new FPoint(0, 0, false), new FPoint(1, 0, false), 2.0);
+//        EdgeSegment segB = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, 0, false), 2.0);
+//        EdgeSegment segC = new EdgeSegment(new FPoint(2, 0, false), new FPoint(3, 0, false), 2.0);
+//
+//        edge1.addConsecutiveSegment(segA);
+//        edge1.addConsecutiveSegment(segB);
+//        edge1.addConsecutiveSegment(segC);
+//
+//        edge2.addConsecutiveSegment(segA);
+//        edge2.addConsecutiveSegment(segB);
+//        edge2.addConsecutiveSegment(segC);
+//
+//
+//        EdgeSegment segD = new EdgeSegment(new FPoint(1.1, 0.1, false), new FPoint(1.9, -0.1, false), 2.1);
+//        segB.replaceWith(segD);
+
+    }
+
+
+
 }

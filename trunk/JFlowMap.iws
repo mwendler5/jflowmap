@@ -2,13 +2,10 @@
 <project relativePaths="false" version="4">
   <component name="ChangeListManager">
     <list default="true" readonly="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.form" afterPath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.form" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/JFlowMap.iws" afterPath="$PROJECT_DIR$/JFlowMap.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/aggregation/SegmentedEdge.java" afterPath="$PROJECT_DIR$/src/jflowmap/aggregation/SegmentedEdge.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java" afterPath="$PROJECT_DIR$/src/jflowmap/ui/ControlPanel.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/jflowmap/aggregation/SegmentedEdgeTest.java" afterPath="$PROJECT_DIR$/test/jflowmap/aggregation/SegmentedEdgeTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/aggregation/EdgeSegment.java" afterPath="$PROJECT_DIR$/src/jflowmap/aggregation/EdgeSegment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/bundling-test2.xml" afterPath="$PROJECT_DIR$/data/bundling-test2.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/jflowmap/aggregation/EdgeSegmentTest.java" afterPath="$PROJECT_DIR$/test/jflowmap/aggregation/EdgeSegmentTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/visuals/VisualNode.java" afterPath="$PROJECT_DIR$/src/jflowmap/visuals/VisualNode.java" />
     </list>
     <ignored path=".idea/workspace.xml" />
     <ignored path="JFlowMap.iws" />
