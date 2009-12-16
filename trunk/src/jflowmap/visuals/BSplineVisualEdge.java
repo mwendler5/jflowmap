@@ -21,12 +21,12 @@ public class BSplineVisualEdge extends VisualEdge {
     private static final long serialVersionUID = 1L;
 
 //    private List<Point> subdivisionPoints;
-    
+
     public BSplineVisualEdge(VisualFlowMap visualFlowMap, Edge edge,
             VisualNode sourceNode, VisualNode targetNode, List<Point> points,
             boolean showSplinePoints) {
         super(visualFlowMap, edge, sourceNode, targetNode);
-        
+
         int numPoints = points.size();
         assert numPoints >= 2;
 
@@ -37,7 +37,7 @@ public class BSplineVisualEdge extends VisualEdge {
         assert(start.y() == sourceNode.getValueY());
         assert(end.x() == targetNode.getValueX());
         assert(end.y() == targetNode.getValueY());
-        
+
         Shape shape;
         if (isSelfLoop()) {
             shape = createSelfLoopShape();
@@ -53,12 +53,13 @@ public class BSplineVisualEdge extends VisualEdge {
             } else {
                 path = new BSplinePath(points);
             }
-            
+
             // add spline points
             if (showSplinePoints) {
+                final double d = visualFlowMap.getStats().getEdgeLengthStats().getMax() / 100;
                 int cnt = 0;
                 for (Point p : points) {
-                    PPath ell = new PPath(new Ellipse2D.Double(p.x()-.2, p.y()-.2, .4, .4));
+                    PPath ell = new PPath(new Ellipse2D.Double(p.x()-d/2, p.y()-d/2, d, d));
                     ell.setStrokePaint(DOT_COLOR);
                     ell.setPaint(DOT_COLOR);
                     ell.moveToFront();
@@ -66,7 +67,7 @@ public class BSplineVisualEdge extends VisualEdge {
                     cnt++;
                 }
             }
-            
+
             shape = path;
         }
 
@@ -76,7 +77,7 @@ public class BSplineVisualEdge extends VisualEdge {
 
 //        update();
     }
-    
+
     @Override
     public void updateEdgeColors() {
         PPath ppath = getEdgePPath();

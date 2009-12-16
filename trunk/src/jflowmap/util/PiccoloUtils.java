@@ -2,17 +2,17 @@
  * This file is part of CGVis.
  *
  * Copyright 2008 Ilya Boyandin, Erik Koerner
- * 
+ *
  * CGVis is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * CGVis is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with CGVis.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,9 +26,8 @@ import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 
 import jflowmap.FlowMapMain;
-
-
 import edu.umd.cs.piccolo.PCamera;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PAffineTransform;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PDimension;
@@ -94,7 +93,7 @@ public class PiccoloUtils {
      * time of writing. This method prepares the specified stroke for the
      * specified paint context, returning a new instance of <code>Stroke</code>
      * with a scaled line width if necessary.
-     * 
+     *
      * @author Original version was written by Jeff Yoshimi and heuermh
      * @param stroke
      *            stroke to prepare, must not be null
@@ -146,6 +145,15 @@ public class PiccoloUtils {
 
         // give up, custom strokes aren't supported on Mac OSX
         return stroke;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static final <T extends PNode> T getParentNodeOfType(PNode node, Class<T> klass) {
+        PNode parent = node;
+        while (parent != null && !(parent.getClass().isAssignableFrom(klass))) {
+            parent = parent.getParent();
+        }
+        return (T) parent;
     }
 
 }

@@ -13,6 +13,7 @@ import java.util.List;
 
 import jflowmap.geom.GeomUtils;
 import jflowmap.geom.Point;
+import jflowmap.util.PiccoloUtils;
 
 import org.apache.log4j.Logger;
 
@@ -197,32 +198,24 @@ public class VisualNode extends PNode {
     private static final PInputEventListener INPUT_EVENT_HANDLER = new PBasicInputEventHandler() {
         @Override
         public void mouseClicked(PInputEvent event) {
-            VisualNode vnode = getParentVisualNode(event.getPickedNode());
+            VisualNode vnode = PiccoloUtils.getParentNodeOfType(event.getPickedNode(), VisualNode.class);
             vnode.visualFlowMap.setSelectedNode(vnode.isSelected() ? null : vnode);
         }
 
         @Override
         public void mouseEntered(PInputEvent event) {
-            VisualNode vnode = getParentVisualNode(event.getPickedNode());
+            VisualNode vnode = PiccoloUtils.getParentNodeOfType(event.getPickedNode(), VisualNode.class);
             vnode.setHighlighted(true);
             vnode.getVisualGraph().showTooltip(vnode, event.getPosition());
         }
 
         @Override
         public void mouseExited(PInputEvent event) {
-            VisualNode vnode = getParentVisualNode(event.getPickedNode());
+            VisualNode vnode = PiccoloUtils.getParentNodeOfType(event.getPickedNode(), VisualNode.class);
             vnode.setHighlighted(false);
             vnode.getVisualGraph().hideTooltip();
         }
     };
-
-    private static final VisualNode getParentVisualNode(PNode node) {
-        PNode parent = node;
-        while (parent != null && !(parent instanceof VisualNode)) {
-            parent = parent.getParent();
-        }
-        return (VisualNode) parent;
-    }
 
     public void addOutgoingEdge(VisualEdge flow) {
         outgoingEdges.add(flow);

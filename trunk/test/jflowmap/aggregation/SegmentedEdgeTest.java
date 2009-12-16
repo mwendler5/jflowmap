@@ -1,6 +1,7 @@
 package jflowmap.aggregation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import jflowmap.geom.FPoint;
 
@@ -20,9 +21,9 @@ public class SegmentedEdgeTest {
         SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
         SegmentedEdge edge2 = new SegmentedEdge(new TableEdge());
         EdgeSegment
-        seg1_1,seg1_2,seg1_3,
-        seg2_1,seg2_2,seg2_3,
-        agg;
+            seg1_1,seg1_2,seg1_3,
+            seg2_1,seg2_2,seg2_3,
+            agg;
 
         seg1_1 = new EdgeSegment(new FPoint(0, 1, false), new FPoint(1, 0, false), 1.0, edge1);
         seg1_2 = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, 0, false), 1.0, edge1);
@@ -198,7 +199,7 @@ public class SegmentedEdgeTest {
     edge1,2 *===A===*===B===*       replacing B with D
 
 
-        */
+         */
         SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
         SegmentedEdge edge2 = new SegmentedEdge(new TableEdge());
 
@@ -215,9 +216,13 @@ public class SegmentedEdgeTest {
         EdgeSegment segD = new EdgeSegment(new FPoint(1.1, 0.1, false), new FPoint(1.9, -0.1, false), 2.1);
         segB.replaceWith(segD);
 
+        assertEquals(segA.getB(), segD.getA());
+        assertEquals(segD, edge1.getNext(segA));
+        assertEquals(segA, edge1.getPrev(segD));
+
+        assertEquals(segD, edge2.getNext(segA));
+        assertEquals(segA, edge2.getPrev(segD));
     }
-
-
 
     @Test
     public void testReplaceSegment_replaceOneOfCommonSeq_2sided() {
@@ -247,8 +252,118 @@ public class SegmentedEdgeTest {
         EdgeSegment segD = new EdgeSegment(new FPoint(1.1, 0.1, false), new FPoint(1.9, -0.1, false), 2.1);
         segB.replaceWith(segD);
 
+
+        assertEquals(segA.getB(), segD.getA());
+        assertEquals(segD.getB(), segC.getA());
+
+        assertEquals(2, segD.getParents().size());
+        assertTrue(segD.getParents().contains(edge1));
+        assertTrue(segD.getParents().contains(edge2));
+
+        assertEquals(segD, edge1.getNext(segA));
+        assertEquals(segA, edge1.getPrev(segD));
+        assertEquals(segD, edge1.getPrev(segC));
+        assertEquals(segC, edge1.getNext(segD));
+
+        assertEquals(segD, edge2.getNext(segA));
+        assertEquals(segA, edge2.getPrev(segD));
+        assertEquals(segD, edge2.getPrev(segC));
+        assertEquals(segC, edge2.getNext(segD));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testReplaceSegment_addNonConsecutive() {
+        SegmentedEdge edge = new SegmentedEdge(new TableEdge());
+        edge.addConsecutiveSegment(new EdgeSegment(new FPoint(0, 0, false), new FPoint(1, 0, false), 1.0));
+        edge.addConsecutiveSegment(new EdgeSegment(new FPoint(2, 0, false), new FPoint(2, 0, false), 1.0));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testReplaceSegment_addFixedSegmentAfterNonFixed() {
+        SegmentedEdge edge = new SegmentedEdge(new TableEdge());
+        edge.addConsecutiveSegment(new EdgeSegment(new FPoint(0, 0, false), new FPoint(1, 0, false), 1.0));
+        edge.addConsecutiveSegment(new EdgeSegment(new FPoint(1, 0, true), new FPoint(2, 0, false), 1.0));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testReplaceSegment_addNonFixedSegmentAfterFixed() {
+        SegmentedEdge edge = new SegmentedEdge(new TableEdge());
+        edge.addConsecutiveSegment(new EdgeSegment(new FPoint(0, 0, false), new FPoint(1, 0, true), 1.0));
+        edge.addConsecutiveSegment(new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, 0, false), 1.0));
     }
 
 
-}
+    @Test
+    public void testReplaceSegment_replaceWithFixed() {
+        /*
 
+
+           edge1,2 *===A===*===B===*===C===*       replacing B with D where both points of D are fixed
+
+
+        */
+        SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
+        SegmentedEdge edge2 = new SegmentedEdge(new TableEdge());
+
+        EdgeSegment segA = new EdgeSegment(new FPoint(0, 0, false), new FPoint(1, 0, false), 2.0);
+        EdgeSegment segB = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, 0, false), 2.0);
+        EdgeSegment segC = new EdgeSegment(new FPoint(2, 0, false), new FPoint(3, 0, false), 2.0);
+
+        edge1.addConsecutiveSegment(segA);
+        edge1.addConsecutiveSegment(segB);
+        edge1.addConsecutiveSegment(segC);
+
+        edge2.addConsecutiveSegment(segA);
+        edge2.addConsecutiveSegment(segB);
+        edge2.addConsecutiveSegment(segC);
+
+        assertTrue(!segA.getB().isFixed());
+
+        EdgeSegment segD = new EdgeSegment(new FPoint(1.1, 0.1, true), new FPoint(1.9, -0.1, true), 2.1);
+        segB.replaceWith(segD);
+
+        assertTrue(segA.getB().isFixed());
+        assertTrue(segC.getA().isFixed());
+    }
+
+    @Test
+    public void testReplaceSegment_replaceFixed() {
+        /*
+
+            edge1,2 *===A===*===B===*===C===*       replacing B with D where both points of B are fixed
+
+
+        */
+        SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
+        SegmentedEdge edge2 = new SegmentedEdge(new TableEdge());
+
+        EdgeSegment segA = new EdgeSegment(new FPoint(0, 0, false), new FPoint(1, 0, true), 2.0);
+        EdgeSegment segB = new EdgeSegment(new FPoint(1, 0, true), new FPoint(2, 0, true), 2.0);
+        EdgeSegment segC = new EdgeSegment(new FPoint(2, 0, true), new FPoint(3, 0, false), 2.0);
+
+        edge1.addConsecutiveSegment(segA);
+        edge1.addConsecutiveSegment(segB);
+        edge1.addConsecutiveSegment(segC);
+
+        edge2.addConsecutiveSegment(segA);
+        edge2.addConsecutiveSegment(segB);
+        edge2.addConsecutiveSegment(segC);
+
+        try {
+            EdgeSegment segD = new EdgeSegment(new FPoint(1.1, 0.1, false), new FPoint(1.9, -0.1, false), 2.1);
+            segB.replaceWith(segD);
+            fail("IllegalArgumentException was expected");
+        } catch (IllegalArgumentException iae) {
+            // ok
+        }
+
+        EdgeSegment segD = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, 0, false), 2.1);  // a and b equal to segB's
+        segB.replaceWith(segD);
+
+        assertTrue(segD.getA().isFixed());
+        assertTrue(segD.getB().isFixed());
+
+        assertTrue(segA.getB().isFixed());
+        assertTrue(segC.getA().isFixed());
+    }
+}

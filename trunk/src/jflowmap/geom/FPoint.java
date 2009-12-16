@@ -99,7 +99,7 @@ public class FPoint {
 
     @Override
     public String toString() {
-        return "SPoint [fixed=" + fixed + ", point=" + point + "]";
+        return "FPoint [fixed=" + fixed + ", x=" + point.x() + ", y=" + point.y() + "]";
     }
 
 }

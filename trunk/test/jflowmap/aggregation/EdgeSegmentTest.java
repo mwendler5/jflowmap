@@ -106,42 +106,76 @@ public class EdgeSegmentTest {
 
         assertEquals(new FPoint(1.75, 0.5, false), seg1_3.getA());
         assertEquals(new FPoint(1.75, 0.5, false), seg2_3.getA());
+
+
+        // check prev/next
+        assertEquals(agg, edge1.getNext(seg1_1));
+        assertEquals(agg, edge1.getPrev(seg1_3));
+
+        assertEquals(agg, edge2.getNext(seg2_1));
+        assertEquals(agg, edge2.getPrev(seg2_3));
+
+        assertEquals(3.0, edge2.getNext(seg2_1).getWeight(), EPS);
     }
 
 
-
-
-    @Test
-    public void testAggregate() {
-        /*
-
-    edge1,2 *===A===*===B===*===C===*       replacing B with D
-
-        */
+    @Test(expected = IllegalArgumentException.class)
+    public void testAggregateWith_zeroLength() {
 
         SegmentedEdge edge1 = new SegmentedEdge(new TableEdge());
         SegmentedEdge edge2 = new SegmentedEdge(new TableEdge());
 
+        EdgeSegment seg1_1 = new EdgeSegment(
+                new FPoint(13.377183611771455, 52.517694721775015, false),
+                new FPoint(13.377922829504366, 52.517377533672196, false), 2.0);
+        edge1.addConsecutiveSegment(seg1_1);
 
+        EdgeSegment seg2_1 = new EdgeSegment(
+                // zero-length
+                new FPoint(13.3760237867868, 52.5185965900901, false),
+                new FPoint(13.3760237867868, 52.5185965900901, false), 2.0);
+        edge2.addConsecutiveSegment(seg2_1);
 
-//        EdgeSegment segA = new EdgeSegment(new FPoint(0, 0, false), new FPoint(1, 0, false), 2.0);
-//        EdgeSegment segB = new EdgeSegment(new FPoint(1, 0, false), new FPoint(2, 0, false), 2.0);
-//        EdgeSegment segC = new EdgeSegment(new FPoint(2, 0, false), new FPoint(3, 0, false), 2.0);
-//
-//        edge1.addConsecutiveSegment(segA);
-//        edge1.addConsecutiveSegment(segB);
-//        edge1.addConsecutiveSegment(segC);
-//
-//        edge2.addConsecutiveSegment(segA);
-//        edge2.addConsecutiveSegment(segB);
-//        edge2.addConsecutiveSegment(segC);
-//
-//
-//        EdgeSegment segD = new EdgeSegment(new FPoint(1.1, 0.1, false), new FPoint(1.9, -0.1, false), 2.1);
-//        segB.replaceWith(segD);
-
+        seg1_1.aggregateWith(seg2_1);
     }
 
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testReplaceWith_impossibleToReplace() {
+
+        SegmentedEdge edge = new SegmentedEdge(new TableEdge());
+
+        EdgeSegment seg1 = new EdgeSegment(
+                new FPoint(13.377183611771455, 52.517694721775015, true),  // fixed -> cannot replace
+                new FPoint(13.377922829504366, 52.517377533672196, false), 2.0);
+        edge.addConsecutiveSegment(seg1);
+
+        EdgeSegment seg2 = new EdgeSegment(
+                new FPoint(13.3760237867868, 52.5185965900901, false),
+                new FPoint(13.3760237867868, 52.5185965900901, false), 2.0);
+
+        seg1.replaceWith(seg2);
+    }
+
+
+    @Test
+    public void testReplaceWith_newSegmentsPointBecomesFixed() {
+
+        SegmentedEdge edge = new SegmentedEdge(new TableEdge());
+
+        EdgeSegment oldSegment = new EdgeSegment(
+                new FPoint(13.377183611771455, 52.517694721775015, true),  // fixed, but ...
+                new FPoint(13.377922829504366, 52.517377533672196, true), 2.0);
+        edge.addConsecutiveSegment(oldSegment);
+
+        EdgeSegment newSegment = new EdgeSegment(
+                new FPoint(13.377183611771455, 52.517694721775015, false),  // ... this point is the same -> possible to replace, and ...
+                new FPoint(13.377922829504366, 52.517377533672196, false), 2.0);
+
+        oldSegment.replaceWith(newSegment);
+
+        assertTrue(newSegment.getA().isFixed());      // ... becomes fixed
+        assertTrue(newSegment.getB().isFixed());
+    }
 
 }

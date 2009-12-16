@@ -150,6 +150,21 @@ public class SegmentedEdge {
         return index;
     }
 
+    public boolean checkSegmentConsecutivity() {
+        if (segments.size() == 0) {
+            return true;
+        }
+        EdgeSegment prev = segments.get(0);
+        for (int i = 1, size = segments.size(); i < size; i++) {
+            EdgeSegment seg = segments.get(i);
+            if (!seg.isConsecutiveFor(prev)) {
+                return false;
+            }
+            prev = seg;
+        }
+        return true;
+    }
+
 //    public EdgeSegment getLeftAdjacent(EdgeSegment segment) {
 //        EdgeSegment prev = null;
 //        for (EdgeSegment seg : segments) {

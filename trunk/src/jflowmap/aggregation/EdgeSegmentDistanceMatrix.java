@@ -23,6 +23,9 @@ class EdgeSegmentDistanceMatrix extends AbstractDistanceMatrix<EdgeSegment> {
             ClusterNode<EdgeSegment> cn1, ClusterNode<EdgeSegment> cn2, double dist) {
         EdgeSegment item1 = cn1.getItem();
         EdgeSegment item2 = cn2.getItem();
+
+//        assert item1.canBeAggregatedWith(item2);
+
         EdgeSegment aggregate = item1.aggregateWith(item2);
 
 //        System.out.println("Merge item " + System.identityHashCode(item1) + " with " + System.identityHashCode(item2));
@@ -32,6 +35,7 @@ class EdgeSegmentDistanceMatrix extends AbstractDistanceMatrix<EdgeSegment> {
         // TODO: update distances for adjacent segments which were changed after replacing with aggregate
         // Problem: how to find the cluster node which corresponds to the adjacent segments?
 
+        assert aggregate.checkParentEdgesSegmentConsecutivity();
 
         return new ClusterNode<EdgeSegment>(aggregate, cn1, cn2, dist);
     }

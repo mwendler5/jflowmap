@@ -49,6 +49,7 @@ public class EdgeSegmentAggregator {
     }
 
     public void aggregate(ProgressTracker pt) {
+        logger.info("Edge segment aggregation started");
         createSegmentedEdges();
         List<ClusterNode<EdgeSegment>> nodes =
             HierarchicalClusterer
@@ -57,9 +58,14 @@ public class EdgeSegmentAggregator {
                 .withDistanceMatrixFactory(DISTANCE_MATRIX_FACTORY)
 //                .withMaxMergeableDistance(Double.MAX_VALUE)  // disallows POSITIVE_INFINITY
 //                .withMaxMergeableDistance(.9575)
-                .withMaxMergeableDistance(5)
+//                .withMaxMergeableDistance(5)
+                .withMaxMergeableDistance(10)
                 .build()
                 .cluster(segments, pt);
+
+        assert checkEdgesSegmentConsecutivity();
+
+        logger.info("Edge segment aggregation finished");
 
 //        double maxDistance = MaxAllowedDistanceFinder.find(root) / 2.0;
 
@@ -79,7 +85,10 @@ public class EdgeSegmentAggregator {
 
         List<EdgeSegment> aggSegs = Lists.newArrayListWithCapacity(nodes.size());
         for (ClusterNode<EdgeSegment> node : nodes) {
-            aggSegs.add(node.getItem());    // items in the top-level nodes are already aggregated
+            EdgeSegment seg = node.getItem();
+            if (seg.length() > 0) {  // we can omit zero-length segments
+                aggSegs.add(seg);    // items in the top-level nodes are already aggregated
+            }
         }
 //        List<EdgeSegment> aggSegs = Lists.newArrayListWithCapacity(nodes.size());
 //        for (ClusterNode<EdgeSegment> node : nodes) {
@@ -95,14 +104,31 @@ public class EdgeSegmentAggregator {
 //        }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Num of segments: " + segments.size());
-            logger.debug("Num of clusters: " + aggSegs.size());
+            logger.debug("Num of original segments: " + segments.size());
+            logger.debug("Num of aggregated segments: " + aggSegs.size());
         }
         this.aggregatedSegments = aggSegs;
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>>> Aggregated segments:");
+            for (EdgeSegment seg : aggSegs) {
+                logger.debug(seg);
+            }
+        }
+
 
         if (!pt.isCancelled()) {
             pt.processFinished();
         }
+    }
+
+    public boolean checkEdgesSegmentConsecutivity() {
+        for (SegmentedEdge se : segmentedEdges) {
+            if (!se.checkSegmentConsecutivity()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public List<EdgeSegment> getAggregatedSegments() {

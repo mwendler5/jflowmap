@@ -46,10 +46,14 @@ import ch.unifr.dmlib.cluster.HierarchicalClusterer;
 import ch.unifr.dmlib.cluster.Linkage;
 import ch.unifr.dmlib.cluster.Linkages;
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
+import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolox.util.PFixedWidthStroke;
@@ -59,7 +63,7 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
  */
 public class VisualFlowMap extends PNode {
 
-    private static final boolean SHOW_SPLINE_POINTS = true;
+    private static final boolean SHOW_SPLINE_POINTS = false;
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(VisualFlowMap.class);
     public enum Attributes {
@@ -183,6 +187,7 @@ public class VisualFlowMap extends PNode {
 
     private void createEdges() {
         edgeLayer.removeAllChildren();
+        clearAggregatedEdgesLayer();
 
 //      for (int i = 0; i < graph.getEdgeTable().getColumnCount(); i++) {
 //      if (logger.isDebugEnabled()) logger.debug("Field: " + graph.getEdgeTable().getColumnName(i));
@@ -503,6 +508,22 @@ public class VisualFlowMap extends PNode {
     }
 
 
+    private PNode aggregatedEdgesLayer;
+
+    private PNode getAggregatedEdgesLayer() {
+        if (aggregatedEdgesLayer == null) {
+            aggregatedEdgesLayer = new PNode();
+            addChild(aggregatedEdgesLayer);
+        }
+        return aggregatedEdgesLayer;
+    }
+
+    private void clearAggregatedEdgesLayer() {
+        if (aggregatedEdgesLayer != null) {
+            aggregatedEdgesLayer.removeAllChildren();
+        }
+    }
+
     public void aggregateBundledEdges() {
         if (!isBundled()) {
             return;
@@ -515,35 +536,24 @@ public class VisualFlowMap extends PNode {
                 try {
                     aggregator.aggregate(pt);
                     List<EdgeSegment> segments = aggregator.getAggregatedSegments();
-                    Color jointPtColor = new Color(0, 0, 255, 150);
-//                    Color[] jointPtColors = ColorUtils.createCategoryColors(segments.size(), .9, 200);
-                    int cnt = 0;
+
+                    clearAggregatedEdgesLayer();
+                    PNode parentNode = getAggregatedEdgesLayer();
+
+                    // create aggregated edge weight stats to normalize on them
+                    MinMax stats = MinMax.createFor(Iterators.transform(segments.iterator(), EdgeSegment.TRANSFORM_TO_WEIGHT));
+
                     for (EdgeSegment seg : segments) {
 //                        if (seg.length() == 0) {
 //                            logger.warn("Zero-length segment: " + seg);
 //                        }
-                        FPoint src = seg.getA();
-                        FPoint dest = seg.getB();
-                        Line2D.Double line = new Line2D.Double(src.asPoint2D(), dest.asPoint2D());
-                        double nv = getStats().getEdgeWeightStats().normalizeLog(seg.getWeight());
-//                        double nv = getStats().getEdgeWeightStats().normalize(seg.getWeight());
+
+                        double nv = stats.normalizeLog(seg.getWeight());
+//                        double nv = stats.normalize(seg.getWeight());
 //                        double nv = seg.getWeight();
                         double width = 1 + nv * getModel().getMaxEdgeWidth();
-                        PPath ppath = new PPath(line, new PFixedWidthStroke((float)width));
-                        ppath.setPaint(Color.white);
-                        ppath.setStrokePaint(Color.white);
-                        addChild(ppath);
 
-                        double d = .5;
-                        PPath srcp = new PPath(new Ellipse2D.Double(src.x() - d/2, src.y() - d/2, d, d));
-                        PPath dstp = new PPath(new Ellipse2D.Double(dest.x() - d/2, dest.y() - d/2, d, d));
-                        addChild(srcp);
-                        addChild(dstp);
-                        srcp.setPaint(jointPtColor);
-                        dstp.setPaint(jointPtColor);
-                        srcp.setStroke(null);
-                        dstp.setStroke(null);
-                        cnt++;
+                        parentNode.addChild(new PSegment(seg, width));
                     }
                     repaint();
                 } catch (Throwable th) {
@@ -561,6 +571,84 @@ public class VisualFlowMap extends PNode {
         worker.start();
         dialog.setVisible(true);
     }
+
+    private static class PSegment extends PNode {
+        private static final long serialVersionUID = 1L;
+        private final static Color JOINT_PT_COLOR = new Color(0, 0, 255, 150);
+        private final EdgeSegment segment;
+
+        public PSegment(EdgeSegment seg, double width) {
+            this.segment = seg;
+
+            FPoint src = seg.getA();
+            FPoint dest = seg.getB();
+            if (src.getPoint().equals(dest.getPoint())) {
+                throw new IllegalStateException();
+            }
+            PPath linep = new PPath(new Line2D.Double(src.asPoint2D(), dest.asPoint2D()), new PFixedWidthStroke((float)width));
+            linep.setPaint(Color.white);
+            linep.setStrokePaint(Color.white);
+            addChild(linep);
+
+            PSegmentPoint srcp = new PSegmentPoint(src);
+            PSegmentPoint dstp = new PSegmentPoint(dest);
+            srcp.setPaint(JOINT_PT_COLOR);
+            dstp.setPaint(JOINT_PT_COLOR);
+            srcp.setStroke(null);
+            dstp.setStroke(null);
+            addChild(srcp);
+            addChild(dstp);
+
+//            setPickable(true);
+            addInputEventListener(MOUSE_HANDLER);
+        }
+
+        private static class PSegmentPoint extends PPath {
+            private static final long serialVersionUID = 1L;
+            private static final double DIAMETER = .5;
+            private final FPoint point;
+
+            public PSegmentPoint(FPoint p) {
+                super(new Ellipse2D.Double(p.x() - DIAMETER/2, p.y() - DIAMETER/2, DIAMETER, DIAMETER));
+                this.point = p;
+            }
+
+            public FPoint getPoint() {
+                return point;
+            }
+        }
+
+        public EdgeSegment getSegment() {
+            return segment;
+        }
+
+        private static final PInputEventListener MOUSE_HANDLER = new PBasicInputEventHandler() {
+            @Override
+            public void mouseClicked(PInputEvent event) {
+            }
+
+            @Override
+            public void mouseEntered(PInputEvent event) {
+                if (logger.isDebugEnabled()) {
+                    PNode picked = event.getPickedNode();
+                    if (picked instanceof PSegmentPoint) {
+                        PSegmentPoint psp = (PSegmentPoint)picked;
+                        logger.debug("Segment point: " + psp.getPoint());
+                    }
+
+//                    PSegment pseg = PiccoloUtils.getParentNodeOfType(picked, PSegment.class);
+//                    if (pseg != null) {
+//                        logger.debug("MouseEntered: " + pseg.getSegment());
+//                    }
+                }
+            }
+
+            @Override
+            public void mouseExited(PInputEvent event) {
+            }
+        };
+    }
+
 
     public ClusterNode<VisualNode> getRootCluster() {
         return rootCluster;

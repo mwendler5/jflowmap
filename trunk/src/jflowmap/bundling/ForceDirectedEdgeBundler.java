@@ -143,6 +143,7 @@ public class ForceDirectedEdgeBundler {
         this.P = params.getP();
         this.Pdouble = this.P;
         this.S = params.getS();
+//        this.S = 1e-6;
 
         calcEdgeCompatibilityMeasures();
 

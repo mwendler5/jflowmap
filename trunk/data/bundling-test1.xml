@@ -51,16 +51,16 @@
       </node>
 
 
+      <!-- 
       <edge source="A" target="B" id="1">
          <data key="data">3</data>
       </edge>
-      <!-- 
       <edge source="A2" target="B2" id="1">
          <data key="data">5</data>
       </edge>
        -->
       <edge source="A1" target="B1" id="1">
-         <data key="data">2</data>
+         <data key="data">4</data>
       </edge>
       <edge source="A3" target="B3" id="1">
          <data key="data">4</data>
