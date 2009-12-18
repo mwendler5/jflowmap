@@ -36,11 +36,11 @@ public class EdgeSegmentTest {
 
         seg1 = new EdgeSegment(new FPoint(0, 1, false) , new FPoint(1.5, 0, true), 1.0, edge1);
         seg2 = new EdgeSegment(new FPoint(0, 1.5, false) , new FPoint(1.5, 0, true), 2.0, edge2);
-        assertTrue(seg1.canBeAggregatedWith(seg2));  // both B points are fixed; but also equal
+        assertTrue(!seg1.canBeAggregatedWith(seg2));  // both B points are fixed; but also equal
 
         seg1 = new EdgeSegment(new FPoint(0, 1, false) , new FPoint(1.5, 0, true), 1.0, edge1);
         seg2 = new EdgeSegment(new FPoint(0, 1.5, true), new FPoint(1.5, 0, false) , 2.0, edge2);
-        assertTrue(seg1.canBeAggregatedWith(seg2));  // cross-points fixed
+        assertTrue(!seg1.canBeAggregatedWith(seg2));  // cross-points fixed
 
     }
 

@@ -51,15 +51,17 @@ public class EdgeSegmentAggregator {
     public void aggregate(ProgressTracker pt) {
         logger.info("Edge segment aggregation started");
         createSegmentedEdges();
+        pt.startTask("Edge segment aggregation", 1.0);
         List<ClusterNode<EdgeSegment>> nodes =
             HierarchicalClusterer
 //                .createWith(DISTANCE_MEASURE, LINKAGE)
                 .createWith(DISTANCE_MEASURE, null)
                 .withDistanceMatrixFactory(DISTANCE_MATRIX_FACTORY)
+                .withDistanceMatrixCalcWeight(0.0)
 //                .withMaxMergeableDistance(Double.MAX_VALUE)  // disallows POSITIVE_INFINITY
 //                .withMaxMergeableDistance(.9575)
 //                .withMaxMergeableDistance(5)
-                .withMaxMergeableDistance(10)
+                .withMaxMergeableDistance(50)
                 .build()
                 .cluster(segments, pt);
 
@@ -109,12 +111,12 @@ public class EdgeSegmentAggregator {
         }
         this.aggregatedSegments = aggSegs;
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(">>>> Aggregated segments:");
-            for (EdgeSegment seg : aggSegs) {
-                logger.debug(seg);
-            }
-        }
+//        if (logger.isDebugEnabled()) {
+//            logger.debug(">>>> Aggregated segments:");
+//            for (EdgeSegment seg : aggSegs) {
+//                logger.debug(seg);
+//            }
+//        }
 
 
         if (!pt.isCancelled()) {

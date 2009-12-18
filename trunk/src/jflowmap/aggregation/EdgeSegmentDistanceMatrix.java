@@ -30,10 +30,10 @@ class EdgeSegmentDistanceMatrix extends AbstractDistanceMatrix<EdgeSegment> {
 
 //        System.out.println("Merge item " + System.identityHashCode(item1) + " with " + System.identityHashCode(item2));
 
+        // TODO: first replace item1 and item2 then update adjacent segments
+        // (otherwise it can be problematic if item1 and item2 share a parent edge)
         item1.replaceWith(aggregate);
         item2.replaceWith(aggregate);
-        // TODO: update distances for adjacent segments which were changed after replacing with aggregate
-        // Problem: how to find the cluster node which corresponds to the adjacent segments?
 
         assert aggregate.checkParentEdgesSegmentConsecutivity();
 
