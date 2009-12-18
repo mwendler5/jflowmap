@@ -575,6 +575,7 @@ public class VisualFlowMap extends PNode {
     private static class PSegment extends PNode {
         private static final long serialVersionUID = 1L;
         private final static Color JOINT_PT_COLOR = new Color(0, 0, 255, 150);
+        private final static Color SEGMENT_COLOR = new Color(255, 255, 255, 200);
         private final EdgeSegment segment;
 
         public PSegment(EdgeSegment seg, double width) {
@@ -586,8 +587,8 @@ public class VisualFlowMap extends PNode {
                 throw new IllegalStateException();
             }
             PPath linep = new PPath(new Line2D.Double(src.asPoint2D(), dest.asPoint2D()), new PFixedWidthStroke((float)width));
-            linep.setPaint(Color.white);
-            linep.setStrokePaint(Color.white);
+//            linep.setPaint(SEGMENT_COLOR);
+            linep.setStrokePaint(SEGMENT_COLOR);
             addChild(linep);
 
             PSegmentPoint srcp = new PSegmentPoint(src);

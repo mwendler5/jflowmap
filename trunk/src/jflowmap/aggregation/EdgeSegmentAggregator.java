@@ -61,7 +61,7 @@ public class EdgeSegmentAggregator {
 //                .withMaxMergeableDistance(Double.MAX_VALUE)  // disallows POSITIVE_INFINITY
 //                .withMaxMergeableDistance(.9575)
 //                .withMaxMergeableDistance(5)
-                .withMaxMergeableDistance(50)
+                .withMaxMergeableDistance(5)
                 .build()
                 .cluster(segments, pt);
 
