@@ -3,19 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" readonly="true" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/JFlowMap.iws" afterPath="$PROJECT_DIR$/JFlowMap.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java" afterPath="$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/util/PiccoloUtils.java" afterPath="$PROJECT_DIR$/src/jflowmap/util/PiccoloUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedEdgeBundler.java" afterPath="$PROJECT_DIR$/src/jflowmap/bundling/ForceDirectedEdgeBundler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/visuals/VisualNode.java" afterPath="$PROJECT_DIR$/src/jflowmap/visuals/VisualNode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/aggregation/SegmentedEdge.java" afterPath="$PROJECT_DIR$/src/jflowmap/aggregation/SegmentedEdge.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/bundling-test1.xml" afterPath="$PROJECT_DIR$/data/bundling-test1.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/jflowmap/aggregation/EdgeSegmentTest.java" afterPath="$PROJECT_DIR$/test/jflowmap/aggregation/EdgeSegmentTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/jflowmap/aggregation/SegmentedEdgeTest.java" afterPath="$PROJECT_DIR$/test/jflowmap/aggregation/SegmentedEdgeTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/visuals/BSplineVisualEdge.java" afterPath="$PROJECT_DIR$/src/jflowmap/visuals/BSplineVisualEdge.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/aggregation/EdgeSegmentDistanceMatrix.java" afterPath="$PROJECT_DIR$/src/jflowmap/aggregation/EdgeSegmentDistanceMatrix.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/aggregation/EdgeSegment.java" afterPath="$PROJECT_DIR$/src/jflowmap/aggregation/EdgeSegment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/geom/FPoint.java" afterPath="$PROJECT_DIR$/src/jflowmap/geom/FPoint.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/jflowmap/aggregation/EdgeSegmentAggregator.java" afterPath="$PROJECT_DIR$/src/jflowmap/aggregation/EdgeSegmentAggregator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/migrations-filtered/migrations-filtered.xml" afterPath="$PROJECT_DIR$/data/migrations-filtered/migrations-filtered.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/migrations-filtered/filter.xsl" afterPath="$PROJECT_DIR$/data/migrations-filtered/filter.xsl" />
     </list>
     <ignored path=".idea/workspace.xml" />
     <ignored path="JFlowMap.iws" />
@@ -104,7 +93,7 @@
       <file leaf-file-name="VisualFlowMap.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="603" column="11" selection-start="22052" selection-end="22052" vertical-scroll-proportion="0.0">
+            <state line="604" column="11" selection-start="22140" selection-end="22140" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -364,7 +353,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="-4" width="1288" height="1032" extended-state="6" />
+    <frame x="-4" y="-4" width="1288" height="1032" extended-state="7" />
     <editor active="false" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2038835" sideWeight="0.688414" order="2" side_tool="false" />
@@ -484,7 +473,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/jflowmap/visuals/VisualFlowMap.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="603" column="11" selection-start="22052" selection-end="22052" vertical-scroll-proportion="0.0">
+        <state line="604" column="11" selection-start="22140" selection-end="22140" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
