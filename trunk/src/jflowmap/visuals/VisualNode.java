@@ -42,7 +42,8 @@ public class VisualNode extends PNode {
     private static final Stroke STROKE = null;
     private static final Stroke HIGHLIGHTED_STROKE = new PFixedWidthStroke(1);
     private static final Stroke SELECTED_STROKE = new PFixedWidthStroke(2);
-    private static final Color PAINT = new Color(255, 255, 255, 70);
+//    private static final Color PAINT = new Color(255, 255, 255, 70);
+    private static final Color PAINT = new Color(255, 255, 255, 170);
     private static final Color HIGHLIGHTED_PAINT = new Color(200, 200, 0, 200);
     private static final Color SELECTED_PAINT = HIGHLIGHTED_PAINT;
     private static final Color STROKE_PAINT = new Color(255, 255, 255, 200);
