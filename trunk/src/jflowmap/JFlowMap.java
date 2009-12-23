@@ -1,3 +1,21 @@
+/*
+ * This file is part of JFlowMap.
+ *
+ * Copyright 2009 Ilya Boyandin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package jflowmap;
 
 import java.awt.BorderLayout;
@@ -218,16 +236,16 @@ public class JFlowMap extends JComponent {
     }
 
     public static final DatasetSpec[] datasetSpecs = new DatasetSpec[] {
-        new DatasetSpec("data/bundling-test1.xml", "data", "x", "y", "name", null),
-        new DatasetSpec("data/bundling-test2.xml", "data", "x", "y", "name", null),
-        new DatasetSpec("data/bundling-test6.xml", "data", "x", "y", "name", null),
         new DatasetSpec("data/migrations-unique.xml", "value", "x", "y", "tooltip", null, 1000),
         new DatasetSpec("data/migrations-5000.xml", "value", "x", "y", "tooltip", null),
         new DatasetSpec("data/migrations-10000.xml", "value", "x", "y", "tooltip", null),
+        new DatasetSpec("data/bundling-test1.xml", "data", "x", "y", "name", null),
+        new DatasetSpec("data/bundling-test2.xml", "data", "x", "y", "name", null),
+        new DatasetSpec("data/bundling-test6.xml", "data", "x", "y", "name", null),
         new DatasetSpec("data/refugees-2008-nv-5000.xml", "refugees", "x", "y", "name", "data/countries-areas.xml"),
         new DatasetSpec("data/refugees-2008-no-various.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
         new DatasetSpec("C:/Data/uni-konstanz/PhotoTrails/sline_test_1.csv", "value", "x", "y", null, null),
-        new DatasetSpec("data/airlines.xml", "value", "x", "y", "tooltip", null),
+//        new DatasetSpec("data/airlines.xml", "value", "x", "y", "tooltip", null),
         new DatasetSpec("data/refugees-2008.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
         new DatasetSpec("data/refugees-2007.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),
         new DatasetSpec("data/refugees-2006.xml", "refugees", "x", "y", "name", "data/countries-areas.xml", 1000),

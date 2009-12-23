@@ -1,3 +1,21 @@
+/*
+ * This file is part of JFlowMap.
+ *
+ * Copyright 2009 Ilya Boyandin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package jflowmap.visuals;
 
 import java.awt.Color;
@@ -43,7 +61,7 @@ public class VisualNode extends PNode {
     private static final Stroke HIGHLIGHTED_STROKE = new PFixedWidthStroke(1);
     private static final Stroke SELECTED_STROKE = new PFixedWidthStroke(2);
 //    private static final Color PAINT = new Color(255, 255, 255, 70);
-    private static final Color PAINT = new Color(255, 255, 255, 170);
+    private static final Color PAINT = new Color(255, 255, 255, 110);
     private static final Color HIGHLIGHTED_PAINT = new Color(200, 200, 0, 200);
     private static final Color SELECTED_PAINT = HIGHLIGHTED_PAINT;
     private static final Color STROKE_PAINT = new Color(255, 255, 255, 200);
