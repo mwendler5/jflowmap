@@ -24,12 +24,13 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import javax.swing.plaf.metal.MetalTabbedPaneUI;
+
+import jflowmap.data.XmlDatasetSpecsReader;
 
 import org.apache.log4j.Logger;
 
@@ -55,9 +56,9 @@ public class FlowMapMain extends JFrame {
 
     private final JFlowMap flowMap;
 
-    public FlowMapMain() {
+    public FlowMapMain(List<DatasetSpec> datasetSpecs) {
         setTitle("JFlowMap");
-        flowMap = new JFlowMap(this);
+        flowMap = new JFlowMap(this, datasetSpecs);
         add(flowMap);
 
         JPanel statusPanel = new JPanel(new BorderLayout());
@@ -95,10 +96,11 @@ public class FlowMapMain extends JFrame {
 
     public static void main(String[] args) throws IOException {
         logger.info(">>> Starting JFlowMap");
+        final List<DatasetSpec> datasetSpecs = XmlDatasetSpecsReader.readDatasetSpecs("/data/datasets.xml");
         initLookAndFeel();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new FlowMapMain().setVisible(true);
+                new FlowMapMain(datasetSpecs).setVisible(true);
             }
         });
     }

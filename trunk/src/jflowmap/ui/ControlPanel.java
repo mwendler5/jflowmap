@@ -27,13 +27,31 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoundedRangeModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
 
+import jflowmap.DatasetSpec;
 import jflowmap.JFlowMap;
 import jflowmap.bundling.ForceDirectedBundlerParameters;
 import jflowmap.clustering.NodeDistanceMeasure;
@@ -207,7 +225,7 @@ public class ControlPanel {
     }
 
     private void initModelsOnce() {
-        datasetCombo.setModel(new DefaultComboBoxModel(JFlowMap.datasetSpecs));
+        datasetCombo.setModel(new DefaultComboBoxModel(jFlowMap.getDatasetSpecs().toArray()));
     }
 
     public void initEdgeBundlingModels() {
@@ -355,7 +373,7 @@ public class ControlPanel {
         datasetCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (initializing) return;
-                loadFlowMap((JFlowMap.DatasetSpec) datasetCombo.getSelectedItem());
+                loadFlowMap((DatasetSpec) datasetCombo.getSelectedItem());
             }
         });
     }
@@ -584,14 +602,14 @@ public class ControlPanel {
         });
     }
 
-    private void loadFlowMap(JFlowMap.DatasetSpec dataset) {
+    private void loadFlowMap(DatasetSpec dataset) {
         VisualFlowMap visualFlowMap = jFlowMap.loadFlowMap(dataset);
         jFlowMap.setVisualFlowMap(visualFlowMap);
         jFlowMap.fitFlowMapInView();
         loadVisualFlowMap(visualFlowMap);
     }
 
-    private List<PropertyChangeListener> visualFlowMapListeners =
+    private final List<PropertyChangeListener> visualFlowMapListeners =
             new ArrayList<PropertyChangeListener>();
 
     private void attachVisualFlowMapListeners(VisualFlowMap visualFlowMap) {

@@ -21,6 +21,8 @@ package jflowmap;
 import javax.swing.JApplet;
 
 /**
+ * TODO: finish FlowMapApplet
+ *
  * @author Ilya Boyandin
  */
 public class FlowMapApplet extends JApplet {
@@ -28,6 +30,6 @@ public class FlowMapApplet extends JApplet {
     private static final long serialVersionUID = 1778664403741899654L;
 
     public FlowMapApplet() {
-        add(new JFlowMap(null));
+//        add(new JFlowMap(null));
     }
 }

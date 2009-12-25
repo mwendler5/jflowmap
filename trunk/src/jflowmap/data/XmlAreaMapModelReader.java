@@ -43,7 +43,10 @@ import prefuse.util.io.IOLib;
  */
 public class XmlAreaMapModelReader {
 
-    public AreaMap readMap(String location) throws IOException {
+    private XmlAreaMapModelReader() {
+    }
+
+    public static AreaMap readMap(String location) throws IOException {
         XmlInfosetBuilder builder = XmlInfosetBuilder.newInstance();
         try {
             return loadFrom(location, builder.parseReader(new InputStreamReader(IOLib.streamFromString(location))));
@@ -60,11 +63,11 @@ public class XmlAreaMapModelReader {
 
 
         List<Area> areas = new ArrayList<Area>();
-        List<XmlElement> areaNodes = (List<XmlElement>) areaPath.selectNodes(doc);
+        List<XmlElement> areaNodes = areaPath.selectNodes(doc);
         for (XmlElement areaNode : areaNodes) {
             String id = areaNode.getAttributeValue(null, "id");
             for (XmlElement polygonsNode : (List<XmlElement>) polygonPath.selectNodes(areaNode)) {
-                List<XmlElement> polyNodes = (List<XmlElement>) polyPath.selectNodes(polygonsNode);
+                List<XmlElement> polyNodes = polyPath.selectNodes(polygonsNode);
                 Polygon[] polygons = new Polygon[polyNodes.size()];
                 int polyCnt = 0;
                 for (XmlElement polyNode : polyNodes) {
@@ -88,7 +91,7 @@ public class XmlAreaMapModelReader {
                         polygons[polyCnt] = new Polygon(points);
                         polyCnt++;
                     }
-                    
+
                 }
                 areas.add(new Area(id, "", polygons));
             }

@@ -36,8 +36,8 @@ public class AreaMap {
 
     private static Logger logger = Logger.getLogger(AreaMap.class);
 
-    private String name;
-    private List<Area> areas;
+    private final String name;
+    private final List<Area> areas;
 
     public AreaMap(String name, List<Area> areas) {
         this.name = name;
@@ -54,7 +54,6 @@ public class AreaMap {
 
     public static final AreaMap load(String filename) throws IOException {
         logger.info("Loading area map \"" + filename + "\"");
-        XmlAreaMapModelReader reader = new XmlAreaMapModelReader();
-        return reader.readMap(filename);
+        return XmlAreaMapModelReader.readMap(filename);
     }
 }
