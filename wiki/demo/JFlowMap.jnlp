@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp
+  spec="1.0+"
+  codebase="http://jflowmap.googlecode.com/svn/wiki/demo"
+  href="JFlowMap.jnlp">
+
+<information>
+  <title>JFlowMap</title>
+  <vendor>Ilya Boyandin, University of Fribourg</vendor>
+  <!-- <homepage href="/" /> -->
+  <description>JFlowMap</description>
+</information>
+<!--<offline-allowed/>-->
+<security>
+  <!--j2ee-application-client-permissions/-->
+  <all-permissions/>
+</security>
+<resources>
+  <j2se version="1.6+" java-vm-args="-ea -Xmx256m -Dsun.java2d.opengl=true" />
+  <jar href="http://jflowmap.googlecode.com/svn/wiki/demo/JFlowMap.jar"/>
+</resources>
+<application-desc main-class="jflowmap.FlowMapMain" />
+</jnlp>
