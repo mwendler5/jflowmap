@@ -19,5 +19,5 @@
   <j2se version="1.6+" java-vm-args="-ea -Xmx256m -Dsun.java2d.opengl=true" />
   <jar href="http://jflowmap.googlecode.com/svn/wiki/demo/JFlowMap.jar"/>
 </resources>
-<application-desc main-class="jflowmap.FlowMapMain" />
+<application-desc main-class="jflowmap.FlowMapPreloadedDataMain" />
 </jnlp>
