@@ -30,6 +30,6 @@ map.projection=Mercator
 }}}
 
 
-The nodes (countries, in this case) are in 'data/refugee-nodes.csv', the flows - in 'data/refugee-flows.csv'. If you unzip the .csv.gz files, you'll see how they are organized, so that you can prepare your data as CSV in the same way. Then you can run the application as described in the README file.
+The nodes (countries, in this case) are in 'data/refugee-nodes.csv', the flows - in 'data/refugee-flows.csv'. Check how they are organized to prepare your data as CSV in the same way. Then you can run the application as described in the README file.
 
 Otherwise, if you have an interesting OD-dataset and need help visualizing it, just [mailto:ilya.boyandin@unifr.ch send me an email].
