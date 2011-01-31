@@ -3,7 +3,7 @@
 
 = How to prepare data for JFlowMap =
 
-To load a dataset in a specific view (flowmap or flowstrates) you need to create a view configuration file (a .jfmv file) which you can then use to open the visualization both as a desktop app or as an applet. You can find a few examples of the config files in the 'viewconf' folder of the demo. They are simple text files, here is an example: 
+To load a dataset in a specific view (flowmap or flowstrates) you need to create a view configuration file (a .jfmv file) which you can then use to open the visualization both as a desktop app or as an applet. The .jfmv config files are simple text files, here is an example: 
 
 {{{
 view=flowstrates
@@ -29,6 +29,7 @@ map.shapefile.src=data/shapefiles/world.shp
 map.projection=Mercator
 }}}
 
+You can find more examples of the config files in the 'viewconf' folder of the demo package.
 
 The nodes (countries, in this case) are in 'data/refugee-nodes.csv', the flows - in 'data/refugee-flows.csv'. Here is how the nodes CSV file is structured:
 
