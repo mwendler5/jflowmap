@@ -1,8 +1,7 @@
 #summary How to prepare data to visualize in JFlowMap.
+#labels Featured
 
 = How to prepare data for JFlowMap =
-
-A very short description for now.
 
 To load a dataset in a specific view (flowmap or flowstrates) you need to create a view configuration file (a .jfmv file). You can find a few examples of them in the 'viewconf' folder of the demo. They are simple text files, readable and easy to change. Here is an example: 
 
@@ -25,8 +24,8 @@ data.attrs.flow.weight.csvList= 1975,1976,1977,1978,1979,\
        1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,\
        2000,2001,2002,2003,2004,2005,2006,2007,2008,2009
 
-map=xml
-map.xml.src=data/maps/countries-areas-ll.xml.gz
+map=shapefile
+map.shapefile.src=data/shapefiles/world.shp.gz
 map.projection=Mercator
 }}}
 
