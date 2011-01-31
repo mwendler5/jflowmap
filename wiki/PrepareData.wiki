@@ -3,7 +3,7 @@
 
 = How to prepare data for JFlowMap =
 
-To load a dataset in a specific view (flowmap or flowstrates) you need to create a view configuration file (a .jfmv file). You can find a few examples of them in the 'viewconf' folder of the demo. They are simple text files, here is an example: 
+To load a dataset in a specific view (flowmap or flowstrates) you need to create a view configuration file (a .jfmv file) which you can then use for running your visualization both as a desktop app or as an applet. You can find a few examples of them in the 'viewconf' folder of the demo. They are simple text files, here is an example: 
 
 {{{
 view=flowstrates
@@ -30,6 +30,6 @@ map.projection=Mercator
 }}}
 
 
-The nodes (countries, in this case) are in 'data/refugee-nodes.csv.gz', the flows - in 'data/refugee-flows.csv.gz'. If you unzip the .csv.gz files, you'll see how they are organized, so that you can prepare your data as CSV in the same way. Then you can run the application as described in the README file.
+The nodes (countries, in this case) are in 'data/refugee-nodes.csv', the flows - in 'data/refugee-flows.csv'. If you unzip the .csv.gz files, you'll see how they are organized, so that you can prepare your data as CSV in the same way. Then you can run the application as described in the README file.
 
 Otherwise, if you have an interesting OD-dataset and need help visualizing it, just [mailto:ilya.boyandin@unifr.ch send me an email].
