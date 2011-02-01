@@ -1,4 +1,5 @@
 #summary How to prepare data for visualizing in JFlowMap.
+#labels Featured
 
 = How to prepare data for JFlowMap =
 
