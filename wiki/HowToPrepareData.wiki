@@ -29,8 +29,6 @@ map.shapefile.src=data/shapefiles/world.shp
 map.projection=Mercator
 }}}
 
-You can find more examples of the config files in the 'viewconf' folder of the demo package.
-
 The nodes (countries, in this case) are in 'data/refugee-nodes.csv', the flows - in 'data/refugee-flows.csv'. Here is how the nodes CSV file is structured:
 
 {{{
@@ -64,6 +62,8 @@ After you make the CSV files and the .jfmv file, you can run the application as 
 java -jar jflowmap.jar my.jfmv  
 }}}
 
+
+You can find more examples of the config files in the 'viewconf' folder of the demo package.
 ----
 
 If you have an interesting OD-dataset and need help visualizing it, just [mailto:ilya.boyandin@unifr.ch send me an email].
