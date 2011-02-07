@@ -77,7 +77,7 @@ var deployApp = function(viewconf) {
 };
 </script>
 </head>
-<body style="overflow:hidden; padding:0px 0px;margin:0px 0px">
+<body style="overflow:hidden; padding:0px 0px; margin:0px 0px">
   <script type="text/javascript">deployApp('my.jfmv');</script>
 </body>
 </html>
