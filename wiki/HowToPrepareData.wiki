@@ -59,7 +59,7 @@ URY,ARG,570,1050,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,1,1,1,,
 
 So the most important thing in a .jfvm file is specifying which columns of the CSV files represent the node ids, labels, coordinates and the flow weights.
 
-As soon as you have a .jfmv file you can run the application:
+As soon as you have a .jfmv file you can run jflowmap as a desktop application:
 {{{
 java -jar jflowmap.jar my.jfmv  
 }}}
@@ -80,7 +80,6 @@ var deployApp = function(viewconf) {
 <body style="overflow:hidden; padding:0px 0px;margin:0px 0px">
   <script type="text/javascript">deployApp('my.jfmv');</script>
 </body>
-
 </html>
 }}}
 
