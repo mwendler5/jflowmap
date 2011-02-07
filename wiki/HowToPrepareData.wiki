@@ -29,6 +29,9 @@ map.shapefile.src=data/shapefiles/world.shp
 map.projection=Mercator
 }}}
 
+
+The most important thing here is specifying which columns of the CSV files represent the node ids, labels, coordinates and the flow weights.
+
 The nodes (countries, in this case) are in 'data/refugee-nodes.csv', the flows - in 'data/refugee-flows.csv'. Here is how the nodes CSV file is structured:
 
 {{{
@@ -56,8 +59,6 @@ IRQ,HUN,,,,,,,,,,,,,,,,,,,11,17,,,,,,201,258,700,938,1294,1252,1235,1272,1243,11
 URY,ARG,570,1050,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,1,1,1,,
 ...
 }}}
-
-So the most important thing in a .jfvm file is specifying which columns of the CSV files represent the node ids, labels, coordinates and the flow weights.
 
 As soon as you have a .jfmv file you can run jflowmap as a desktop application:
 {{{
