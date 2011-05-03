@@ -60,6 +60,8 @@ URY,ARG,570,1050,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,1,1,1,,
 ...
 }}}
 
+The maps currently support the following projections: None, Mercator, and WinkelTripel.
+
 If your shapefile is supplied with a DBF in which there is a field with the IDs of the geometries in the map, then you should specify the name of this field in the *map.shapefile.dbfAreaIdField* property in the .jfmv file. This way JFlowMap will be able to find in the shapefile the polygons corresponding to the nodes specified in the CSV file and colorize them, e.g. showing the total flow magnitudes when you select a column in the heatmap.
 
 
