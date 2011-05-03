@@ -26,6 +26,7 @@ data.attrs.flow.weight.csvList= 1975,1976,1977,1978,1979,\
 
 map=shapefile
 map.shapefile.src=data/shapefiles/world.shp
+map.shapefile.dbfAreaIdField=ISO_A3
 map.projection=Mercator
 }}}
 
@@ -58,6 +59,9 @@ IRQ,HUN,,,,,,,,,,,,,,,,,,,11,17,,,,,,201,258,700,938,1294,1252,1235,1272,1243,11
 URY,ARG,570,1050,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,1,1,1,,
 ...
 }}}
+
+If your shapefile is supplied with a DBF in which there is a field with the IDs of the geometries in the map, then you should specify the name of this field in the *map.shapefile.dbfAreaIdField* property in the .jfmv file. This way JFlowMap will be able to find in the shapefile the polygons corresponding to the nodes specified in the CSV file and colorize them, e.g. showing the total flow magnitudes when you select a column in the heatmap.
+
 
 As soon as you have a .jfmv file you can run jflowmap as a desktop application:
 {{{
