@@ -59,7 +59,7 @@
 <td>Name of the node attribute with the node ids.</td>
 <td></td>
 </tr>
-<
+
 <tr>
 <td>*data.attrs.node.label*</td>
 <td>Name of the node attribute with the node labels.</td>
