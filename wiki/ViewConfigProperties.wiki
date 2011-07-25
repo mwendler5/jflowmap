@@ -17,6 +17,20 @@
 </tr>
 
 
+<tr>
+<td>*view.flowstrates.messages.originsMapCaption*</td>
+<td>Origins map caption text.</td>
+<td>default: Origins</td>
+</tr>
+<tr>
+<td>*view.flowstrates.messages.destsMapCaption*</td>
+<td>Destinations map caption text.</td>
+<td>default: Destinations</td>
+</tr>
+
+
+
+
 
 <tr>
 <td>*data*</td>
@@ -192,6 +206,8 @@
 <td>Which tabs of the settings window to show when the app starts (the others will be hidden).</td>
 <td>Comma-separated list of the tab titles.</td>
 </tr>
+
+
 
 
 
