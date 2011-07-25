@@ -19,7 +19,32 @@
 <tr><td>*window.settings.activeTab*</td><td>Which tab of the settings window to activate when the app starts.</td><td>e.g. Filter, Aesthetics, Animation</td></tr>
 
 
-<tr><td>*window.settings.showTabs*</td><td>Which tabs of the settings window to show when the app starts (the others will be hidden).</td><td>Comma-separated list of the tab titles.</td></tr>
+<tr>
+<td>*window.settings.showTabs*</td>
+<td>Which tabs of the settings window to show when the app starts (the others will be hidden).</td>
+<td>Comma-separated list of the tab titles.</td>
+</tr>
+
+
+
+<tr>
+<td>*data*</td>
+<td>Input data format.</td>
+<td>csv, graphml</td>
+</tr>
+
+
+<tr>
+<td>*data.csv.separator*</td>
+<td>CSV field separator character.</td>
+<td>, or ;</td>
+</tr>
+<tr>
+<td>*data.csv.charset*</td>
+<td>CSV file encoding.</td>
+<td>e.g. utf-8 or windows-1252</td>
+</tr>
+
 
 
 
