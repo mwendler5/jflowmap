@@ -1,4 +1,4 @@
-#summary The full list of the view config (.jfmv) properties.
+#summary (Nearly) full list of the view config (.jfmv) properties.
 
 
 <table border="0" cellspacing="0" cellpadding="10">
