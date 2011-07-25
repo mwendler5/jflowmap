@@ -2,13 +2,12 @@
 
 
 <table border="0" cellspacing="0" cellpadding="10">
-<tr><th colspan="3">*General*</th></tr>
 
 <tr><td>*view*</td><td>The view in which the data is to be shown.</td><td>flowmap, flowmapSmallMultiple, flowstrates</td></tr>
 
 
 
-<tr><th colspan="3">*Window*</th></tr>
+
 
 <tr><td>*window.size*</td><td>The size of the view window will be set to the given dimensions.</td><td>e.g. 1024x768</td></tr>
 
@@ -19,9 +18,6 @@
 
 <tr><td>*window.settings.showTabs*</td><td>Which tabs of the settings window to show when the app starts (the others will be hidden).</td><td>Comma-separated list of the tab titles.</td></tr>
 
-<tr><th colspan="3">*Data*</th></tr>
-<tr><th colspan="3">*Map*</th></tr>
 
-<tr><th colspan="3">*Flowstrates*</th></tr>
 
 </table>
