@@ -3,6 +3,9 @@
 
 <table border="0" cellspacing="0" cellpadding="10">
 
+<tr>
+<th>Property</th><th>Description</th><th>Supported values</th>
+</tr>
 <tr><td>*view*</td><td>The view in which the data is to be shown.</td><td>flowmap, flowmapSmallMultiple, flowstrates</td></tr>
 
 
