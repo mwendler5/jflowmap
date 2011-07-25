@@ -10,19 +10,10 @@
 
 
 
-
-
-<tr><td>*window.size*</td><td>The size of the view window will be set to the given dimensions.</td><td>e.g. 1024x768</td></tr>
-
-<tr><td>*window.settings.show*</td><td>Show or hide the settings window when the app starts.</td><td>true or false</td></tr>
-
-<tr><td>*window.settings.activeTab*</td><td>Which tab of the settings window to activate when the app starts.</td><td>e.g. Filter, Aesthetics, Animation</td></tr>
-
-
 <tr>
-<td>*window.settings.showTabs*</td>
-<td>Which tabs of the settings window to show when the app starts (the others will be hidden).</td>
-<td>Comma-separated list of the tab titles.</td>
+<td>*view.flowmap.colorScheme*</td>
+<td>Color scheme for the flow map view.</td>
+<td>Dark, Light, Light Blue, Inverted, Gray red-green</td>
 </tr>
 
 
@@ -31,31 +22,6 @@
 <td>*data*</td>
 <td>Input data format.</td>
 <td>csv, graphml</td>
-</tr>
-
-<tr>
-<td>*data.select.nodes.where*</td>
-<td>Filter criteria for nodes (an SQL-like WHERE clause).</td>
-<td>Select only European countries: {{{([region]='Europe')}}}</td>
-</tr>
-
-<tr>
-<td>*data.select.flows.where*</td>
-<td>Filter criteria for flows.</td>
-<td>Remove self-loops: {{{([source] != [target])}}}</td>
-</tr>
-
-<tr>
-<td>*data.select.flows.where.exists*</td>
-<td>Filter criteria for flows which must be satisfied for *at least one* flow weight attribute. #weightAttr# can be used as a placeholder for the weight attributes.</td>
-<td>Select only flows which have at least one attribute of the value greater than 100: 
-{{{ (NOT ISNAN([#weightAttr#])) AND ([#weightAttr#] > 100) }}}
-</td>
-</tr>
-<tr>
-<td>*data.select.flows.where.forAll*</td>
-<td>Filter criteria for flows which must be satisfied for *all* the flow weight attributes. #weightAttr# can be used as a placeholder for the weight attributes.</td>
-<td></td>
 </tr>
 
 <tr>
@@ -79,6 +45,153 @@
 <td></td>
 </tr>
 
+
+<tr>
+<td>*data.graphml.src*</td>
+<td>Location of the GraphML file with the flows.</td>
+<td></td>
+</tr>
+
+
+
+<tr>
+<td>*data.attrs.node.id*</td>
+<td>Name of the node attribute with the node ids.</td>
+<td></td>
+</tr>
+<
+<tr>
+<td>*data.attrs.node.label*</td>
+<td>Name of the node attribute with the node labels.</td>
+<td></td>
+</tr>
+
+<tr>
+<td>*data.attrs.node.lat*</td>
+<td>Name of the node attribute with the node latitudes.</td>
+<td></td>
+</tr>
+
+<tr>
+<td>*data.attrs.node.lon*</td>
+<td>Name of the node attribute with the node longitudes.</td>
+<td></td>
+</tr>
+
+<tr>
+<td>*data.attrs.flow.origin*</td>
+<td>Name of the flow attribute with the flow origins (the values must correspond to the node ids).</td>
+<td></td>
+</tr>
+
+<tr>
+<td>*data.attrs.flow.dest*</td>
+<td>Name of the flow attribute with the flow destinations (the values must correspond to the node ids).</td>
+<td></td>
+</tr>
+<tr>
+<td>*data.attrs.flow.weight.csvList*</td>
+<td>Comma-separated list of flow attributes to be used as flow weight attributes.</td>
+<td>1975,1976,1977,1978,1979</td>
+</tr>
+<tr>
+<td>*data.attrs.flow.weight.re*</td>
+<td>Regular expression for matching the flow attributes to be used as flow weight attributes (this is an alternative to data.attrs.flow.weight.csvList).</td>
+<td>Match all four-digit years: {{{[0-9]{4}}}}</td>
+</tr>
+
+
+
+
+<tr>
+<td>*data.select.nodes.where*</td>
+<td>Filter criteria for nodes (like a WHERE clause in SQL).</td>
+<td>Select only countries in Europe: {{{([region]='Europe')}}}</td>
+</tr>
+
+<tr>
+<td>*data.select.flows.where*</td>
+<td>Filter criteria for flows.</td>
+<td>Remove self-loops: {{{([source]!=[target])}}}</td>
+</tr>
+
+<tr>
+<td>*data.select.flows.where.exists*</td>
+<td>Filter criteria for flows which must be satisfied for *at least one* flow weight attribute. #weightAttr# can be used as a placeholder for the weight attributes.</td>
+<td>Select only flows which have at least one attribute of the value greater than 100: 
+{{{ (NOT ISNAN([#weightAttr#])) AND ([#weightAttr#] > 100) }}}
+</td>
+</tr>
+<tr>
+<td>*data.select.flows.where.forAll*</td>
+<td>Filter criteria for flows which must be satisfied for *all* the flow weight attributes. #weightAttr# can be used as a placeholder for the weight attributes.</td>
+<td></td>
+</tr>
+
+
+
+<tr>
+<td>*map*</td>
+<td>Type of the map to use.</td>
+<td>shapefile, xml</td>
+</tr>
+
+
+
+<tr>
+<td>*map.shapefile.src*</td>
+<td>Location of the map shapefile.</td>
+<td></td>
+</tr>
+
+
+<tr>
+<td>*map.shapefile.dbf.areaIdField*</td>
+<td>Name of the DBF field with the IDs of the areas (to let JFlowMap to relate the polygons in the map to their corresponding nodes).</td>
+<td></td>
+</tr>
+
+
+<tr>
+<td>*map.projection*</td>
+<td>Projection to use for the nodes and map shapes.</td>
+<td>None, FlipY, Mercator, WinkelTripel</td>
+</tr>
+
+
+<tr>
+<td>*map.background.src*</td>
+<td>Location of an image (PNG, JPG, GIF etc) to use as a background map. The image will be used as is, not projected. </td>
+<td></td>
+</tr>
+
+<tr>
+<td>*map.background.boundingBox*</td>
+<td>Bounding box (in the projected coordinates) of the background map image.</td>
+<td>7.303,-29.761,2.129,1.541</td>
+</tr>
+
+<tr>
+<td>*map.background.transparency*</td>
+<td>Transparency of the background map image.</td>
+<td>a value from 0.0 to 1.0</td>
+</tr>
+
+
+
+
+<tr><td>*window.size*</td><td>The size of the view window will be set to the given dimensions.</td><td>e.g. 1024x768</td></tr>
+
+<tr><td>*window.settings.show*</td><td>Show or hide the settings window when the app starts.</td><td>true or false</td></tr>
+
+<tr><td>*window.settings.activeTab*</td><td>Which tab of the settings window to activate when the app starts.</td><td>e.g. Filter, Aesthetics, Animation</td></tr>
+
+
+<tr>
+<td>*window.settings.showTabs*</td>
+<td>Which tabs of the settings window to show when the app starts (the others will be hidden).</td>
+<td>Comma-separated list of the tab titles.</td>
+</tr>
 
 
 
