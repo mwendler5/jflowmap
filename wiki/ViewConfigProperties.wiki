@@ -117,14 +117,14 @@
 
 <tr>
 <td>*data.select.flows.where.exists*</td>
-<td>Filter criteria for flows which must be satisfied for *at least one* flow weight attribute. #weightAttr# can be used as a placeholder for the weight attributes.</td>
+<td>Filter criteria for flows which must be satisfied for *at least one* flow weight attribute in order for a flow to be accepted. #weightAttr# can be used as a placeholder for the weight attributes.</td>
 <td>Select only flows which have at least one attribute of the value greater than 100: 
 {{{ (NOT ISNAN([#weightAttr#])) AND ([#weightAttr#] > 100) }}}
 </td>
 </tr>
 <tr>
 <td>*data.select.flows.where.forAll*</td>
-<td>Filter criteria for flows which must be satisfied for *all* the flow weight attributes. #weightAttr# can be used as a placeholder for the weight attributes.</td>
+<td>Filter criteria for flows which must be satisfied for *all* the flow weight attributes in order for a flow to be accepted. #weightAttr# can be used as a placeholder for the weight attributes.</td>
 <td></td>
 </tr>
 
