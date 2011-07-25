@@ -4,7 +4,7 @@
 <table border="0" cellspacing="0" cellpadding="10">
 
 <tr>
-<th>Property</th><th>Description</th><th>Supported values</th>
+<th>Property</th><th>Description</th><th>Supported values / Sample use</th>
 </tr>
 <tr><td>*view*</td><td>The view in which the data is to be shown.</td><td>flowmap, flowmapSmallMultiple, flowstrates</td></tr>
 
@@ -35,25 +35,33 @@
 
 <tr>
 <td>*data.select.nodes.where*</td>
-<td></td>
-<td></td>
+<td>Filter criteria for nodes (an SQL-like WHERE clause).</td>
+<td>Select only European countries: {{{([region]='Europe')}}}</td>
+</tr>
+
+<tr>
+<td>*data.select.flows.where*</td>
+<td>Filter criteria for flows.</td>
+<td>Remove self-loops: {{{([source] != [target])}}}</td>
 </tr>
 
 <tr>
 <td>*data.select.flows.where.exists*</td>
-<td></td>
-<td></td>
+<td>Filter criteria for flows which must be satisfied for *at least one* flow weight attribute. #weightAttr# can be used as a placeholder for the weight attributes.</td>
+<td>Select only flows which have at least one attribute of the value greater than 100: 
+{{{ (NOT ISNAN([#weightAttr#])) AND ([#weightAttr#] > 100) }}}
+</td>
 </tr>
 <tr>
 <td>*data.select.flows.where.forAll*</td>
-<td></td>
+<td>Filter criteria for flows which must be satisfied for *all* the flow weight attributes. #weightAttr# can be used as a placeholder for the weight attributes.</td>
 <td></td>
 </tr>
 
 <tr>
 <td>*data.csv.separator*</td>
 <td>CSV field separator character.</td>
-<td>, or ;</td>
+<td>E.g. , or ;</td>
 </tr>
 <tr>
 <td>*data.csv.charset*</td>
