@@ -41,8 +41,18 @@
 </tr>
 <tr>
 <td>*data.csv.charset*</td>
-<td>CSV file encoding.</td>
+<td>CSV files encoding.</td>
 <td>e.g. utf-8 or windows-1252</td>
+</tr>
+<tr>
+<td>*data.csv.flows*</td>
+<td>Location of the CSV file with the flows.</td>
+<td></td>
+</tr>
+<tr>
+<td>*data.csv.nodes*</td>
+<td>Location of the CSV file with the nodes.</td>
+<td></td>
 </tr>
 
 
