@@ -212,7 +212,7 @@
 
 <tr>
 <td>*window.settings.embed*</td>
-<td>Whether the settings window should be embedded into the view.</td>
+<td>Whether the settings window should be embedded into the view as a panel.</td>
 <td>true or false</td>
 </tr>
 
