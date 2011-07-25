@@ -17,20 +17,6 @@
 </tr>
 
 
-<tr>
-<td>*view.flowstrates.messages.originsMapCaption*</td>
-<td>Origins map caption text.</td>
-<td>default: Origins</td>
-</tr>
-<tr>
-<td>*view.flowstrates.messages.destsMapCaption*</td>
-<td>Destinations map caption text.</td>
-<td>default: Destinations</td>
-</tr>
-
-
-
-
 
 <tr>
 <td>*data*</td>
@@ -189,6 +175,22 @@
 <td>*map.background.transparency*</td>
 <td>Transparency of the background map image.</td>
 <td>a value from 0.0 to 1.0</td>
+</tr>
+
+
+
+
+
+
+<tr>
+<td>*view.flowstrates.messages.originsMapCaption*</td>
+<td>Origins map caption text.</td>
+<td>default: Origins</td>
+</tr>
+<tr>
+<td>*view.flowstrates.messages.destsMapCaption*</td>
+<td>Destinations map caption text.</td>
+<td>default: Destinations</td>
 </tr>
 
 
