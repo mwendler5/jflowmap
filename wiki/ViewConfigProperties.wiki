@@ -33,6 +33,22 @@
 <td>csv, graphml</td>
 </tr>
 
+<tr>
+<td>*data.select.nodes.where*</td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<td>*data.select.flows.where.exists*</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>*data.select.flows.where.forAll*</td>
+<td></td>
+<td></td>
+</tr>
 
 <tr>
 <td>*data.csv.separator*</td>
@@ -45,12 +61,12 @@
 <td>e.g. utf-8 or windows-1252</td>
 </tr>
 <tr>
-<td>*data.csv.flows*</td>
+<td>*data.csv.flows.src*</td>
 <td>Location of the CSV file with the flows.</td>
 <td></td>
 </tr>
 <tr>
-<td>*data.csv.nodes*</td>
+<td>*data.csv.nodes.src*</td>
 <td>Location of the CSV file with the nodes.</td>
 <td></td>
 </tr>
