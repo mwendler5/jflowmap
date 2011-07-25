@@ -1,6 +1,6 @@
 #summary The full list of the view config (.jfmv) properties.
 
-= List of ViewConfig (.jfmv) Properties =
+= List of the View Config (.jfmv) Properties =
 
 <table border="1" cellspacing="0" cellpadding="10">
 <tr><th colspan="3">*General*</th></tr>
