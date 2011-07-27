@@ -155,7 +155,7 @@
 <tr>
 <td>*map.shapefile.dbf.select.shapes.where*</td>
 <td>Filter query for shapes based on the DBF field records' values. Only the shapes satisfying the query will be retained.</td>
-<td>Select only countries with of the population more than one million: {{{[POP_EST]>1000000.0}}}</td>
+<td>Select only countries of the population more than one million: {{{[POP_EST]>1000000.0}}}</td>
 </tr>
 
 
