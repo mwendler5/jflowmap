@@ -153,6 +153,13 @@
 
 
 <tr>
+<td>*map.shapefile.dbf.select.shapes.where*</td>
+<td>Filter query for shapes based on the DBF field records' values.</td>
+<td>Select only countries with of the population more than one million: {{{[POP_EST]>1000000.0}}}</td>
+</tr>
+
+
+<tr>
 <td>*map.projection*</td>
 <td>Projection to use for the nodes and map shapes.</td>
 <td>None, FlipY, Mercator, WinkelTripel</td>
