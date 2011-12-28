@@ -1,6 +1,9 @@
 #summary Visual exploration of temporal origin-destination data with  Flowstrates
 
 = Flowstrates =
+
+<a href="http://jflowmap.googlecode.com/svn/wiki/images/Sudan-to-Europe-stroke.png" title="Flowstrates: Refugees from Sudan in 1975-2009"><img src="http://jflowmap.googlecode.com/svn/wiki/images/flowstrates/Flowstrates3_x120.png"/></a> 
+
 Flowstrates is a new interactive visualization approach which extends the idea of a flow map (which represent magnitudes of the flows of entities between geographic locations) to the temporal dimension and allows to analyze the temporal changes of the flow magnitudes. In Flowstrates the origins and the destinations of the flows are displayed in two separate maps, and the changes over time of the flow magnitudes are visualized in a separate heatmap view in the middle.
 
 As in most flow maps, in Flowstrates we also do not show the exact flow paths (they are usually not even known in origin-destination datasets), therefore we can reroute the flow lines in any way. So we represent the temporal information in an
@@ -8,9 +11,6 @@ abstract view (a heatmap in which the columns correspond
 to different time periods) and draw the flow lines so that
 they connect the flow origins and destinations with the corresponding rows of the heatmap, as if the flows were going
 through it.
-
-<a href="http://jflowmap.googlecode.com/svn/wiki/images/Sudan-to-Europe-stroke.png" title="Flowstrates: Refugees from Sudan in 1975-2009"><img src="http://jflowmap.googlecode.com/svn/wiki/images/flowstrates/Flowstrates3_x120.png"/></a> 
-
 
 This allows the users to perform spatial visual queries, focusing on different regions of interest for the origins
 and destinations, and to analyze the changes over time provided with the means of flow ordering, filtering and aggregation in the heatmap.
@@ -35,6 +35,4 @@ implementation supports the following techniques:
 Here is a short video which can give you an impression of how Flowstrates can be used:
 
 <wiki:video url="http://www.youtube.com/watch?v=nij8OUyiaV0&hd=1" width="590" height="355" />
-
-
 
