@@ -12,8 +12,6 @@ to different time periods) and draw the flow lines so that
 they connect the flow origins and destinations with the corresponding rows of the heatmap, as if the flows were going
 through it.
 
-This allows the users to perform spatial visual queries, focusing on different regions of interest for the origins
-and destinations, and to analyze the changes over time provided with the means of flow ordering, filtering and aggregation in the heatmap.
 
 Flowstrates are meant for interactive exploration. Unlike
 [http://people.hofstra.edu/geotrans/eng/ch5en/meth5en/odmatrix.html OD-matrices] which represent exactly one flow in each
@@ -31,6 +29,9 @@ implementation supports the following techniques:
  * Zooming and panning
  * Heatmap row ordering
  * Heatmap row aggregation
+
+
+
 
 Here is a short video which can give you an impression of how Flowstrates can be used:
 
