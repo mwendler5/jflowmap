@@ -16,7 +16,7 @@ This allows the users to perform spatial visual queries, focusing on different r
 and destinations, and to analyze the changes over time provided with the means of flow ordering, filtering and aggregation in the heatmap.
 
 Flowstrates are meant for interactive exploration. Unlike
-OD-matrices which represent exactly one flow in each
+[http://people.hofstra.edu/geotrans/eng/ch5en/meth5en/odmatrix.html OD-matrices] which represent exactly one flow in each
 heatmap cell, in Flowstrates every flow takes the whole row
 of the heatmap. Thus, much more screen real estate is used
 to represent the same number of flows. Hence, for many
