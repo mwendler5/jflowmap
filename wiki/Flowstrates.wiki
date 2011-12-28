@@ -15,14 +15,26 @@ through it.
 This allows the users to perform spatial visual queries, focusing on different regions of interest for the origins
 and destinations, and to analyze the changes over time provided with the means of flow ordering, filtering and aggregation in the heatmap.
 
+Flowstrates are meant for interactive exploration. Unlike
+OD-matrices which represent exactly one flow in each
+heatmap cell, in Flowstrates every flow takes the whole row
+of the heatmap. Thus, much more screen real estate is used
+to represent the same number of flows. Hence, for many
+datasets it is impossible to display all the flows simultaneously
+without filtering or aggregating them. If we want the
+analysts to still be able to explore the data in every bit of
+detail, then we need to provide means of interaction for controlling
+filtering, zooming and aggregation. Currently, our
+implementation supports the following techniques:
+
+ * Visual querying and filtering
+ * Zooming and panning
+ * Heatmap row ordering
+ * Heatmap row aggregation
+
+Here is a short video which can give you an impression of how Flowstrates can be used:
 
 <wiki:video url="http://www.youtube.com/watch?v=nij8OUyiaV0&hd=1" width="590" height="355" />
 
 
 
-= Why maps? =
-Maps are well familiar to everybody. They
-allow to reason about the geographic patterns of the movement
-as no other representation by naturally providing answers
-to questions such as: “What is the spatial distribution
-of the locations?”, “How far are they from each other?”,
