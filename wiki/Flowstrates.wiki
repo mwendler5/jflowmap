@@ -2,9 +2,12 @@
 
 = Flowstrates =
 
-<a href="http://jflowmap.googlecode.com/svn/wiki/images/Sudan-to-Europe-stroke.png" title="Flowstrates: Refugees from Sudan in 1975-2009"><img src="http://jflowmap.googlecode.com/svn/wiki/images/flowstrates/Flowstrates3_x120.png"/></a> 
 
-Flowstrates is a novel interactive visualization approach which extends the idea of a [http://en.wikipedia.org/wiki/Flow_map flow map] (showing magnitudes of the flows of entities between geographic locations on a map) to the temporal dimension and allows to analyze the temporal changes of the flow magnitudes. In Flowstrates the origins and the destinations of the flows are displayed in two separate maps, and the changes over time of the flow magnitudes are visualized in a separate heatmap view in the middle.
+Flowstrates is a novel interactive visualization approach which extends the idea of a [http://en.wikipedia.org/wiki/Flow_map flow map] (used for representing magnitudes of flows of entities between geographic locations on a map) to the temporal dimension, thus, allowing to analyze how the flow magnitudes change over time. 
+In Flowstrates the origins and the destinations of the flows are displayed in two separate maps, and the temporal changes of the flow magnitudes are visualized in a separate heatmap view in the middle.
+
+
+<a href="http://jflowmap.googlecode.com/svn/wiki/images/Sudan-to-Europe-stroke.png" title="Flowstrates: Refugees from Sudan in 1975-2009"><img src="http://jflowmap.googlecode.com/svn/wiki/images/flowstrates/Flowstrates3_x120.png"/></a> 
 
 As in most flow maps, in Flowstrates we also do not show the exact flow paths (they are usually not even known in origin-destination datasets), therefore we can reroute the flow lines in any way. So we represent the temporal information in an
 abstract view (a heatmap in which the columns correspond
@@ -16,20 +19,13 @@ through it.
 Flowstrates are meant for interactive exploration. Unlike
 [http://people.hofstra.edu/geotrans/eng/ch5en/meth5en/odmatrix.html OD-matrices] which represent exactly one flow in each
 matrix cell, in Flowstrates every flow takes the whole row
-of the heatmap. Thus, much more screen real estate is used
-to represent the same number of flows. Hence, for many
-datasets it is impossible to display all the flows simultaneously
-without filtering or aggregating them. If we want the
-analysts to still be able to explore the data in every bit of
-detail, then we need to provide means of interaction. Currently, our
-implementation supports the following interaction techniques:
-
- * Visual querying and filtering
- * Zooming and panning
- * Heatmap row ordering
- * Heatmap row aggregation
-
-
+of the heatmap for showing how the flow changed over time. Hence, much more screen real estate is used
+to represent the same number of flows, and for many
+datasets it is impossible to display all the flows simultaneously on the screen 
+without filtering or aggregating them. 
+Therefore, to allow the users to explore the whole data in every bit of
+detail Flowstrates provide interactive support for performing spatial visual queries, focusing on different regions of interest for the origins
+and destinations, sorting and aggregating the heatmap rows.
 
 
 Here is a short video which can give you an impression of how Flowstrates can be used:
