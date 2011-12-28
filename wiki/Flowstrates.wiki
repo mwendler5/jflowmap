@@ -1,4 +1,4 @@
-#summary Visual exploration of temporal origin-destination data with  Flowstrates
+#summary Flowstrates: An Approach for visual exploration of temporal origin-destination data
 
 = Flowstrates =
 
@@ -35,4 +35,3 @@ implementation supports the following techniques:
 Here is a short video which can give you an impression of how Flowstrates can be used:
 
 <wiki:video url="http://www.youtube.com/watch?v=nij8OUyiaV0&hd=1" width="590" height="355" />
-
