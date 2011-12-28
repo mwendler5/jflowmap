@@ -3,8 +3,8 @@
 = Flowstrates =
 
 
-Flowstrates is a novel interactive visualization approach which extends the idea of a [http://en.wikipedia.org/wiki/Flow_map flow map] (used for representing magnitudes of flows of entities between geographic locations on a map) to the temporal dimension, thus, allowing to analyze how the flow magnitudes change over time. 
-In Flowstrates the origins and the destinations of the flows are displayed in two separate maps, and the temporal changes of the flow magnitudes are visualized in a heatmap view placed between the two maps.
+Flowstrates is a novel interactive visualization approach which extends the idea of a [http://en.wikipedia.org/wiki/Flow_map flow map] (used for representing magnitudes of flows of entities between geographic locations on a map) to the temporal dimension allowing to analyze how the flow magnitudes change over time. 
+In Flowstrates the origins and the destinations of the flows are displayed in two separate maps, and the temporal changes of the flow magnitudes are visualized in a heatmap view displayed between the two maps.
 
 
 <a href="http://jflowmap.googlecode.com/svn/wiki/images/Sudan-to-Europe-stroke.png" title="Flowstrates: Refugees from Sudan in 1975-2009"><img src="http://jflowmap.googlecode.com/svn/wiki/images/flowstrates/Flowstrates3_x120.png"/></a> 
