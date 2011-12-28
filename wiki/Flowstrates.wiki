@@ -15,7 +15,7 @@ through it.
 
 Flowstrates are meant for interactive exploration. Unlike
 [http://people.hofstra.edu/geotrans/eng/ch5en/meth5en/odmatrix.html OD-matrices] which represent exactly one flow in each
-heatmap cell, in Flowstrates every flow takes the whole row
+matrix cell, in Flowstrates every flow takes the whole row
 of the heatmap. Thus, much more screen real estate is used
 to represent the same number of flows. Hence, for many
 datasets it is impossible to display all the flows simultaneously
