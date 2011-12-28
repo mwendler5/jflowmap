@@ -12,6 +12,7 @@ In Flowstrates the origins and the destinations of the flows are displayed in tw
 As in most flow maps which concentrate on showing the flow magnitudes, the exact routes of the flows are not accurately represented in Flowstrates. Instead, the flow lines are rerouted so that
 they connect the flow origins and destinations with the corresponding rows of the heatmap, as if the flows were going
 through it.
+With the links we can clearly see where the origins and the destinations of the flows represented in the heatmap are on the geographic maps.
 
 
 Flowstrates are meant for interactive exploration. Unlike
