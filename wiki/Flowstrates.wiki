@@ -21,9 +21,8 @@ to represent the same number of flows. Hence, for many
 datasets it is impossible to display all the flows simultaneously
 without filtering or aggregating them. If we want the
 analysts to still be able to explore the data in every bit of
-detail, then we need to provide means of interaction for controlling
-filtering, zooming and aggregation. Currently, our
-implementation supports the following techniques:
+detail, then we need to provide means of interaction. Currently, our
+implementation supports the following interaction techniques:
 
  * Visual querying and filtering
  * Zooming and panning
