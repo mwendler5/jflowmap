@@ -31,3 +31,5 @@ and destinations, sorting and aggregating the heatmap rows.
 Here is a short video which can give you an impression of how Flowstrates can be used:
 
 <wiki:video url="http://www.youtube.com/watch?v=nij8OUyiaV0&hd=1" width="590" height="355" />
+
+Try out a [http://jflowmap.googlecode.com/svn/trunk/JFlowMap/demo/demo-applets.html?refugees-flowstrates demo of Flowstrates] representing refugee flows between the world's countries.
