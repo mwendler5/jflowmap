@@ -1,6 +1,6 @@
 #summary An approach for visual exploration of temporal origin-destination data
 
-Flowstrates is a novel interactive visualization approach which extends the idea of a [http://en.wikipedia.org/wiki/Flow_map flow map] (used for representing magnitudes of flows of entities between geographic locations on a map) to the temporal dimension allowing to analyze how the flow magnitudes change over time. 
+Flowstrates extend the idea of a [http://en.wikipedia.org/wiki/Flow_map flow map] (used for representing magnitudes of flows of entities between geographic locations on a map) to the temporal dimension allowing to analyze how the flow magnitudes change over time. 
 In Flowstrates the origins and the destinations of the flows are displayed in two separate maps, and the temporal changes of the flow magnitudes are visualized in a heatmap view displayed between the two maps.
 
 
