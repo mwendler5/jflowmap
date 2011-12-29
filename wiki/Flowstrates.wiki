@@ -1,4 +1,4 @@
-#summary An Approach for visual exploration of temporal origin-destination data
+#summary An approach for visual exploration of temporal origin-destination data
 
 = Flowstrates =
 
