@@ -13,7 +13,7 @@ The flow lines help to see in the geographic maps the  origins and the destinati
 
 Flowstrates are meant for interactive exploration. Unlike
 [http://people.hofstra.edu/geotrans/eng/ch5en/meth5en/odmatrix.html OD-matrices] which represent exactly one flow in each
-matrix cell, in Flowstrates every flow takes the whole row
+matrix cell, in Flowstrates every flow occupies one whole row
 of the heatmap for showing how the flow changed over time. Hence, much more screen real estate is used
 to represent the same number of flows, and for many
 datasets it is impossible to display all the flows simultaneously on the screen 
