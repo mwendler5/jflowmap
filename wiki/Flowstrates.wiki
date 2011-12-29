@@ -20,7 +20,7 @@ datasets it is impossible to display all the flows simultaneously on the screen
 without filtering or aggregating them. 
 Therefore, to allow the users to explore the whole data in every bit of
 detail Flowstrates provide interactive support for performing spatial visual queries, focusing on different regions of interest for the origins
-and destinations, sorting and aggregating the heatmap rows.
+and destinations, zooming and panning, sorting and aggregating the heatmap rows.
 
 
 Here is a short video which can give you an impression of how Flowstrates can be used:
