@@ -1,6 +1,6 @@
 #summary An approach for visual exploration of temporal origin-destination data
 
-Flowstrates extend the idea of a [http://en.wikipedia.org/wiki/Flow_map flow map] (which are used for representing entities flowing between geographic locations) to the temporal dimension and allow to analyze how the flow magnitudes change over time. 
+Flowstrates extend the idea of a [http://en.wikipedia.org/wiki/Flow_map flow map] (which are used for representing entities flowing between geographic locations) to the temporal dimension and allow to analyze the changes of the flow magnitudes over time. 
 In Flowstrates the origins and the destinations of the flows are displayed in two separate maps, and the temporal changes of the flow magnitudes are displayed between the two maps in a heatmap in which the columns represent time periods.
 
 <a href="http://jflowmap.googlecode.com/svn/wiki/images/Sudan-to-Europe-stroke.png" title="Flowstrates: Refugees from Sudan in 1975-2009"><img src="http://jflowmap.googlecode.com/svn/wiki/images/flowstrates/Flowstrates3_x120.png"/></a> 
