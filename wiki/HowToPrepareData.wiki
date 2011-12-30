@@ -33,7 +33,7 @@ map.projection=Mercator
 
 The most important thing here is specifying the data attributes: i.e. which columns of the CSV files represent the node ids, labels, coordinates and the flow weights.
 
-The nodes (countries, in this case) are in 'data/refugee-nodes.csv', the flows - in 'data/refugee-flows.csv'. Here is how the nodes CSV file is structured:
+The nodes (countries, in this case) are in 'data/refugee-nodes.csv' (if your data is about world countries, you can use [http://code.google.com/p/jflowmap/source/browse/trunk/JFlowMap/demo/data/refugee-nodes.csv.gz this nodes file]), the flows - in 'data/refugee-flows.csv'. Here is how the nodes CSV file is structured:
 
 {{{
 Code,Name,Lat,Lon
