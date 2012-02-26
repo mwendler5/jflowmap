@@ -28,3 +28,5 @@ Here is a short video which can give you an impression of how Flowstrates can be
 <wiki:video url="http://www.youtube.com/watch?v=nij8OUyiaV0&hd=1" width="590" height="355" />
 
 Try out a [http://jflowmap.googlecode.com/svn/trunk/JFlowMap/demo/demo-applets.html?refugees-flowstrates demo of Flowstrates] representing refugee flows between the world's countries.
+
+You can also watch [http://youtu.be/UQPN7o6A3Cg?hd=1 the video of the Flowstrates demo]  or read our [http://onlinelibrary.wiley.com/doi/10.1111/j.1467-8659.2011.01946.x/full paper on Flowstrates] published in Computer Graphics Forum.
