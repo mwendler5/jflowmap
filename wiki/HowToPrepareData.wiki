@@ -63,7 +63,7 @@ map.projection=Mercator
 If you don't have a shapefile with a suitable map, you can simply omit the properties starting with "map.shapefile".
 
 
-_Here you can see all the files for this [http://code.google.com/p/jflowmap/source/browse/trunk/JFlowMap/demo/minimal-config-example/ minimal JFlowMap config example]._
+_Here you can find all the files which we need for this [http://code.google.com/p/jflowmap/source/browse/trunk/JFlowMap/demo/minimal-config-example/ minimal JFlowMap config example] to work._
 
 
 
