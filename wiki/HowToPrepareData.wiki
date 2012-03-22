@@ -4,6 +4,9 @@
 
 _For a full list of the view config properties refer to ViewConfigProperties._
 
+_There is also a [http://code.google.com/p/jflowmap/source/browse/#svn%2Ftrunk%2FJFlowMap%2Fdemo%2Fminimal-config-example minimalistic config example]._
+
+
 To load a dataset in a specific view (flowmap or flowstrates) you need to create a view configuration file (a .jfmv file) which you can then use to open the visualization both as a desktop app or as an applet. The .jfmv config files are simple text files, here is an example: 
 
 {{{
