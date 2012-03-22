@@ -7,7 +7,7 @@ _For a full list of the view config properties refer to ViewConfigProperties._
 
 == Minimal configuration example ==
 
-To load a dataset in a specific view (flowmap or flowstrates) you need to create a view configuration file (a .jfmv file) which you can then use to open the visualization both as a desktop app or as an applet. 
+To load a dataset in a specific view (flowmap or flowstrates) you need to create a view configuration file (a .jfmv file) which you can then use to open the visualization both in the desktop app version or as an applet. 
 
 So we'll need two [http://en.wikipedia.org/wiki/Comma-separated_values CSV files] with the data: nodes.csv and flows.csv, a shapefile with the map, and a config file flowmap-config.jfmv.
 
