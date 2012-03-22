@@ -4,10 +4,74 @@
 
 _For a full list of the view config properties refer to ViewConfigProperties._
 
-_There is also a [http://code.google.com/p/jflowmap/source/browse/#svn%2Ftrunk%2FJFlowMap%2Fdemo%2Fminimal-config-example minimal JFlowMap config example]._
+
+== Minimal configuration example ==
+
+To load a dataset in a specific view (flowmap or flowstrates) you need to create a view configuration file (a .jfmv file) which you can then use to open the visualization both as a desktop app or as an applet. 
+
+So we'll need two [http://en.wikipedia.org/wiki/Comma-separated_values CSV files] with the data: nodes.csv and flows.csv, a shapefile with the map, and a config file flowmap-config.jfmv.
+
+Here's the content of nodes.csv:
+{{{
+Code,Name,Lat,Lon
+SDN,Sudan,13.197363,30.439371
+ARE,Emirates,24.154436,54.363366
+DEU,Germany,51.77387,10.574742
+ECU,Ecuador,-1.147179,-78.247751
+UGA,Uganda,1.324938,32.233743
+GBR,United Kingdom,52.597352,-1.534873
+IRN,Iran,32.673635,53.738655
+JPN,Japan,35.992619,137.776432
+}}}
 
 
-To load a dataset in a specific view (flowmap or flowstrates) you need to create a view configuration file (a .jfmv file) which you can then use to open the visualization both as a desktop app or as an applet. The .jfmv config files are simple text files, here is an example: 
+Here's flows.csv in which we refer to the nodes by their "Code":
+{{{
+Origin,Dest,Refugees in 2009
+SDN,ARE,15
+DEU,ECU,1
+UGA,GBR,1601
+IRN,JPN,31
+}}}
+
+And here is the config file which puts it all together: 
+
+{{{
+view=flowmap
+
+data=csv
+data.csv.nodes.src=nodes.csv
+data.csv.flows.src=flows.csv
+
+
+data.attrs.node.id=Code
+data.attrs.node.label=Name
+data.attrs.node.lat=Lat
+data.attrs.node.lon=Lon
+data.attrs.flow.origin=Origin
+data.attrs.flow.dest=Dest
+
+data.attrs.flow.weight.csvList=Refugees in 2009
+
+
+map=shapefile
+map.shapefile.src=countries.shp
+map.projection=Mercator
+}}}
+
+
+If you don't have a shapefile with a suitable map, you can simply omit the properties starting with "map".
+
+
+_Here you can see all the files for this [http://code.google.com/p/jflowmap/source/browse/trunk/JFlowMap/demo/minimal-config-example/ minimal JFlowMap config example]._
+
+
+
+
+
+
+== More sophisticated example ==
+Here we have more flow weight attributes which represent changes over time of the flow magnitudes:
 
 {{{
 view=flowstrates
