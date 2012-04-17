@@ -160,6 +160,3 @@ var deployApp = function(viewconf) {
 }}}
 
 You can find more examples of the config files in the 'viewconf' folder of the demo package.
-----
-
-If you have an interesting OD-dataset and need help visualizing it, just [mailto:ilya.boyandin@unifr.ch send me an email].
